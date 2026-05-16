@@ -1,49 +1,60 @@
 {
   "login": {
     "back": "Back",
-    "title": "Sign In",
-    "subtitle": "Welcome back! Please log in.",
-    "phoneLabel": "Username or Phone Number",
+    "title": "Welcome Back",
+    "subtitle": "Sign in to continue to Sajilo Sahayata.",
+    "phoneLabel": "Phone Number",
     "passwordLabel": "Password",
     "passwordPlaceholder": "Enter your password",
-    "remember": "Remember for 30 days",
+    "remember": "Remember me",
     "forgot": "Forgot password?",
-    "login": "Login",
+    "login": "Sign In",
+    "submitting": "Signing in...",
     "success": "Login successful!",
-    "failed": "Login failed. Please try again.",
+    "failed": "Login failed. Check phone or password.",
     "noAccount": "Don’t have an account?",
-    "register": "Register"
+    "register": "Create one now",
+    "hidePassword": "Hide password",
+    "showPassword": "Show password",
+    "invalidPhone": "Invalid phone number",
+    "shortPassword": "Password too short"
   },
   "register": {
-    "back": "Back",
-    "title": "Create an account",
-    "subtitle": "Welcome! Please enter your details",
+    "back": "Go back",
+    "title": "Create an Account",
+    "subtitle": "Join Sajilo Sahayata to report emergencies securely.",
     "name": "Full Name",
-    "namePlaceholder": "Your Name",
+    "namePlaceholder": "e.g. John Doe",
     "phone": "Phone Number",
     "password": "Password",
-    "passwordPlaceholder": "Minimum 8 characters",
+    "passwordPlaceholder": "Min. 8 characters",
     "confirmPassword": "Confirm Password",
     "confirmPasswordPlaceholder": "Re-enter password",
     "passwordNote": "Password must be at least 8 characters",
     "signup": "Sign Up",
-    "success": "Account created! Redirecting...",
+    "submitting": "Creating Account...",
+    "success": "Account created! Redirecting to login...",
     "haveAccount": "Already have an account?",
     "login": "Log in",
     "showPassword": "Show password",
     "hidePassword": "Hide password",
-    "genericError": "Something went wrong. Try again."
+    "genericError": "Something went wrong. Try again.",
+    "invalidName": "Please enter a valid full name (min 3 letters).",
+    "invalidPhone": "Please enter a valid 10-digit phone number.",
+    "shortPassword": "Password must be at least 8 characters.",
+    "passwordMismatch": "Passwords do not match.",
+    "detectingLocation": "Optimizing for your location...",
+    "locationDetected": "Location optimized!"
   },
-
   "otp": {
-  "title": "Phone number Verification",
-  "subtitle": "Enter the 6-digit code sent to your phone",
-  "verify": "Verify & Continue",
-  "invalid": "Invalid code. Please try again.",
-  "resendText": "Didn't receive the code?",
-  "resend": "Send again",
-  "back": "Go back"
-},
+    "title": "Phone number Verification",
+    "subtitle": "Enter the 6-digit code sent to your phone",
+    "verify": "Verify & Continue",
+    "invalid": "Invalid code. Please try again.",
+    "resendText": "Didn't receive the code?",
+    "resend": "Send again",
+    "back": "Go back"
+  },
   "forgotPassword": {
     "title": "Forgot Password",
     "subtitle": "Enter your phone number to receive an OTP",
@@ -62,7 +73,7 @@
     "All": "All",
     "latestReports": "Latest Reports"
   },
-   "Latest": "Latest",
+  "Latest": "Latest",
   "Oldest": "Oldest",
   "mapit": {
     "filterLabel": "Filter Incidents",
@@ -74,7 +85,9 @@
     "filterLabel": "Filter Incidents",
     "selectAll": "Select All",
     "clearAll": "Clear All",
-    "showPath": "Show Path"
+    "showPath": "Show Path",
+    "safeZones": "Safe Zones",
+    "call": "Call"
   },
   "incidentTypes": {
     "incident": "Incident",
@@ -89,30 +102,30 @@
     "relief": "Relief",
     "other": "Other"
   },
-  "fireAuthorities":{
-  "nearbyFireAuthorities": "Nearby Fire Authorities",
-  "call": "Call"
-},
-"policeAuthorities": {
-  "nearbyPoliceAuthorities": "Nearby Police Authorities",
-  "call": "Call"
-},
-"floodAuthorities": {
-  "nearbyFloodAuthorities": "Nearby Flood Relief",
-  "call": "Call"
-},
-"accidentAuthorities": {
-  "nearbyAccidentAuthorities": "Nearby Accident Response",
-  "call": "Call"
-},
-"landslideAuthorities": {
-  "nearbyLandslideAuthorities": "Nearby Landslide Rescue",
-  "call": "Call"
-},
-"otherAuthorities": {
-  "nearbyOtherAuthorities": "Other Emergency Services",
-  "call": "Call"
-},
+  "fireAuthorities": {
+    "nearbyFireAuthorities": "Nearby Fire Authorities",
+    "call": "Call"
+  },
+  "policeAuthorities": {
+    "nearbyPoliceAuthorities": "Nearby Police Authorities",
+    "call": "Call"
+  },
+  "floodAuthorities": {
+    "nearbyFloodAuthorities": "Nearby Flood Relief",
+    "call": "Call"
+  },
+  "accidentAuthorities": {
+    "nearbyAccidentAuthorities": "Nearby Accident Response",
+    "call": "Call"
+  },
+  "landslideAuthorities": {
+    "nearbyLandslideAuthorities": "Nearby Landslide Rescue",
+    "call": "Call"
+  },
+  "otherAuthorities": {
+    "nearbyOtherAuthorities": "Other Emergency Services",
+    "call": "Call"
+  },
   "selectEmergencyType": "Select Emergency Type",
   "emergency": {
     "fire": "Fire",
@@ -120,7 +133,13 @@
     "flood": "Flood",
     "accident": "Accident",
     "landslide": "Landslide",
-    "other": "Other"
+    "other": "Other",
+    "reportingQuery": "What type of emergency are you reporting in ",
+    "contacts": "Contacts",
+    "verifiedContactsFor": "Verified emergency contacts for",
+    "loadingContacts": "Loading contacts...",
+    "errorLoading": "Could not load contact information.",
+    "noContacts": "No contact information available for this department."
   },
   "navigation": {
     "home": "Home",
@@ -134,55 +153,82 @@
     "citizen": "Citizen",
     "tillotama": "Tillotama",
     "butwal": "Butwal",
-    "detectingLocalGovernment": "Detecting your local Government..."
-    
+    "detectingLocalGovernment": "Detecting your local Government...",
+    "detectingLocation": "Detecting location..."
   },
-   "alerts": {
+  "alerts": {
     "title": "Emergency Alerts"
   },
   "report": {
+    "title": "File a Report",
     "getLocation": "Get Location",
+    "location": "Location",
+    "refresh": "Refresh",
+    "locationFetching": "Securing GPS Signal...",
+    "locationSecured": "Location Secured",
+    "locationError": "Failed to retrieve location.",
+    "photo": "Visual Evidence",
+    "takePhoto": "Take Live Photo",
     "description": "Description",
-    "descriptionPlaceholder": "Describe the issue briefly...",
-    "selectAuthority": "Select Related Authority",
+    "descriptionPlaceholder": "Provide specific details...",
+    "selectAuthority": "Select Incident Type",
     "selectOption": "Choose a type",
-    "submit": "Submit Report",
-    "submitting": "Submitting",
-    "success": "Report submitted successfully!",
+    "submit": "Submit",
+    "submitting": "Submitting...",
+    "success": "Report Submitted!",
+    "queuedTitle": "Saved Offline",
+    "queuedMessage": "Your report has been saved and will be submitted automatically when you're back online.",
+    "backHome": "Return Home",
     "photoReady": "Photo ready",
     "useRealTimePhoto": "Please take a real-time photo using the camera.",
-     "locationRequired": "Location is required to submit a report.",
+    "locationRequired": "Location is required to submit a report.",
     "descriptionRequired": "Please provide a short description.",
-    "mediaRequired": "Please upload a valid image or video.",
+    "descriptionLength": "Description must be at least 10 characters.",
+    "mediaRequired": "A live photo is required. Gallery uploads are not allowed.",
+    "invalidFormat": "Please select an image file.",
     "tagRequired": "Please select an authority type.",
-    "submitFailed": "Something went wrong. Please try again later."
+    "invalidType": "Invalid type selected.",
+    "submitError": "Failed to submit report.",
+    "submitFailed": "Something went wrong. Please try again later.",
+    "errorTitle": "Submission Failed",
+    "cancel": "Cancel",
+    "retry": "Retry"
   },
-"profile": {
-  "title": "My Profile",
-  "back": "Back",
-  "phone": "Phone",
-  "email": "Email",
-  "gender": "Gender",
-  "citizenship": "Citizenship ID",
-  "address": "Address",
-  "language": "Language",
-  "fontSize": "Font Size",
-  "fontFamily": "Font Family",
-  "theme": "Theme",
-  "verification": "Verification",
-  "verified": "Verified",
-  "notVerified": "Not Verified",
-  "community": "Thank you for being a responsible citizen!"
+  "profile": {
+    "title": "My Profile",
+    "back": "Back",
+    "phone": "Phone",
+    "email": "Email",
+    "gender": "Gender",
+    "citizenship": "Citizenship ID",
+    "address": "Address",
+    "language": "Language",
+    "fontSize": "Font Size",
+    "fontFamily": "Font Family",
+    "theme": "Theme",
+    "pushNotifications": "Push Notifications",
+    "appPreferences": "App Preferences",
+    "verification": "Verification",
+    "verified": "Verified",
+    "notVerified": "Not Verified",
+    "community": "Thank you for being a responsible citizen!",
+    "guest": "Guest",
+    "notLoggedIn": "Not logged in",
+    "detectingLocation": "Detecting location...",
+    "editProfile": "Edit Profile",
+    "cancel": "Cancel",
+    "save": "Save",
+    "personalInfo": "Personal Information",
+    "appPreferences": "App Preferences",
+    "noProfileInfo": "No profile information added yet.",
+    "addDetails": "+ Add your details",
+    "adminDashboard": "Admin Dashboard"
   },
-
   "auth": {
-  "logout": "Logout",
-  "tagline": "From alert to action - Instantly",
-  "login": "Login",
-  "register": "Register"
+    "back": "Go back",
+    "logout": "Logout",
+    "tagline": "From alert to action — Instantly",
+    "login": "Login",
+    "register": "Create an account"
   }
-
-
-
-
 }

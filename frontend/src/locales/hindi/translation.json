@@ -1,0 +1,199 @@
+{
+    "login": {
+        "back": "वापस",
+        "title": "साइन इन करें",
+        "subtitle": "वापसी पर स्वागत है! कृपया लॉग इन करें।",
+        "phoneLabel": "उपयोगकर्ता नाम या फ़ोन नंबर",
+        "passwordLabel": "पासवर्ड",
+        "passwordPlaceholder": "अपना पासवर्ड दर्ज करें",
+        "remember": "30 दिनों के लिए याद रखें",
+        "forgot": "पासवर्ड भूल गए?",
+        "login": "लॉग इन",
+        "success": "लॉगिन सफल रहा!",
+        "failed": "लॉगिन विफल। कृपया पुनः प्रयास करें।",
+        "noAccount": "खाता नहीं है?",
+        "register": "पंजीकरण करें"
+    },
+    "register": {
+        "back": "वापस",
+        "title": "खाता बनाएँ",
+        "subtitle": "स्वागत है! कृपया अपना विवरण दर्ज करें",
+        "name": "पूरा नाम",
+        "namePlaceholder": "आपका नाम",
+        "phone": "फ़ोन नंबर",
+        "password": "पासवर्ड",
+        "passwordPlaceholder": "कम से कम 8 अक्षर",
+        "confirmPassword": "पासवर्ड की पुष्टि करें",
+        "confirmPasswordPlaceholder": "पासवर्ड फिर से दर्ज करें",
+        "passwordNote": "पासवर्ड कम से कम 8 अक्षर का होना चाहिए",
+        "signup": "साइन अप करें",
+        "success": "खाता बन गया! पुनर्निर्देशित किया जा रहा है...",
+        "haveAccount": "पहले से खाता है?",
+        "login": "लॉग इन करें",
+        "showPassword": "पासवर्ड दिखाएँ",
+        "hidePassword": "पासवर्ड छिपाएँ",
+        "genericError": "कुछ गड़बड़ हो गई। पुनः प्रयास करें।"
+    },
+    "otp": {
+        "title": "फ़ोन नंबर सत्यापन",
+        "subtitle": "अपने फ़ोन पर भेजा गया 6-अंकीय कोड दर्ज करें",
+        "verify": "सत्यापित करें और जारी रखें",
+        "invalid": "अमान्य कोड। कृपया पुनः प्रयास करें।",
+        "resendText": "कोड प्राप्त नहीं हुआ?",
+        "resend": "पुनः भेजें",
+        "back": "वापस जाएँ"
+    },
+    "forgotPassword": {
+        "title": "पासवर्ड भूल गए",
+        "subtitle": "OTP प्राप्त करने के लिए अपना फ़ोन नंबर दर्ज करें",
+        "back": "वापस जाएँ",
+        "phoneLabel": "फ़ोन नंबर",
+        "phonePlaceholder": "9800000000",
+        "sendOtpButton": "OTP भेजें"
+    },
+    "dashboard": {
+        "recentIncidents": "हाल की घटनाएँ",
+        "sahayatacall": "सहायता कॉल",
+        "Verified": "सत्यापित",
+        "Working": "कार्यरत",
+        "Solved": "हल हो गया",
+        "Pending": "लंबित",
+        "All": "सभी",
+        "latestReports": "नवीनतम रिपोर्टें"
+    },
+    "Latest": "नवीनतम",
+    "Oldest": "सबसे पुराना",
+    "mapit": {
+        "filterLabel": "घटनाएँ फ़िल्टर करें",
+        "selectAll": "सभी प्रकार"
+    },
+    "map": {
+        "title": "आपदा मानचित्र",
+        "youAreHere": "आप यहाँ हैं",
+        "filterLabel": "घटनाएँ फ़िल्टर करें",
+        "selectAll": "सभी चुनें",
+        "clearAll": "सभी साफ़ करें",
+        "showPath": "रास्ता दिखाएँ"
+    },
+    "incidentTypes": {
+        "incident": "घटना",
+        "complaint": "शिकायत",
+        "suggestion": "सुझाव",
+        "police": "पुलिस",
+        "fire": "आग",
+        "flood": "बाढ़",
+        "landslide": "भूस्खलन",
+        "accident": "दुर्घटना",
+        "garbage": "कचरा",
+        "relief": "राहत",
+        "other": "अन्य"
+    },
+    "fireAuthorities": {
+        "nearbyFireAuthorities": "निकटवर्ती अग्निशमन प्राधिकरण",
+        "call": "कॉल करें"
+    },
+    "policeAuthorities": {
+        "nearbyPoliceAuthorities": "निकटवर्ती पुलिस प्राधिकरण",
+        "call": "कॉल करें"
+    },
+    "floodAuthorities": {
+        "nearbyFloodAuthorities": "निकटवर्ती बाढ़ राहत",
+        "call": "कॉल करें"
+    },
+    "accidentAuthorities": {
+        "nearbyAccidentAuthorities": "निकटवर्ती दुर्घटना प्रतिक्रिया",
+        "call": "कॉल करें"
+    },
+    "landslideAuthorities": {
+        "nearbyLandslideAuthorities": "निकटवर्ती भूस्खलन बचाव",
+        "call": "कॉल करें"
+    },
+    "otherAuthorities": {
+        "nearbyOtherAuthorities": "अन्य आपातकालीन सेवाएँ",
+        "call": "कॉल करें"
+    },
+    "selectEmergencyType": "आपातकाल का प्रकार चुनें",
+    "emergency": {
+        "fire": "आग",
+        "police": "पुलिस",
+        "flood": "बाढ़",
+        "accident": "दुर्घटना",
+        "landslide": "भूस्खलन",
+        "other": "अन्य",
+        "reportingQuery": "आप किस प्रकार की आपात स्थिति की रिपोर्ट कर रहे हैं",
+        "contacts": "संपर्क",
+        "verifiedContactsFor": "के लिए सत्यापित आपातकालीन संपर्क",
+        "loadingContacts": "संपर्क लोड हो रहे हैं...",
+        "errorLoading": "संपर्क जानकारी लोड नहीं कर सका।",
+        "noContacts": "इस विभाग के लिए कोई संपर्क जानकारी उपलब्ध नहीं है।"
+    },
+    "navigation": {
+        "home": "होम",
+        "report": "रिपोर्ट करें",
+        "map": "मानचित्र",
+        "alerts": "अलर्ट",
+        "profile": "प्रोफ़ाइल",
+        "settings": "सेटिंग्स",
+        "logout": "लॉगआउट",
+        "hello": "नमस्ते",
+        "citizen": "नागरिक",
+        "tillotama": "तिलोत्तमा",
+        "butwal": "बुटवल",
+        "detectingLocalGovernment": "आपका स्थानीय निकाय पता लगाया जा रहा है...",
+        "detectingLocation": "स्थान पता लगाया जा रहा है..."
+    },
+    "alerts": {
+        "title": "आपातकालीन अलर्ट"
+    },
+    "report": {
+        "getLocation": "स्थान प्राप्त करें",
+        "description": "विवरण",
+        "descriptionPlaceholder": "समस्या का संक्षेप में वर्णन करें...",
+        "selectAuthority": "संबंधित प्राधिकरण चुनें",
+        "selectOption": "प्रकार चुनें",
+        "submit": "रिपोर्ट सबमिट करें",
+        "submitting": "सबमिट हो रहा है",
+        "success": "रिपोर्ट सफलतापूर्वक सबमिट हो गई!",
+        "photoReady": "फ़ोटो तैयार है",
+        "useRealTimePhoto": "कृपया कैमरे का उपयोग करके वास्तविक समय की फ़ोटो लें।",
+        "locationRequired": "रिपोर्ट सबमिट करने के लिए स्थान आवश्यक है।",
+        "descriptionRequired": "कृपया एक संक्षिप्त विवरण दें।",
+        "mediaRequired": "कृपया एक मान्य छवि या वीडियो अपलोड करें।",
+        "tagRequired": "कृपया एक प्राधिकरण प्रकार चुनें।",
+        "submitFailed": "कुछ गड़बड़ हो गई। कृपया बाद में पुनः प्रयास करें।"
+    },
+    "profile": {
+        "title": "मेरी प्रोफ़ाइल",
+        "back": "वापस",
+        "phone": "फ़ोन",
+        "email": "ईमेल",
+        "gender": "लिंग",
+        "citizenship": "नागरिकता आईडी",
+        "address": "पता",
+        "language": "भाषा",
+        "fontSize": "फ़ॉन्ट आकार",
+        "fontFamily": "फ़ॉन्ट परिवार",
+        "theme": "थीम",
+        "verification": "सत्यापन",
+        "verified": "सत्यापित",
+        "notVerified": "सत्यापित नहीं",
+        "community": "एक जिम्मेदार नागरिक होने के लिए धन्यवाद!",
+        "guest": "अतिथि",
+        "notLoggedIn": "लॉग इन नहीं किया गया",
+        "detectingLocation": "स्थान पता लगाया जा रहा है...",
+        "editProfile": "प्रोफ़ाइल संपादित करें",
+        "cancel": "रद्द करें",
+        "save": "सहेजें",
+        "personalInfo": "व्यक्तिगत जानकारी",
+        "appPreferences": "ऐप प्राथमिकताएँ",
+        "noProfileInfo": "अभी तक कोई प्रोफ़ाइल जानकारी नहीं जोड़ी गई।",
+        "addDetails": "+ अपना विवरण जोड़ें",
+        "adminDashboard": "व्यवस्थापक डैशबोर्ड"
+    },
+    "auth": {
+        "logout": "लॉगआउट",
+        "tagline": "अलर्ट से कार्रवाई तक - तुरंत",
+        "login": "लॉग इन",
+        "register": "पंजीकरण करें"
+    }
+}

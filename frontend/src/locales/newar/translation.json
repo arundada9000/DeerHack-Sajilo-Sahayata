@@ -1,0 +1,199 @@
+{
+    "login": {
+        "back": "लिहाः",
+        "title": "साइन इन याय्",
+        "subtitle": "लसकुस वापः! कृपया लगइन याय्।",
+        "phoneLabel": "युझरनेम् वा फोन नम्बर",
+        "passwordLabel": "पासवर्ड",
+        "passwordPlaceholder": "छिगु पासवर्ड तय्",
+        "remember": "३० दुने तक्क लः",
+        "forgot": "पासवर्ड लिसें वन?",
+        "login": "लगइन",
+        "success": "लगइन सफल जुल!",
+        "failed": "लगइन विफल जुल। कृपया न्हापः नं यासय्।",
+        "noAccount": "खाता मदु?",
+        "register": "दर्ता याय्"
+    },
+    "register": {
+        "back": "लिहाः",
+        "title": "खाता दयेकगु",
+        "subtitle": "लसकुस वापः! कृपया छिगु विवरण तय्",
+        "name": "पूरा नां",
+        "namePlaceholder": "छिगु नां",
+        "phone": "फोन नम्बर",
+        "password": "पासवर्ड",
+        "passwordPlaceholder": "कमसेकम ८ दँय्",
+        "confirmPassword": "पासवर्ड कन्फर्म याय्",
+        "confirmPasswordPlaceholder": "पासवर्ड न्हापः नं तय्",
+        "passwordNote": "पासवर्ड कमसेकम ८ दँय् जुइमा",
+        "signup": "साइन अप याय्",
+        "success": "खाता दय्कल। पुनर्निर्देशित जुइधुं...",
+        "haveAccount": "न्ह्यः नं खाता दु?",
+        "login": "लगइन याय्",
+        "showPassword": "पासवर्ड खनाय्",
+        "hidePassword": "पासवर्ड च्वनाय्",
+        "genericError": "छुं गडबड जुल। कृपया न्हापः नं यासय्।"
+    },
+    "otp": {
+        "title": "फोन नम्बर सत्यापन",
+        "subtitle": "छिगु फोनय् पठाःगु ६ अंकया कोड तय्",
+        "verify": "सत्यापन याय् अन जारी याय्",
+        "invalid": "अमान्य कोड। कृपया न्हापः नं यासय्।",
+        "resendText": "कोड मवन?",
+        "resend": "न्हापः नं पठाथ्यः",
+        "back": "लिहाः वन"
+    },
+    "forgotPassword": {
+        "title": "पासवर्ड लिसें वन",
+        "subtitle": "OTP म्हितुत छिगु फोन नम्बर तय्",
+        "back": "लिहाः वन",
+        "phoneLabel": "फोन नम्बर",
+        "phonePlaceholder": "९८००००००००",
+        "sendOtpButton": "OTP पठा"
+    },
+    "dashboard": {
+        "recentIncidents": "थःथितिया घटना",
+        "sahayatacall": "सहायता कल",
+        "Verified": "सत्यापित",
+        "Working": "चालू",
+        "Solved": "समाधान जुल",
+        "Pending": "बाँकी",
+        "All": "सकल",
+        "latestReports": "दकले न्हूगु रिपोर्ट"
+    },
+    "Latest": "न्हूगु",
+    "Oldest": "पुलांगु",
+    "mapit": {
+        "filterLabel": "घटना फिल्टर याय्",
+        "selectAll": "सकल प्रकार"
+    },
+    "map": {
+        "title": "प्रकोप नक्सा",
+        "youAreHere": "छि थन दु",
+        "filterLabel": "घटना फिल्टर याय्",
+        "selectAll": "सकल काय्",
+        "clearAll": "सकल हे याय्",
+        "showPath": "लिबः खनाय्"
+    },
+    "incidentTypes": {
+        "incident": "घटना",
+        "complaint": "उजुरि",
+        "suggestion": "सुझाव",
+        "police": "प्रहरी",
+        "fire": "मि",
+        "flood": "बाढि",
+        "landslide": "हि म्वाइगु",
+        "accident": "दुर्घटना",
+        "garbage": "फोहोर",
+        "relief": "राहत",
+        "other": "मेगु"
+    },
+    "fireAuthorities": {
+        "nearbyFireAuthorities": "नापंया मि निवाइगु प्राधिकरण",
+        "call": "फोन याय्"
+    },
+    "policeAuthorities": {
+        "nearbyPoliceAuthorities": "नापंया प्रहरी प्राधिकरण",
+        "call": "फोन याय्"
+    },
+    "floodAuthorities": {
+        "nearbyFloodAuthorities": "नापंया बाढि राहत",
+        "call": "फोन याय्"
+    },
+    "accidentAuthorities": {
+        "nearbyAccidentAuthorities": "नापंया दुर्घटना उद्धार",
+        "call": "फोन याय्"
+    },
+    "landslideAuthorities": {
+        "nearbyLandslideAuthorities": "नापंया हि म्वाइगु उद्धार",
+        "call": "फोन याय्"
+    },
+    "otherAuthorities": {
+        "nearbyOtherAuthorities": "मेगु आपत्कालीन सेवा",
+        "call": "फोन याय्"
+    },
+    "selectEmergencyType": "आपत्कालीन प्रकार काय्",
+    "emergency": {
+        "fire": "मि",
+        "police": "प्रहरी",
+        "flood": "बाढि",
+        "accident": "दुर्घटना",
+        "landslide": "हि म्वाइगु",
+        "other": "मेगु",
+        "reportingQuery": "छि गुकिगु प्रकारया आपत्काल रिपोर्ट यानादिसें?",
+        "contacts": "सम्पर्क",
+        "verifiedContactsFor": "यात सत्यापित आपत्कालीन सम्पर्क",
+        "loadingContacts": "सम्पर्क लोड जुइधुं...",
+        "errorLoading": "सम्पर्क जानकारी लोड याय् मफु।",
+        "noContacts": "थ्व विभागयात सम्पर्क जानकारी मदु।"
+    },
+    "navigation": {
+        "home": "छें",
+        "report": "रिपोर्ट याय्",
+        "map": "नक्सा",
+        "alerts": "अलर्ट",
+        "profile": "प्रोफाइल",
+        "settings": "सेटिङ",
+        "logout": "लगआउट",
+        "hello": "ज्वजलपा",
+        "citizen": "नागरिक",
+        "tillotama": "तिलोत्तमा",
+        "butwal": "बुटवल",
+        "detectingLocalGovernment": "छिगु स्थानीय निकाय लुइकिगु...",
+        "detectingLocation": "थाय् लुइकिगु..."
+    },
+    "alerts": {
+        "title": "आपत्कालीन अलर्ट"
+    },
+    "report": {
+        "getLocation": "थाय् लाय्",
+        "description": "विवरण",
+        "descriptionPlaceholder": "समस्या यागु संक्षिप्त वर्णन याय्...",
+        "selectAuthority": "सम्बन्धित प्राधिकरण काय्",
+        "selectOption": "प्रकार काय्",
+        "submit": "रिपोर्ट पेस याय्",
+        "submitting": "पेस जुइधुं",
+        "success": "रिपोर्ट सफलतापूर्वक पेस जुल!",
+        "photoReady": "फोटो तयार दु",
+        "useRealTimePhoto": "कृपया क्यामेरा छ्यला वास्तविक समयया फोटो काय्।",
+        "locationRequired": "रिपोर्ट पेस यायेत थाय् मागु दु।",
+        "descriptionRequired": "कृपया म्हो विवरण बी।",
+        "mediaRequired": "कृपया मान्य छवि वा भिडियो अपलोड याय्।",
+        "tagRequired": "कृपया प्राधिकरणया प्रकार काय्।",
+        "submitFailed": "छुं गडबड जुल। कृपया लिपा न्हापः नं यासय्।"
+    },
+    "profile": {
+        "title": "जिगु प्रोफाइल",
+        "back": "लिहाः",
+        "phone": "फोन",
+        "email": "ईमेल",
+        "gender": "लिङ्ग",
+        "citizenship": "नागरिकता आईडी",
+        "address": "पता",
+        "language": "भाषा",
+        "fontSize": "फन्ट साइज",
+        "fontFamily": "फन्ट फ्यामिलि",
+        "theme": "थीम",
+        "verification": "सत्यापन",
+        "verified": "सत्यापित",
+        "notVerified": "सत्यापित मजु",
+        "community": "जिम्मेवार नागरिक जुइधुंकेत धन्यवाद!",
+        "guest": "पाहुन",
+        "notLoggedIn": "लगइन मजु",
+        "detectingLocation": "थाय् लुइकिगु...",
+        "editProfile": "प्रोफाइल सम्पादन याय्",
+        "cancel": "रद्द याय्",
+        "save": "बचत याय्",
+        "personalInfo": "व्यक्तिगत जानकारी",
+        "appPreferences": "एप प्राथमिकता",
+        "noProfileInfo": "अले नं प्रोफाइल जानकारी तनेमदु।",
+        "addDetails": "+ छिगु विवरण तनाः",
+        "adminDashboard": "प्रशासक ड्यासबोर्ड"
+    },
+    "auth": {
+        "logout": "लगआउट",
+        "tagline": "अलर्टं कार्यय् तक्क - तुरुन्त",
+        "login": "लगइन",
+        "register": "दर्ता याय्"
+    }
+}

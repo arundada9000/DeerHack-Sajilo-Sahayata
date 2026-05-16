@@ -34,7 +34,15 @@ const ApplyPreferences = ({ children }) => {
       "font-sans",
       "font-serif",
       "font-mono",
-      "font-montserrat"
+      "font-montserrat",
+      "font-roboto",
+      "font-inter",
+      "font-outfit",
+      "font-mukta",
+      "font-yantramanav",
+      "font-khand",
+      "font-kalam",
+      "font-laila"
     );
     body.classList.add(`font-${fontFamily}`);
 
@@ -52,11 +60,28 @@ const ApplyPreferences = ({ children }) => {
   return <>{children}</>;
 };
 
+import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
+import { HelmetProvider } from "react-helmet-async";
+
+const queryClient = new QueryClient({
+  defaultOptions: {
+    queries: {
+      refetchOnWindowFocus: false,
+      retry: 1,
+      staleTime: 5 * 60 * 1000, // 5 minutes
+    },
+  },
+});
+
 const Root = () => (
   <React.StrictMode>
-    <ApplyPreferences>
-      <App />
-    </ApplyPreferences>
+    <QueryClientProvider client={queryClient}>
+      <HelmetProvider>
+        <ApplyPreferences>
+          <App />
+        </ApplyPreferences>
+      </HelmetProvider>
+    </QueryClientProvider>
   </React.StrictMode>
 );
 

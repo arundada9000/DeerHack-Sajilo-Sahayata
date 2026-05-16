@@ -2,6 +2,7 @@ import { Request, Response } from "express";
 import Report from "../models/reportModel";
 import dayjs from "dayjs";
 import relativeTime from "dayjs/plugin/relativeTime";
+import { resolveGaPa } from "../utils/resolveGaPa";
 
 import { v2 as cloudinary } from "cloudinary";
 
@@ -25,9 +26,10 @@ export const createReport = async (req: Request, res: Response) => {
     const { type, description, location } = req.body;
 
     if (!type || typeof type !== "string" || !allowedTypes.includes(type)) {
-      return res.status(400).json({
+      res.status(400).json({
         message: `Invalid type. It must be one of: ${allowedTypes.join(", ")}.`,
       });
+      return;
     }
 
     if (
@@ -35,36 +37,52 @@ export const createReport = async (req: Request, res: Response) => {
       typeof description !== "string" ||
       description.length < 10
     ) {
-      return res.status(400).json({
+      res.status(400).json({
         message:
           "Description must be a string and at least 10 characters long.",
       });
+      return;
     }
 
     const parsedLocation = JSON.parse(location);
     if (!parsedLocation) {
-      return res
-        .status(400)
-        .json({ message: "Location must be a valid JSON string." });
+      res.status(400).json({ message: "Location must be a valid JSON string." });
+      return;
     }
 
     let imageUrl = "";
     let imageId = "";
 
     if (req.file) {
-      // Upload to Cloudinary
-      const uploadResult = await cloudinary.uploader.upload(req.file.path, {
-        folder: "reports",
-      });
-
-      imageUrl = uploadResult.secure_url;
-      imageId = uploadResult.public_id;
+      // Check if Cloudinary is configured
+      if (process.env.CLOUDINARY_API_KEY) {
+        try {
+          const uploadResult = await cloudinary.uploader.upload(req.file.path, {
+            folder: "reports",
+          });
+          imageUrl = uploadResult.secure_url;
+          imageId = uploadResult.public_id;
+        } catch (err) {
+          console.error("Cloudinary upload failed, falling back to local:", err);
+          imageUrl = `/${req.file.path.replace(/\\/g, "/")}`;
+          imageId = req.file.filename;
+        }
+      } else {
+        // Fallback to local storage if no Cloudinary keys
+        imageUrl = `/${req.file.path.replace(/\\/g, "/")}`;
+        imageId = req.file.filename;
+      }
     }
+
+    // Auto-detect ga-pa from coordinates
+    const [lng, lat] = parsedLocation;
+    const localGovName = resolveGaPa(lat, lng);
 
     const report = new Report({
       type,
       description,
       location: { coordinates: parsedLocation },
+      localGovName,
       imageUrl,
       imageId,
     });
@@ -138,14 +156,19 @@ export const getAllReportLocations = async (req: Request, res: Response) => {
       }
     );
     const formattedReports = reports.map((report) => {
+      const c = report.location.coordinates;
+      const isNewFormat = c[0] > 70;
+      const lng = isNewFormat ? c[0] : c[1];
+      const lat = isNewFormat ? c[1] : c[0];
+      
       return {
         id: report._id,
         title: `${
           report.type.charAt(0).toUpperCase() + report.type.slice(1)
         } reported`,
         type: report.type,
-        lat: report.location.coordinates[0],
-        lng: report.location.coordinates[1],
+        lat,
+        lng,
         time: dayjs(report.createdAt).fromNow(),
       };
     });
@@ -178,7 +201,8 @@ export const deleteReport = async (req: Request, res: Response) => {
   try {
     const deleted = await Report.findByIdAndDelete(id);
     if (!deleted) {
-      return res.status(404).json({ message: "Report not found" });
+      res.status(404).json({ message: "Report not found" });
+      return;
     }
     res.status(200).json({ message: "Report deleted successfully" });
   } catch (error) {
@@ -194,14 +218,15 @@ export const updateReport = async (req: Request, res: Response) => {
   try {
     const report = await Report.findById(id);
     if (!report) {
-      return res.status(404).json({ message: "Report not found" });
+      res.status(404).json({ message: "Report not found" });
+      return;
     }
 
     if (type) report.type = type;
     if (description) report.description = description;
     if (status) report.status = status;
-    if (location && Array.isArray(location)) {
-      report.location.coordinates = location;
+    if (location && Array.isArray(location) && location.length >= 2) {
+      report.location.coordinates = [location[0], location[1]];
     }
 
     // ✅ Handle image update

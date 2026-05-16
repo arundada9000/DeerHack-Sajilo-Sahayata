@@ -1,0 +1,199 @@
+{
+    "login": {
+        "back": "पाछु",
+        "title": "साइन इन करू",
+        "subtitle": "वापसी पर स्वागत अछि! कृपया लॉग इन करू।",
+        "phoneLabel": "यूजरनेम वा फोन नंबर",
+        "passwordLabel": "पासवर्ड",
+        "passwordPlaceholder": "अपन पासवर्ड दर्ज करू",
+        "remember": "३० दिन लेल याद राखू",
+        "forgot": "पासवर्ड भूलि गेलियाँ?",
+        "login": "लॉग इन",
+        "success": "लॉगिन सफल भेल!",
+        "failed": "लॉगिन विफल। कृपया पुनः प्रयास करू।",
+        "noAccount": "खाता नहि अछि?",
+        "register": "पंजीकरण करू"
+    },
+    "register": {
+        "back": "पाछु",
+        "title": "खाता बनाउ",
+        "subtitle": "स्वागत अछि! कृपया अपन विवरण दर्ज करू",
+        "name": "पूरा नाम",
+        "namePlaceholder": "अहाँक नाम",
+        "phone": "फोन नंबर",
+        "password": "पासवर्ड",
+        "passwordPlaceholder": "कम से कम ८ अक्षर",
+        "confirmPassword": "पासवर्ड पुष्टि करू",
+        "confirmPasswordPlaceholder": "पासवर्ड फेर दर्ज करू",
+        "passwordNote": "पासवर्ड कम से कम ८ अक्षरक होएत चाही",
+        "signup": "साइन अप करू",
+        "success": "खाता बनि गेल! पुनर्निर्देशित करैत अछि...",
+        "haveAccount": "पहिने सँ खाता अछि?",
+        "login": "लॉग इन करू",
+        "showPassword": "पासवर्ड देखाउ",
+        "hidePassword": "पासवर्ड लुकाउ",
+        "genericError": "किछु गड़बड़ी भेल। कृपया पुनः प्रयास करू।"
+    },
+    "otp": {
+        "title": "फोन नंबर सत्यापन",
+        "subtitle": "अहाँक फोन पर भेजल ६-अंकीय कोड दर्ज करू",
+        "verify": "सत्यापित करू आ जारी राखू",
+        "invalid": "अमान्य कोड। कृपया पुनः प्रयास करू।",
+        "resendText": "कोड नहि मिलल?",
+        "resend": "पुनः पठाउ",
+        "back": "पाछु जाउ"
+    },
+    "forgotPassword": {
+        "title": "पासवर्ड भूलि गेलियाँ",
+        "subtitle": "OTP प्राप्त करवाक लेल अपन फोन नंबर दर्ज करू",
+        "back": "पाछु जाउ",
+        "phoneLabel": "फोन नंबर",
+        "phonePlaceholder": "९८००००००००",
+        "sendOtpButton": "OTP भेजू"
+    },
+    "dashboard": {
+        "recentIncidents": "हालिया घटना",
+        "sahayatacall": "सहायता कॉल",
+        "Verified": "सत्यापित",
+        "Working": "कार्यरत",
+        "Solved": "हल भेल",
+        "Pending": "बाँकी",
+        "All": "सभ",
+        "latestReports": "नवीनतम रिपोर्ट"
+    },
+    "Latest": "नवीनतम",
+    "Oldest": "सबसँ पुरान",
+    "mapit": {
+        "filterLabel": "घटना फ़िल्टर करू",
+        "selectAll": "सभ प्रकार"
+    },
+    "map": {
+        "title": "आपदा नक्सा",
+        "youAreHere": "अहाँ इहाँ छी",
+        "filterLabel": "घटना फ़िल्टर करू",
+        "selectAll": "सभ चुनू",
+        "clearAll": "सभ साफ करू",
+        "showPath": "पथ देखाउ"
+    },
+    "incidentTypes": {
+        "incident": "घटना",
+        "complaint": "शिकायत",
+        "suggestion": "सुझाव",
+        "police": "पुलिस",
+        "fire": "आगि",
+        "flood": "बाढ़ि",
+        "landslide": "भूस्खलन",
+        "accident": "दुर्घटना",
+        "garbage": "कचरा",
+        "relief": "राहत",
+        "other": "अन्य"
+    },
+    "fireAuthorities": {
+        "nearbyFireAuthorities": "नजदीकी अग्निशमन प्राधिकरण",
+        "call": "फोन करू"
+    },
+    "policeAuthorities": {
+        "nearbyPoliceAuthorities": "नजदीकी पुलिस प्राधिकरण",
+        "call": "फोन करू"
+    },
+    "floodAuthorities": {
+        "nearbyFloodAuthorities": "नजदीकी बाढ़ राहत",
+        "call": "फोन करू"
+    },
+    "accidentAuthorities": {
+        "nearbyAccidentAuthorities": "नजदीकी दुर्घटना प्रतिक्रिया",
+        "call": "फोन करू"
+    },
+    "landslideAuthorities": {
+        "nearbyLandslideAuthorities": "नजदीकी भूस्खलन बचाव",
+        "call": "फोन करू"
+    },
+    "otherAuthorities": {
+        "nearbyOtherAuthorities": "अन्य आपातकालीन सेवा",
+        "call": "फोन करू"
+    },
+    "selectEmergencyType": "आपातकालक प्रकार चुनू",
+    "emergency": {
+        "fire": "आगि",
+        "police": "पुलिस",
+        "flood": "बाढ़ि",
+        "accident": "दुर्घटना",
+        "landslide": "भूस्खलन",
+        "other": "अन्य",
+        "reportingQuery": "अहाँ कोन प्रकारक आपात स्थितिक रिपोर्ट करैत छी",
+        "contacts": "संपर्क",
+        "verifiedContactsFor": "क लेल सत्यापित आपातकालीन संपर्क",
+        "loadingContacts": "संपर्क लोड होइत अछि...",
+        "errorLoading": "संपर्क जानकारी लोड करएमे विफल।",
+        "noContacts": "एहि विभागक लेल कोनो संपर्क जानकारी उपलब्ध नहि अछि।"
+    },
+    "navigation": {
+        "home": "होम",
+        "report": "रिपोर्ट करू",
+        "map": "नक्सा",
+        "alerts": "अलर्ट",
+        "profile": "प्रोफाइल",
+        "settings": "सेटिंग",
+        "logout": "लॉगआउट",
+        "hello": "प्रणाम",
+        "citizen": "नागरिक",
+        "tillotama": "तिलोत्तमा",
+        "butwal": "बुटवल",
+        "detectingLocalGovernment": "अहाँक स्थानीय निकायक पता लगाएत अछि...",
+        "detectingLocation": "स्थानक पता लगाएत अछि..."
+    },
+    "alerts": {
+        "title": "आपातकालीन अलर्ट"
+    },
+    "report": {
+        "getLocation": "स्थान प्राप्त करू",
+        "description": "विवरण",
+        "descriptionPlaceholder": "समस्याक संक्षेपमे वर्णन करू...",
+        "selectAuthority": "संबंधित प्राधिकरण चुनू",
+        "selectOption": "प्रकार चुनू",
+        "submit": "रिपोर्ट जमा करू",
+        "submitting": "जमा करैत अछि",
+        "success": "रिपोर्ट सफलतापूर्वक जमा भेल!",
+        "photoReady": "फोटो तैयार अछि",
+        "useRealTimePhoto": "कृपया कैमराक उपयोग सँ रियल टाइम फोटो लीजिए।",
+        "locationRequired": "रिपोर्ट जमा करवाक लेल स्थान आवश्यक अछि।",
+        "descriptionRequired": "कृपया संक्षिप्त विवरण दीजिए।",
+        "mediaRequired": "कृपया एकटा वैध छवि वा वीडियो अपलोड करू।",
+        "tagRequired": "कृपया प्राधिकरण प्रकार चुनू।",
+        "submitFailed": "किछु गड़बड़ी भेल। कृपया बादमे पुनः प्रयास करू।"
+    },
+    "profile": {
+        "title": "हमर प्रोफाइल",
+        "back": "पाछु",
+        "phone": "फोन",
+        "email": "ईमेल",
+        "gender": "लिंग",
+        "citizenship": "नागरिकता आईडी",
+        "address": "पता",
+        "language": "भाषा",
+        "fontSize": "फ़ॉन्ट आकार",
+        "fontFamily": "फ़ॉन्ट परिवार",
+        "theme": "थीम",
+        "verification": "सत्यापन",
+        "verified": "सत्यापित",
+        "notVerified": "सत्यापित नहि",
+        "community": "जिम्मेदार नागरिक होएबाक लेल धन्यवाद!",
+        "guest": "अतिथि",
+        "notLoggedIn": "लॉग इन नहि कएल गेल",
+        "detectingLocation": "स्थानक पता लगाएत अछि...",
+        "editProfile": "प्रोफाइल संपादित करू",
+        "cancel": "रद्द करू",
+        "save": "सहेजू",
+        "personalInfo": "व्यक्तिगत जानकारी",
+        "appPreferences": "ऐप प्राथमिकता",
+        "noProfileInfo": "अबहिन कोनो प्रोफाइल जानकारी नहि जोड़ल गेल अछि।",
+        "addDetails": "+ अपन विवरण जोड़ू",
+        "adminDashboard": "व्यवस्थापक डैशबोर्ड"
+    },
+    "auth": {
+        "logout": "लॉगआउट",
+        "tagline": "अलर्ट सँ कार्रवाई धरि - तुरंत",
+        "login": "लॉग इन",
+        "register": "पंजीकरण करू"
+    }
+}

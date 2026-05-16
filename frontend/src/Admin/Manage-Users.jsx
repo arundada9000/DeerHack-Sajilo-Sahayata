@@ -1,15 +1,35 @@
-import { useEffect, useState } from "react";
+import { useEffect, useState, useMemo } from "react";
 import API from "../api/axios";
-import { Trash2, Shield, Search } from "lucide-react";
+import { Trash2, Shield, Search, Eye, X, User, MapPin, Mail, Phone, Calendar, IdCard } from "lucide-react";
 import toast from "react-hot-toast";
 import { motion, AnimatePresence } from "framer-motion";
+import useDebounce from "../hooks/useDebounce";
+import useAdminLocationStore from "../stores/useAdminLocationStore";
+import AdminFilterBar from "../components/admin/AdminFilterBar";
+import TableSkeleton from "../components/admin/TableSkeleton";
+import Pagination from "../components/admin/Pagination";
+
+const PAGE_SIZE = 10;
 
 export default function ManageUsers() {
   const [users, setUsers] = useState([]);
-  const [filteredUsers, setFilteredUsers] = useState([]);
   const [loading, setLoading] = useState(true);
   const [search, setSearch] = useState("");
+  const [roleFilter, setRoleFilter] = useState("");
+  const [locationFilter, setLocationFilter] = useState("");
+  const [currentPage, setCurrentPage] = useState(1);
   const [modal, setModal] = useState({ visible: false, action: null });
+  const [selectedUser, setSelectedUser] = useState(null);
+
+  const { adminLocation } = useAdminLocationStore();
+  const debouncedSearch = useDebounce(search, 300);
+
+  // Seed location filter from admin store on first load
+  useEffect(() => {
+    if (adminLocation && !locationFilter) {
+      setLocationFilter(adminLocation);
+    }
+  }, [adminLocation]);
 
   useEffect(() => {
     fetchUsers();
@@ -19,7 +39,6 @@ export default function ManageUsers() {
     try {
       const res = await API.get("/auth/users");
       setUsers(res.data);
-      setFilteredUsers(res.data);
     } catch (err) {
       console.error("Error fetching users", err);
       toast.error("Failed to load users");
@@ -27,6 +46,48 @@ export default function ManageUsers() {
       setLoading(false);
     }
   };
+
+  // Derived filtered list (memoized)
+  const filteredUsers = useMemo(() => {
+    let data = [...users];
+
+    // Search filter (debounced)
+    if (debouncedSearch) {
+      const q = debouncedSearch.toLowerCase();
+      data = data.filter(
+        (u) =>
+          u.username?.toLowerCase().includes(q) ||
+          u.email?.toLowerCase().includes(q) ||
+          u.phoneNumber?.toLowerCase().includes(q)
+      );
+    }
+
+    // Role filter
+    if (roleFilter) {
+      data = data.filter((u) => u.role === roleFilter);
+    }
+
+    // Location filter
+    if (locationFilter) {
+      data = data.filter(
+        (u) => u.address?.toLowerCase().includes(locationFilter.toLowerCase())
+      );
+    }
+
+    return data;
+  }, [users, debouncedSearch, roleFilter, locationFilter]);
+
+  // Reset to page 1 when filters change
+  useEffect(() => {
+    setCurrentPage(1);
+  }, [debouncedSearch, roleFilter, locationFilter]);
+
+  // Pagination slice
+  const totalPages = Math.ceil(filteredUsers.length / PAGE_SIZE);
+  const paginatedUsers = filteredUsers.slice(
+    (currentPage - 1) * PAGE_SIZE,
+    currentPage * PAGE_SIZE
+  );
 
   const handleConfirm = async () => {
     if (!modal.action) return;
@@ -49,11 +110,6 @@ export default function ManageUsers() {
               user._id === userId ? { ...user, role: newRole } : user
             )
           );
-          setFilteredUsers((prev) =>
-            prev.map((user) =>
-              user._id === userId ? { ...user, role: newRole } : user
-            )
-          );
           toast.success("Role updated successfully");
         } catch (err) {
           console.error("Failed to update role", err);
@@ -68,7 +124,6 @@ export default function ManageUsers() {
       try {
         await API.delete(`/auth/users/${id}`);
         setUsers((prev) => prev.filter((u) => u._id !== id));
-        setFilteredUsers((prev) => prev.filter((u) => u._id !== id));
         toast.success("User deleted successfully");
       } catch (err) {
         console.error("Failed to delete user", err);
@@ -77,61 +132,55 @@ export default function ManageUsers() {
     });
   };
 
-  const handleSearch = (e) => {
-    const query = e.target.value.toLowerCase();
-    setSearch(query);
-    setFilteredUsers(
-      users.filter(
-        (u) =>
-          u.username?.toLowerCase().includes(query) ||
-          u.email?.toLowerCase().includes(query) ||
-          u.phoneNumber?.toLowerCase().includes(query)
-      )
-    );
+  const clearAllFilters = () => {
+    setSearch("");
+    setRoleFilter("");
+    setLocationFilter("");
   };
 
   return (
     <>
       {/* Header */}
-      <motion.div
-        className="flex items-center justify-between mb-8"
-        initial={{ y: -30, opacity: 0 }}
-        animate={{ y: 0, opacity: 1 }}
-        transition={{ delay: 0.2 }}
-      >
-        <div className="flex items-center gap-3">
-          <img src="/assets/logo.png" alt="Logo" className="w-10 h-10" />
-          <h1 className="text-3xl font-bold text-gray-800 tracking-tight">
-            Manage Users
-          </h1>
-        </div>
+      <div className="flex items-center gap-3 mb-6">
+        <img src="/assets/logo.png" alt="Logo" className="w-10 h-10" />
+        <h1 className="text-3xl font-bold text-gray-800 tracking-tight">
+          Manage Users
+        </h1>
+        <span className="ml-auto text-sm text-gray-500 bg-gray-100 px-3 py-1 rounded-full font-medium">
+          {filteredUsers.length} user{filteredUsers.length !== 1 ? "s" : ""}
+        </span>
+      </div>
 
-        <div className="flex items-center bg-white border rounded-md px-3 py-1.5 shadow-sm">
-          <Search size={16} className="text-gray-400 mr-2" />
-          <input
-            type="text"
-            value={search}
-            onChange={handleSearch}
-            placeholder="Search by name, email or phone"
-            className="outline-none text-sm"
-          />
-        </div>
-      </motion.div>
+      {/* Filter Bar */}
+      <AdminFilterBar
+        search={search}
+        onSearchChange={setSearch}
+        searchPlaceholder="Search by name, email or phone..."
+        locationFilter={locationFilter}
+        onLocationChange={setLocationFilter}
+        filters={[
+          {
+            label: "Role",
+            value: roleFilter,
+            onChange: setRoleFilter,
+            options: [
+              { value: "user", label: "User" },
+              { value: "admin", label: "Admin" },
+            ],
+          },
+        ]}
+        onClearAll={clearAllFilters}
+      />
 
       {/* Table */}
-      <motion.div
-        className="overflow-x-auto bg-white rounded-2xl shadow-lg ring-1 ring-gray-200"
-        initial={{ opacity: 0, y: 20 }}
-        animate={{ opacity: 1, y: 0 }}
-        transition={{ delay: 0.3 }}
-      >
+      <div className="overflow-x-auto bg-white rounded-2xl shadow-lg ring-1 ring-gray-200">
         <table className="min-w-full divide-y divide-gray-200">
-          <thead className="bg-gray-100">
+          <thead className="bg-gray-50">
             <tr>
               {["Name", "Email", "Phone", "Role", "Actions"].map((head) => (
                 <th
                   key={head}
-                  className="px-6 py-4 text-left text-sm font-semibold text-gray-700"
+                  className="px-6 py-4 text-left text-xs font-bold text-gray-500 uppercase tracking-wider"
                 >
                   {head}
                 </th>
@@ -140,38 +189,34 @@ export default function ManageUsers() {
           </thead>
           <tbody className="divide-y divide-gray-100">
             {loading ? (
+              <TableSkeleton rows={PAGE_SIZE} cols={5} />
+            ) : paginatedUsers.length === 0 ? (
               <tr>
-                <td colSpan="5" className="text-center py-8 text-gray-500">
-                  Loading users...
-                </td>
-              </tr>
-            ) : filteredUsers.length === 0 ? (
-              <tr>
-                <td colSpan="5" className="text-center py-8 text-gray-500">
-                  No users found.
+                <td colSpan="5" className="text-center py-12 text-gray-400">
+                  No users found matching your filters.
                 </td>
               </tr>
             ) : (
-              filteredUsers.map((user, index) => (
+              paginatedUsers.map((user, index) => (
                 <motion.tr
                   key={user._id}
-                  initial={{ opacity: 0, y: 10 }}
-                  animate={{ opacity: 1, y: 0 }}
-                  transition={{ delay: 0.05 * index }}
-                  className="hover:bg-indigo-50/20 transition duration-200 ease-in-out"
+                  initial={{ opacity: 0 }}
+                  animate={{ opacity: 1 }}
+                  transition={{ delay: 0.03 * index }}
+                  className="hover:bg-indigo-50/30 transition duration-200"
                 >
                   <td className="px-6 py-4 text-sm font-medium text-gray-800">
                     {user.username}
                   </td>
-                  <td className="px-6 py-4 text-sm text-gray-700">
-                    {user.email}
+                  <td className="px-6 py-4 text-sm text-gray-600">
+                    {user.email || "—"}
                   </td>
-                  <td className="px-6 py-4 text-sm text-gray-700">
-                    {user.phoneNumber}
+                  <td className="px-6 py-4 text-sm text-gray-600 tabular-nums">
+                    {user.phoneNumber || "—"}
                   </td>
-                  <td className="px-6 py-4 text-sm capitalize">
+                  <td className="px-6 py-4 text-sm">
                     <span
-                      className={`inline-block px-2 py-1 rounded-full text-xs font-semibold ${
+                      className={`inline-block px-2.5 py-1 rounded-full text-xs font-semibold capitalize ${
                         user.role === "admin"
                           ? "bg-purple-100 text-purple-700"
                           : "bg-blue-100 text-blue-700"
@@ -183,22 +228,28 @@ export default function ManageUsers() {
                   <td className="px-6 py-4 text-sm">
                     <div className="flex gap-2">
                       <button
+                        onClick={() => setSelectedUser(user)}
+                        className="flex items-center gap-1 px-3 py-1.5 bg-blue-50 text-blue-600 rounded-lg hover:bg-blue-100 transition text-xs font-medium"
+                      >
+                        <Eye size={13} /> View
+                      </button>
+                      <button
                         onClick={() =>
                           handleRoleChange(
                             user._id,
                             user.role === "admin" ? "user" : "admin"
                           )
                         }
-                        className="flex items-center gap-1 px-3 py-1 bg-indigo-600 text-white rounded hover:bg-indigo-700"
+                        className="flex items-center gap-1 px-3 py-1.5 bg-indigo-600 text-white rounded-lg hover:bg-indigo-700 transition text-xs font-medium"
                       >
-                        <Shield size={14} />
+                        <Shield size={13} />
                         {user.role === "admin" ? "Make User" : "Make Admin"}
                       </button>
                       <button
                         onClick={() => handleDeleteUser(user._id)}
-                        className="flex items-center gap-1 px-3 py-1 bg-red-500 text-white rounded hover:bg-red-600"
+                        className="flex items-center gap-1 px-3 py-1.5 bg-red-50 text-red-600 rounded-lg hover:bg-red-100 transition text-xs font-medium"
                       >
-                        <Trash2 size={14} /> Delete
+                        <Trash2 size={13} /> Delete
                       </button>
                     </div>
                   </td>
@@ -207,38 +258,142 @@ export default function ManageUsers() {
             )}
           </tbody>
         </table>
-      </motion.div>
 
-      {/* Modal */}
+        <Pagination
+          currentPage={currentPage}
+          totalPages={totalPages}
+          onPageChange={setCurrentPage}
+          totalItems={filteredUsers.length}
+          pageSize={PAGE_SIZE}
+        />
+      </div>
+
+      {/* User Details Modal */}
+      <AnimatePresence>
+        {selectedUser && (
+          <motion.div
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            exit={{ opacity: 0 }}
+            className="fixed inset-0 bg-black/40 backdrop-blur-sm flex items-center justify-center z-[80] p-4"
+            onClick={() => setSelectedUser(null)}
+          >
+            <motion.div
+              initial={{ scale: 0.95, opacity: 0, y: 20 }}
+              animate={{ scale: 1, opacity: 1, y: 0 }}
+              exit={{ scale: 0.95, opacity: 0, y: 20 }}
+              transition={{ type: "spring", stiffness: 300, damping: 25 }}
+              className="bg-white rounded-2xl p-6 w-full max-w-lg shadow-2xl relative"
+              onClick={(e) => e.stopPropagation()}
+            >
+              <button
+                onClick={() => setSelectedUser(null)}
+                className="absolute top-4 right-4 p-1 rounded-full bg-gray-100 hover:bg-gray-200 text-gray-500 transition"
+              >
+                <X size={18} />
+              </button>
+
+              <div className="flex items-center gap-4 mb-6">
+                <div className="w-14 h-14 rounded-full bg-indigo-100 flex items-center justify-center text-indigo-600">
+                  <User size={28} />
+                </div>
+                <div>
+                  <h2 className="text-xl font-bold text-gray-800">{selectedUser.username}</h2>
+                  <span className={`inline-block px-2 py-0.5 mt-1 rounded-full text-xs font-semibold capitalize ${selectedUser.role === "admin" ? "bg-purple-100 text-purple-700" : "bg-blue-100 text-blue-700"}`}>
+                    {selectedUser.role}
+                  </span>
+                </div>
+              </div>
+
+              <div className="space-y-4">
+                <div className="flex items-center gap-3 text-sm text-gray-700 bg-gray-50 p-3 rounded-xl">
+                  <Mail size={16} className="text-gray-400" />
+                  <div className="flex flex-col">
+                    <span className="text-xs text-gray-400 font-semibold uppercase">Email</span>
+                    <span className="font-medium">{selectedUser.email || "Not provided"}</span>
+                  </div>
+                </div>
+
+                <div className="flex items-center gap-3 text-sm text-gray-700 bg-gray-50 p-3 rounded-xl">
+                  <Phone size={16} className="text-gray-400" />
+                  <div className="flex flex-col">
+                    <span className="text-xs text-gray-400 font-semibold uppercase">Phone Number</span>
+                    <span className="font-medium">{selectedUser.phoneNumber || "Not provided"}</span>
+                  </div>
+                </div>
+
+                <div className="grid grid-cols-2 gap-4">
+                  <div className="flex items-center gap-3 text-sm text-gray-700 bg-gray-50 p-3 rounded-xl">
+                    <MapPin size={16} className="text-gray-400" />
+                    <div className="flex flex-col">
+                      <span className="text-xs text-gray-400 font-semibold uppercase">Address</span>
+                      <span className="font-medium">{selectedUser.address || "Not provided"}</span>
+                    </div>
+                  </div>
+                  
+                  <div className="flex items-center gap-3 text-sm text-gray-700 bg-gray-50 p-3 rounded-xl">
+                    <User size={16} className="text-gray-400" />
+                    <div className="flex flex-col">
+                      <span className="text-xs text-gray-400 font-semibold uppercase">Gender</span>
+                      <span className="font-medium capitalize">{selectedUser.gender || "Not provided"}</span>
+                    </div>
+                  </div>
+                </div>
+
+                <div className="grid grid-cols-2 gap-4">
+                  <div className="flex items-center gap-3 text-sm text-gray-700 bg-gray-50 p-3 rounded-xl">
+                    <IdCard size={16} className="text-gray-400" />
+                    <div className="flex flex-col">
+                      <span className="text-xs text-gray-400 font-semibold uppercase">Citizenship ID</span>
+                      <span className="font-medium">{selectedUser.citizenshipId || "Not provided"}</span>
+                    </div>
+                  </div>
+                  <div className="flex items-center gap-3 text-sm text-gray-700 bg-gray-50 p-3 rounded-xl">
+                    <Calendar size={16} className="text-gray-400" />
+                    <div className="flex flex-col">
+                      <span className="text-xs text-gray-400 font-semibold uppercase">Joined On</span>
+                      <span className="font-medium">
+                        {selectedUser.createdAt ? new Date(selectedUser.createdAt).toLocaleDateString() : "Unknown"}
+                      </span>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </motion.div>
+          </motion.div>
+        )}
+      </AnimatePresence>
+
+      {/* Confirmation Modal */}
       <AnimatePresence>
         {modal.visible && (
           <motion.div
             initial={{ opacity: 0 }}
             animate={{ opacity: 1 }}
             exit={{ opacity: 0 }}
-            className="fixed inset-0 bg-[#00000090] flex items-center justify-center z-50"
+            className="fixed inset-0 bg-black/40 backdrop-blur-sm flex items-center justify-center z-[80]"
           >
             <motion.div
               initial={{ scale: 0.9, opacity: 0 }}
               animate={{ scale: 1, opacity: 1 }}
               exit={{ scale: 0.9, opacity: 0 }}
               transition={{ type: "spring", stiffness: 300, damping: 20 }}
-              className="bg-white p-6 rounded-lg shadow-md max-w-sm w-full"
+              className="bg-white p-6 rounded-2xl shadow-xl max-w-sm w-full mx-4"
             >
-              <h2 className="text-lg font-semibold text-gray-800 mb-4">
-                Confirmation
+              <h2 className="text-lg font-bold text-gray-800 mb-3">
+                Confirm Action
               </h2>
               <p className="text-sm text-gray-600 mb-6">{modal.message}</p>
               <div className="flex justify-end gap-3">
                 <button
                   onClick={() => setModal({ visible: false, action: null })}
-                  className="px-4 py-2 rounded bg-gray-100 hover:bg-gray-200 text-sm"
+                  className="px-4 py-2 rounded-lg bg-gray-100 hover:bg-gray-200 text-sm font-medium transition"
                 >
                   Cancel
                 </button>
                 <button
                   onClick={handleConfirm}
-                  className="px-4 py-2 rounded bg-indigo-600 hover:bg-indigo-700 text-white text-sm"
+                  className="px-4 py-2 rounded-lg bg-indigo-600 hover:bg-indigo-700 text-white text-sm font-medium transition"
                 >
                   Confirm
                 </button>

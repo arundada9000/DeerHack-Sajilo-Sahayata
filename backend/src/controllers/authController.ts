@@ -5,6 +5,7 @@ import multer from "multer";
 import path from "path";
 import bcrypt from "bcrypt";
 import { JwtPayload } from "jsonwebtoken";
+import { resolveGaPa } from "../utils/resolveGaPa";
 
 const storage = multer.diskStorage({
   destination: (req, file, cb) => {
@@ -68,35 +69,44 @@ export const registerUser = async (req: Request, res: Response) => {
   console.log("📥 REGISTER REQUEST BODY:", req.body);
 
   try {
-    const { username, password, phoneNumber } = req.body;
+    const { username, password, phoneNumber, latitude, longitude } = req.body;
 
     // ✅ Check if phoneNumber already exists
     const existingUser = await User.findOne({ phoneNumber });
     if (existingUser) {
-      return res
-        .status(409)
-        .json({ message: "Phone number already registered" });
+      res.status(409).json({ message: "Phone number already registered" });
+      return;
     }
 
     const hashedPassword = await bcrypt.hash(password, 10);
 
+    // Auto-detect ga-pa from GPS coordinates
+    const lat = parseFloat(latitude);
+    const lng = parseFloat(longitude);
+    const localGovName = resolveGaPa(lat, lng);
+
     const user = new User({
       username,
       password: hashedPassword,
-      phoneNumber, // ✅ Now it's correctly passed
+      phoneNumber,
+      localGovName,
+      location: {
+        type: "Point",
+        coordinates: [lng || 0, lat || 0],
+      },
     });
 
     await user.save();
 
-    return res
-      .status(201)
-      .json({ message: "User registered successfully", user });
+    res.status(201).json({ message: "User registered successfully", user });
+    return;
   } catch (error: any) {
     console.error("❌ REGISTER ERROR:", error?.message);
-    return res.status(400).json({
+    res.status(400).json({
       message: "Error registering user",
       error: error?.message || error,
     });
+    return;
   }
 };
 
@@ -146,22 +156,25 @@ export const loginUser = async (req: Request, res: Response) => {
     });
   } catch (error: any) {
     console.error("❌ REGISTER ERROR:", error?.message);
-    return res.status(400).json({
+    res.status(400).json({
       message: "Error registering user",
       error: error?.message || error,
     });
+    return;
   }
 };
 
 export const verifyUser = async (req: Request, res: Response) => {
   try {
     if (!req.user) {
-      return res.status(401).json({ message: "Unauthorized" });
+      res.status(401).json({ message: "Unauthorized" });
+      return;
     }
 
     const user = await User.findById(req.user.id).select("-password");
     if (!user) {
-      return res.status(404).json({ message: "User not found" });
+      res.status(404).json({ message: "User not found" });
+      return;
     }
 
     res.json({ user });
@@ -208,14 +221,16 @@ export const updateUserRole = async (req: Request, res: Response) => {
   const { role } = req.body;
 
   if (!["user", "admin"].includes(role)) {
-    return res.status(400).json({ message: "Invalid role" });
+    res.status(400).json({ message: "Invalid role" });
+    return;
   }
 
   try {
     const user = await User.findByIdAndUpdate(id, { role }, { new: true });
 
     if (!user) {
-      return res.status(404).json({ message: "User not found" });
+      res.status(404).json({ message: "User not found" });
+      return;
     }
 
     res.json({ message: "Role updated", user });
@@ -232,7 +247,8 @@ export const deleteUser = async (req: Request, res: Response) => {
     const deletedUser = await User.findByIdAndDelete(id);
 
     if (!deletedUser) {
-      return res.status(404).json({ message: "User not found" });
+      res.status(404).json({ message: "User not found" });
+      return;
     }
 
     res.json({ message: "User deleted successfully" });

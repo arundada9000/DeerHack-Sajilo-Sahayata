@@ -3,10 +3,13 @@ import mongoose, { Document, Schema } from "mongoose";
 export interface IReport extends Document {
   type: string;
   description: string;
+  imageUrl?: string;
+  imageId?: string;
   location: {
     type: string;
     coordinates: [number, number];
   };
+  localGovName?: string;
   status: "pending" | "verified" | "solved" | "working";
   userId?: string;
   verifiedBy?: string;
@@ -22,6 +25,7 @@ const ReportSchema: Schema = new Schema({
     type: { type: String, default: "Point" },
     coordinates: { type: [Number], required: true },
   },
+  localGovName: { type: String, default: "Unknown" },
   status: {
     type: String,
     enum: ["pending", "verified", "solved", "working"],

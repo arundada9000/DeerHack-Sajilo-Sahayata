@@ -5,6 +5,7 @@ export interface IUser extends Document {
   password: string; // In production, hash this with bcrypt
   phoneNumber?: number;
   role: "user" | "admin";
+  localGovName?: string;
   location?: {
     type: string;
     coordinates: [number, number];
@@ -17,6 +18,7 @@ const UserSchema: Schema = new Schema({
   phoneNumber: { type: String, unique: true, required: true },
   image_url: { type: String },
   role: { type: String, enum: ["user", "admin"], default: "user" },
+  localGovName: { type: String, default: "Unknown" },
   location: {
     type: { type: String, default: "Point" },
     coordinates: { type: [Number], default: [0, 0] },

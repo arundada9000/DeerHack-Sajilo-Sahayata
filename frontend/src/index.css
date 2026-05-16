@@ -11,6 +11,16 @@
   width: 100%;
 }
 
+@theme {
+  --color-primary-red: #e9403e;
+  --color-primary-red-hover: #d33836;
+  --color-bg-light: #f4f7fe;
+  --color-bg-card: #edf2f8;
+  --color-text-dark: #264960;
+  --color-text-light: #ffffff;
+  --color-accent-yellow: #fae35e;
+}
+
 /* Base reset and defaults */
 body {
   margin: 0 auto;
@@ -25,6 +35,15 @@ body {
 .font-poppins {
   font-family: "Poppins", sans-serif;
 }
+
+.font-roboto { font-family: "Roboto", sans-serif; }
+.font-inter { font-family: "Inter", sans-serif; }
+.font-outfit { font-family: "Outfit", sans-serif; }
+.font-mukta { font-family: "Mukta", sans-serif; }
+.font-yantramanav { font-family: "Yantramanav", sans-serif; }
+.font-khand { font-family: "Khand", sans-serif; }
+.font-kalam { font-family: "Kalam", cursive; }
+.font-laila { font-family: "Laila", serif; }
 
 .font-sans {
   font-family: ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont,
@@ -45,4 +64,20 @@ body {
 .animate-bounce-glow {
   animation: bounce-glow 1.2s infinite;
   border-radius: 50%;
+}
+
+/* Custom Leaflet Popups */
+.premium-popup .leaflet-popup-content-wrapper {
+  padding: 0;
+  overflow: hidden;
+  border-radius: 0.75rem;
+  box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.25);
+  background: transparent;
+}
+.premium-popup .leaflet-popup-content {
+  margin: 0;
+  line-height: normal;
+}
+.premium-popup .leaflet-popup-tip {
+  background: white;
 }

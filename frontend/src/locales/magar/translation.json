@@ -1,0 +1,199 @@
+{
+    "login": {
+        "back": "फिरि",
+        "title": "साइन इन गर",
+        "subtitle": "लसकस आवा! कृपया लगइन गर।",
+        "phoneLabel": "प्रयोगकर्ता नाउँ वा फोन नम्बर",
+        "passwordLabel": "पासवर्ड",
+        "passwordPlaceholder": "ङ्यो पासवर्ड हाल",
+        "remember": "३० दिन सम्म याद राख",
+        "forgot": "पासवर्ड बिर्सिबा?",
+        "login": "लगइन",
+        "success": "लगइन सफल भो!",
+        "failed": "लगइन विफल भो। कृपया फेरि कोसिस गर।",
+        "noAccount": "खाता छैन?",
+        "register": "दर्ता गर"
+    },
+    "register": {
+        "back": "फिरि",
+        "title": "खाता बनौ",
+        "subtitle": "लसकस आवा! कृपया ङ्यो विवरण हाल",
+        "name": "पुरा नाउँ",
+        "namePlaceholder": "ङ्यो नाउँ",
+        "phone": "फोन नम्बर",
+        "password": "पासवर्ड",
+        "passwordPlaceholder": "कमसेकम ८ अक्षर",
+        "confirmPassword": "पासवर्ड पुष्टि गर",
+        "confirmPasswordPlaceholder": "पासवर्ड फेरि हाल",
+        "passwordNote": "पासवर्ड कमसेकम ८ अक्षरको हुनु पर्छ",
+        "signup": "साइन अप गर",
+        "success": "खाता बन्यो! पुनःनिर्देशित भइरहेको छ...",
+        "haveAccount": "पहिल्यै खाता छ?",
+        "login": "लगइन गर",
+        "showPassword": "पासवर्ड देखाउ",
+        "hidePassword": "पासवर्ड लुकाउ",
+        "genericError": "केही गल्ती भो। कृपया फेरि कोसिस गर।"
+    },
+    "otp": {
+        "title": "फोन नम्बर सत्यापन",
+        "subtitle": "ङ्यो फोनमा पठाइएको ६ अंकको कोड हाल",
+        "verify": "सत्यापन गर र जारी राख",
+        "invalid": "अमान्य कोड। कृपया फेरि कोसिस गर।",
+        "resendText": "कोड प्राप्त भएन?",
+        "resend": "फेरि पठाउनुहोस्",
+        "back": "फिरि जाउ"
+    },
+    "forgotPassword": {
+        "title": "पासवर्ड बिर्सिबा",
+        "subtitle": "OTP पाउनको लागि ङ्यो फोन नम्बर हाल",
+        "back": "फिरि जाउ",
+        "phoneLabel": "फोन नम्बर",
+        "phonePlaceholder": "९८००००००००",
+        "sendOtpButton": "OTP पठाउ"
+    },
+    "dashboard": {
+        "recentIncidents": "हालका घटनाहरू",
+        "sahayatacall": "सहायता कल",
+        "Verified": "सत्यापित",
+        "Working": "चालू",
+        "Solved": "समाधान भयो",
+        "Pending": "बाँकी",
+        "All": "सबै",
+        "latestReports": "नयाँ रिपोर्टहरू"
+    },
+    "Latest": "नयाँ",
+    "Oldest": "पुरानो",
+    "mapit": {
+        "filterLabel": "घटना फिल्टर गर",
+        "selectAll": "सबै प्रकार"
+    },
+    "map": {
+        "title": "प्रकोप नक्सा",
+        "youAreHere": "ङ्ये याइछ",
+        "filterLabel": "घटना फिल्टर गर",
+        "selectAll": "सबै छान",
+        "clearAll": "सबै मेट",
+        "showPath": "बाटो देखाउ"
+    },
+    "incidentTypes": {
+        "incident": "घटना",
+        "complaint": "उजुरी",
+        "suggestion": "सुझाव",
+        "police": "प्रहरी",
+        "fire": "मेई",
+        "flood": "बाढी",
+        "landslide": "पहिरो",
+        "accident": "दुर्घटना",
+        "garbage": "फोहोर",
+        "relief": "राहत",
+        "other": "अरु"
+    },
+    "fireAuthorities": {
+        "nearbyFireAuthorities": "नजिकको मेई निभाउने प्राधिकरण",
+        "call": "फोन गर"
+    },
+    "policeAuthorities": {
+        "nearbyPoliceAuthorities": "नजिकको प्रहरी प्राधिकरण",
+        "call": "फोन गर"
+    },
+    "floodAuthorities": {
+        "nearbyFloodAuthorities": "नजिकको बाढी राहत",
+        "call": "फोन गर"
+    },
+    "accidentAuthorities": {
+        "nearbyAccidentAuthorities": "नजिकको दुर्घटना उद्धार",
+        "call": "फोन गर"
+    },
+    "landslideAuthorities": {
+        "nearbyLandslideAuthorities": "नजिकको पहिरो उद्धार",
+        "call": "फोन गर"
+    },
+    "otherAuthorities": {
+        "nearbyOtherAuthorities": "अरु आपत्कालीन सेवाहरू",
+        "call": "फोन गर"
+    },
+    "selectEmergencyType": "आपत्कालीन प्रकार छान",
+    "emergency": {
+        "fire": "मेई",
+        "police": "प्रहरी",
+        "flood": "बाढी",
+        "accident": "दुर्घटना",
+        "landslide": "पहिरो",
+        "other": "अरु",
+        "reportingQuery": "ङ्ये कुन प्रकारको आपत्काल रिपोर्ट गरिराछ?",
+        "contacts": "सम्पर्क",
+        "verifiedContactsFor": "को लागि सत्यापित आपत्कालीन सम्पर्क",
+        "loadingContacts": "सम्पर्क लोड भइरहेको छ...",
+        "errorLoading": "सम्पर्क जानकारी लोड गर्न असफल भयो।",
+        "noContacts": "यो विभागको लागि कुनै सम्पर्क जानकारी छैन।"
+    },
+    "navigation": {
+        "home": "घर",
+        "report": "रिपोर्ट गर",
+        "map": "नक्सा",
+        "alerts": "अलर्ट",
+        "profile": "प्रोफाइल",
+        "settings": "सेटिङ",
+        "logout": "लगआउट",
+        "hello": "सेलो",
+        "citizen": "नागरिक",
+        "tillotama": "तिलोत्तमा",
+        "butwal": "बुटवल",
+        "detectingLocalGovernment": "ङ्यो स्थानीय निकाय पत्ता लगाउदै...",
+        "detectingLocation": "स्थान पत्ता लगाउदै..."
+    },
+    "alerts": {
+        "title": "आपत्कालीन अलर्ट"
+    },
+    "report": {
+        "getLocation": "स्थान प्राप्त गर",
+        "description": "विवरण",
+        "descriptionPlaceholder": "समस्याको संक्षिप्त वर्णन गर...",
+        "selectAuthority": "सम्बन्धित प्राधिकरण छान",
+        "selectOption": "प्रकार छान",
+        "submit": "रिपोर्ट पेस गर",
+        "submitting": "पेस भइरहेको छ",
+        "success": "रिपोर्ट सफलतापूर्वक पेस भयो!",
+        "photoReady": "फोटो तयार छ",
+        "useRealTimePhoto": "कृपया क्यामेरा प्रयोग गरी वास्तविक समयको फोटो लिऊ।",
+        "locationRequired": "रिपोर्ट पेस गर्न स्थान आवश्यक छ।",
+        "descriptionRequired": "कृपया छोटो विवरण देऊ।",
+        "mediaRequired": "कृपया मान्य छवि वा भिडियो अपलोड गर।",
+        "tagRequired": "कृपया प्राधिकरणको प्रकार छान।",
+        "submitFailed": "केही गल्ती भयो। कृपया पछि फेरि कोसिस गर।"
+    },
+    "profile": {
+        "title": "मेरो प्रोफाइल",
+        "back": "फिरि",
+        "phone": "फोन",
+        "email": "इमेल",
+        "gender": "लिङ्ग",
+        "citizenship": "नागरिकता आईडी",
+        "address": "ठेगाना",
+        "language": "भाषा",
+        "fontSize": "अक्षरको आकार",
+        "fontFamily": "अक्षर परिवार",
+        "theme": "रूप",
+        "verification": "सत्यापन",
+        "verified": "सत्यापित",
+        "notVerified": "सत्यापित छैन",
+        "community": "जिम्मेवार नागरिक भएकोमा धन्यवाद!",
+        "guest": "पाहुना",
+        "notLoggedIn": "लगइन छैन",
+        "detectingLocation": "स्थान पत्ता लगाउदै...",
+        "editProfile": "प्रोफाइल सम्पादन गर",
+        "cancel": "रद्द गर",
+        "save": "बचत गर",
+        "personalInfo": "व्यक्तिगत जानकारी",
+        "appPreferences": "एप प्राथमिकता",
+        "noProfileInfo": "अहिलेसम्म कुनै प्रोफाइल जानकारी थपिएको छैन।",
+        "addDetails": "+ आफ्नो विवरण थप",
+        "adminDashboard": "प्रशासक ड्यासबोर्ड"
+    },
+    "auth": {
+        "logout": "लगआउट",
+        "tagline": "अलर्टबाट कार्यमा - तुरुन्त",
+        "login": "लगइन",
+        "register": "दर्ता गर"
+    }
+}

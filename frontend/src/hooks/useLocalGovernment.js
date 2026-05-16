@@ -1,7 +1,5 @@
-// Source for boundary data https://localboundries.oknp.org/
-
+// Local government boundary detection using backend API
 import { useEffect, useState } from "react";
-import * as turf from "@turf/turf";
 import { useLocalGovStore } from "../stores/localGovStore";
 
 export const useLocalGovernment = () => {
@@ -20,32 +18,26 @@ export const useLocalGovernment = () => {
       }
 
       try {
-        // Load all boundaries
-        const [butwal, tilottama, omsatiya, siddharthanagar] =
-          await Promise.all([
-            fetch("/geojson/butwal.json").then((res) => res.json()),
-            fetch("/geojson/tilottama.json").then((res) => res.json()),
-            fetch("/geojson/omsatiya.json").then((res) => res.json()),
-            fetch("/geojson/siddharthanagar.json").then((res) => res.json()),
-          ]);
-
         navigator.geolocation.getCurrentPosition(
-          (pos) => {
-            const point = turf.point([
-              pos.coords.longitude,
-              pos.coords.latitude,
-            ]);
+          async (pos) => {
+            try {
+              const apiUrl = import.meta.env.VITE_API_URL || "http://localhost:3000/api";
+              const res = await fetch(`${apiUrl}/location/detect?lat=${pos.coords.latitude}&lng=${pos.coords.longitude}`);
+              if (!res.ok) throw new Error("API failed");
+              const data = await res.json();
+              const name = data.localGovName || "Unknown";
+              const coords = [pos.coords.latitude, pos.coords.longitude];
 
-            const matched = [butwal, tilottama, omsatiya, siddharthanagar].find(
-              (gj) => turf.booleanPointInPolygon(point, gj)
-            );
-
-            const name = matched?.properties?.GaPa_NaPa || "Unknown";
-
-            // Cache result in Zustand
-            setLocalGov(name);
-            setLocalGovState(name);
-            setLoading(false);
+              // Cache result in Zustand
+              setLocalGov(name, coords);
+              setLocalGovState(name);
+            } catch (err) {
+              console.error("Backend detection failed", err);
+              setLocalGov("Detection Failed", null);
+              setLocalGovState("Detection Failed");
+            } finally {
+              setLoading(false);
+            }
           },
           (err) => {
             console.error("Geolocation Error", err.message);
@@ -55,7 +47,7 @@ export const useLocalGovernment = () => {
           }
         );
       } catch (err) {
-        console.error("Boundary fetch failed", err);
+        console.error("Geolocation request failed", err);
         setLocalGov("Detection Failed");
         setLocalGovState("Detection Failed");
         setLoading(false);
@@ -67,3 +59,4 @@ export const useLocalGovernment = () => {
 
   return { localGov, loading };
 };
+

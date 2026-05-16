@@ -119,7 +119,13 @@
     "flood": "बाढी",
     "accident": "दुर्घटना",
     "landslide": "पहिरो",
-    "other": "अन्य"
+    "other": "अन्य",
+    "reportingQuery": "तपाईं कुन प्रकारको आपतकाल रिपोर्ट गर्दै हुनुहुन्छ ",
+    "contacts": "सम्पर्कहरू",
+    "verifiedContactsFor": "यसको लागि प्रमाणित आपतकालीन सम्पर्कहरू",
+    "loadingContacts": "सम्पर्कहरू लोड हुँदैछन्...",
+    "errorLoading": "सम्पर्क जानकारी लोड गर्न सकिएन।",
+    "noContacts": "यस विभागको लागि कुनै सम्पर्क जानकारी उपलब्ध छैन।"
   },
   "navigation": {
     "home": "गृहपृष्ठ",
@@ -133,7 +139,8 @@
     "citizen": "नागरिक",
     "tillotama": "तिलोत्तमा",
     "butwal": "बुटवल",
-    "detectingLocalGovernment": "तपाईंको स्थानीय सरकार पत्ता लगाउँदै..."
+    "detectingLocalGovernment": "तपाईंको स्थानीय सरकार पत्ता लगाउँदै...",
+    "detectingLocation": "स्थान पत्ता लगाउँदै..."
   },
   "alerts": {
     "title": "आपतकालीन चेतावनीहरू"
@@ -170,7 +177,18 @@
     "verification": "प्रमाणीकरण",
     "verified": "प्रमाणित",
     "notVerified": "अप्रमाणित",
-    "community": "जिम्मेवार नागरिक भएकोमा धन्यवाद!"
+    "community": "जिम्मेवार नागरिक भएकोमा धन्यवाद!",
+    "guest": "अतिथि",
+    "notLoggedIn": "लगइन गरिएको छैन",
+    "detectingLocation": "स्थान पत्ता लगाउँदै...",
+    "editProfile": "प्रोफाइल सम्पादन गर्नुहोस्",
+    "cancel": "रद्द गर्नुहोस्",
+    "save": "बचत गर्नुहोस्",
+    "personalInfo": "व्यक्तिगत जानकारी",
+    "appPreferences": "एप सेटिङहरू",
+    "noProfileInfo": "कुनै प्रोफाइल जानकारी थपिएको छैन।",
+    "addDetails": "+ आफ्नो विवरण थप्नुहोस्",
+    "adminDashboard": "प्रशासक ड्यासबोर्ड"
   },
   "auth": {
     "logout": "बाहिर निस्कनुहोस्",

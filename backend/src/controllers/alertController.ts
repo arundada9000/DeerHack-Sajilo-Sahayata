@@ -1,5 +1,6 @@
 import { Request, Response } from "express";
 import Alert from "../models/alertModel";
+import { sendPushToAll } from "./pushController";
 
 // Create a new alert
 export const createAlert = async (req: Request, res: Response) => {
@@ -14,6 +15,17 @@ export const createAlert = async (req: Request, res: Response) => {
       location,
       createdBy,
     });
+
+    // Send push notification to all subscribers (non-blocking)
+    try {
+      await sendPushToAll(
+        `⚠️ ${title}`,
+        `${type?.charAt(0).toUpperCase()}${type?.slice(1)} alert in ${location}: ${description?.substring(0, 100)}`,
+        "/dashboard/home"
+      );
+    } catch (pushErr) {
+      console.warn("[Alert] Push notification failed (non-critical):", pushErr);
+    }
 
     res.status(201).json(newAlert);
   } catch (err) {
@@ -38,7 +50,10 @@ export const updateAlert = async (req: Request, res: Response) => {
       new: true,
     });
 
-    if (!updated) return res.status(404).json({ message: "Alert not found" });
+    if (!updated) {
+      res.status(404).json({ message: "Alert not found" });
+      return;
+    }
 
     res.json(updated);
   } catch (err) {
@@ -50,7 +65,10 @@ export const updateAlert = async (req: Request, res: Response) => {
 export const deleteAlert = async (req: Request, res: Response) => {
   try {
     const deleted = await Alert.findByIdAndDelete(req.params.id);
-    if (!deleted) return res.status(404).json({ message: "Alert not found" });
+    if (!deleted) {
+      res.status(404).json({ message: "Alert not found" });
+      return;
+    }
     res.json({ message: "Alert deleted" });
   } catch (err) {
     res.status(500).json({ message: "Failed to delete alert", error: err });

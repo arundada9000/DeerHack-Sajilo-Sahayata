@@ -21,7 +21,8 @@ const authenticateToken = (req: Request, res: Response, next: NextFunction) => {
     process.env.JWT_SECRET || "secret",
     (err: Error | null, decoded: any) => {
       if (err) {
-        return res.status(403).json({ message: "Invalid or expired token" });
+        res.status(403).json({ message: "Invalid or expired token" });
+        return;
       }
       req.user = decoded as IUser;
       next();

@@ -3,22 +3,33 @@ import connectDB from "./config/db";
 import authRoutes from "./routes/authRoutes";
 import alertRoutes from "./routes/alertRoutes";
 import reportRoutes from "./routes/reportRoutes";
+import contactRoutes from "./routes/contactRoutes";
+import locationRoutes from "./routes/locationRoutes";
+import pushRoutes from "./routes/pushRoutes";
+import safeZoneRoutes from "./routes/safeZoneRoutes";
 import cookieParser from "cookie-parser";
 import dotenv from "dotenv";
 import cors from "cors";
 import path from "path";
+import dns from "dns";
+dns.setServers(["1.1.1.1", "8.8.8.8"]);
 const app = express();
 
 dotenv.config();
 // Middleware
 app.use("/uploads", express.static(path.join(__dirname, "../uploads"))); // Serve static files from the uploads directory
-app.use(cors({
-   origin: [process.env.CLIENT_URL || "http://localhost:5173"], // frontend dev server
-  credentials: true 
-})); // Apply CORS middleware with the configuration
+app.use(
+  cors({
+    origin: [
+      process.env.CLIENT_URL || "http://localhost:5173",
+      "http://localhost:5174",
+      "http://localhost:5175",
+    ],
+    credentials: true,
+  }),
+); // Apply CORS middleware with the configuration
 app.use(express.json());
 app.use(cookieParser());
-app.use("/api/auth", authRoutes);
 
 // Connect to MongoDB
 connectDB();
@@ -27,6 +38,18 @@ connectDB();
 app.use("/api/auth", authRoutes);
 app.use("/api", reportRoutes);
 app.use("/api/alerts", alertRoutes);
+app.use("/api/contacts", contactRoutes);
+app.use("/api/location", locationRoutes);
+app.use("/api/push", pushRoutes);
+app.use("/api/safe-zones", safeZoneRoutes);
+
+// Global Error Handler
+app.use((err: any, req: express.Request, res: express.Response, next: express.NextFunction) => {
+  console.error("Unhandled Error:", err.stack || err);
+  const status = err.statusCode || 500;
+  const message = err.message || "Internal Server Error";
+  res.status(status).json({ success: false, message });
+});
 
 const PORT = process.env.PORT || 3000;
 app.listen(PORT, () => {

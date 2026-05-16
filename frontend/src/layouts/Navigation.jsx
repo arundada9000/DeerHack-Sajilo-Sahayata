@@ -1,6 +1,8 @@
-import { useState, useEffect, useRef, forwardRef } from "react";
+import { useState, useEffect } from "react";
 import { useTranslation } from "react-i18next";
 import { useLocation, useNavigate, Outlet } from "react-router-dom";
+import { motion, AnimatePresence } from "framer-motion";
+import { Home, AlertTriangle, Map as MapIcon, User } from "lucide-react";
 import ProfileDrawer from "../pages/Dashboard/Profile";
 import useAuth from "../stores/useAuth";
 import { useLocalGovStore } from "../stores/localGovStore";
@@ -19,9 +21,6 @@ const NavigationLayout = () => {
 
   const currentPath = location.pathname;
 
-  const underlineRef = useRef(null);
-  const buttonRefs = useRef([]);
-
   const isActive = (path) => {
     if (path === "/home") {
       return currentPath === "/" || currentPath === "/dashboard/home";
@@ -30,117 +29,110 @@ const NavigationLayout = () => {
   };
 
   const navItems = [
-    { path: "/home", index: 0 },
-    { path: "/reports", index: 1 },
-    { path: "/map", index: 2 },
-    { path: "/settings", index: 3 },
+    { id: "home", path: "/home", labelKey: "navigation.home", icon: Home },
+    { id: "reports", path: "/reports", labelKey: "navigation.report", icon: AlertTriangle },
+    { id: "map", path: "/map", labelKey: "navigation.map", icon: MapIcon },
+    { id: "settings", path: "/settings", labelKey: "navigation.settings", icon: User },
   ];
 
-  const activeIndex =
+  // Determine which tab is active for the layoutId indicator
+  const activeTabId =
     navItems.find((item) =>
       item.path !== "/settings" ? isActive(item.path) : false
-    )?.index ?? (showProfileDrawer ? 3 : -1);
+    )?.id ?? (showProfileDrawer ? "settings" : null);
 
-  // Move underline on activeIndex change
-  useEffect(() => {
-    if (activeIndex >= 0 && buttonRefs.current[activeIndex]) {
-      const button = buttonRefs.current[activeIndex];
-      const rect = button.getBoundingClientRect();
-      const parentRect = button.parentNode.getBoundingClientRect();
-
-      const left = rect.left - parentRect.left + rect.width / 2 - 10; // 20px width / 2
-      if (underlineRef.current) {
-        underlineRef.current.style.left = `${left}px`;
-      }
-    }
-  }, [activeIndex]);
-
-  // Auto hide/show nav on scroll
-  useEffect(() => {
-    const handleScroll = () => {
-      const currentScroll = window.scrollY;
-      setShowBottomNav(prevScrollY > currentScroll || currentScroll < 10);
-      setPrevScrollY(currentScroll);
-    };
-    window.addEventListener("scroll", handleScroll);
-    return () => window.removeEventListener("scroll", handleScroll);
-  }, [prevScrollY]);
+  // Navbar hiding disabled as per user request
 
   const userName = user?.username || t("navigation.citizen");
 
   return (
-    <div className="relative min-h-screen bg-red-50 text-gray-800 w-full">
-      {/* Top Navbar */}
-      <div className="text-white bg-[#155ac1] px-4 py-2 relative">
-        <div className="text-lg font-extrabold">{t("navigation.hello")},</div>
-        <div className="text-base">{userName}!</div>
-        <div className="absolute right-4 top-2">
-          <img
-            src="/assets/logo.png"
-            alt="Logo"
-            className="w-15 h-15 rounded-full"
-            onClick={() => navigate("/dashboard/home")}
-          />
+    <div className="relative min-h-screen bg-bg-light text-text-dark w-full overflow-x-hidden">
+      {/* Premium Glassmorphic Top Header */}
+      <header className="sticky top-0 z-40 bg-white/80 backdrop-blur-md border-b border-gray-200/50 shadow-sm px-4 py-3">
+        <div className="flex items-center justify-between max-w-4xl mx-auto">
+          <div className="flex flex-col">
+            <h1 className="text-xl font-extrabold tracking-tight text-text-dark flex items-center gap-1">
+              {t("navigation.hello")}, <span className="text-primary-red">{userName}!</span>
+            </h1>
+            <div className="flex items-center mt-0.5">
+              <span className="inline-flex items-center px-2 py-0.5 rounded text-xs font-medium bg-blue-50 text-blue-700 border border-blue-100">
+                {localGov ? localGov : t("navigation.detectingLocation")}
+              </span>
+            </div>
+          </div>
+          
+          <motion.div 
+            whileHover={{ scale: 1.05 }} 
+            whileTap={{ scale: 0.95 }}
+            className="flex-shrink-0 cursor-pointer"
+          >
+            <img
+              src="/assets/logo.png"
+              alt="Sajilo Sahayata Logo"
+              className="w-12 h-12 rounded-full shadow-sm border border-gray-100"
+              onClick={() => navigate("/dashboard/home")}
+            />
+          </motion.div>
         </div>
-        <p className="mt-4 text-white absolute top-0 left-[50%] transform -translate-x-1/2">
-          {localGov ? `${localGov}` : "Detecting your local government..."}
-        </p>
-      </div>
+      </header>
 
-      {/* Main Content */}
-      <main className="pt-1 pb-1">
+      {/* Main Content Area */}
+      <main className="pb-24 pt-2 max-w-4xl mx-auto w-full">
         <Outlet />
       </main>
 
-      {/* Bottom Navbar */}
-      <nav
-        className={`fixed bottom-0 left-0 right-0 z-40 bg-[#155ac1] border-t shadow-md transition-transform duration-300 ${
-          showBottomNav ? "translate-y-0" : "translate-y-full"
-        } w-full`}
-      >
-        <div className="relative mx-auto max-w-md w-full flex items-center justify-around py-1 px-3">
-          {/* Underline */}
-          <div
-            ref={underlineRef}
-            className="absolute bottom-0 h-1 bg-yellow-300 transition-all duration-300 ease-in-out"
-            style={{
-              width: "20px",
-              top: "45px",
-              borderRadius: "40px",
-            }}
-          />
+      {/* Premium Floating Bottom Navbar */}
+      <AnimatePresence>
+        <motion.nav
+          initial={false}
+          animate={{ y: showBottomNav ? 0 : 100 }}
+          transition={{ type: "spring", stiffness: 260, damping: 20 }}
+          className="fixed bottom-6 left-0 right-0 z-50 px-4 pointer-events-none"
+        >
+          <div className="mx-auto max-w-md w-full bg-white/90 backdrop-blur-lg shadow-[0_8px_30px_rgb(0,0,0,0.12)] border border-gray-100/80 rounded-3xl flex items-center justify-around py-2 px-2 pointer-events-auto">
+            {navItems.map((item) => {
+              const Icon = item.icon;
+              const isSelected = activeTabId === item.id;
 
-          {/* Buttons */}
-          <NavButton
-            ref={(el) => (buttonRefs.current[0] = el)}
-            icon="/icons/home-icon.svg"
-            label={t("navigation.home")}
-            active={isActive("/home")}
-            onClick={() => navigate("/dashboard/home")}
-          />
-          <NavButton
-            ref={(el) => (buttonRefs.current[1] = el)}
-            icon="/icons/emergency-icon.svg"
-            label={t("navigation.report")}
-            active={isActive("/reports")}
-            onClick={() => navigate("/dashboard/reports")}
-          />
-          <NavButton
-            ref={(el) => (buttonRefs.current[2] = el)}
-            icon="/icons/location-icon.svg"
-            label={t("navigation.map")}
-            active={isActive("/map")}
-            onClick={() => navigate("/dashboard/map")}
-          />
-          <NavButton
-            ref={(el) => (buttonRefs.current[3] = el)}
-            icon="/icons/setting-icon.svg"
-            label={t("navigation.settings")}
-            active={showProfileDrawer}
-            onClick={() => setShowProfileDrawer(true)}
-          />
-        </div>
-      </nav>
+              return (
+                <button
+                  key={item.id}
+                  onClick={() => {
+                    if (item.path === "/settings") {
+                      setShowProfileDrawer(true);
+                    } else {
+                      setShowProfileDrawer(false);
+                      navigate(`/dashboard${item.path}`);
+                    }
+                  }}
+                  className={`relative flex flex-col items-center justify-center w-16 h-14 rounded-2xl transition-colors duration-300 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary-red ${
+                    isSelected ? "text-primary-red" : "text-gray-500 hover:text-gray-900 hover:bg-gray-50/50"
+                  }`}
+                  aria-label={t(item.labelKey)}
+                  aria-current={isSelected ? "page" : undefined}
+                >
+                  {/* Framer Motion Sliding Pill Indicator */}
+                  {isSelected && (
+                    <motion.div
+                      layoutId="activeNavIndicator"
+                      className="absolute inset-0 bg-red-50/80 rounded-2xl"
+                      transition={{ type: "spring", stiffness: 300, damping: 25 }}
+                    />
+                  )}
+                  
+                  {/* Icon & Label (above the background pill) */}
+                  <div className="relative z-10 flex flex-col items-center gap-1">
+                    <Icon size={22} strokeWidth={isSelected ? 2.5 : 2} className="transition-all duration-300" />
+                    <span className={`text-[10px] font-medium tracking-tight ${isSelected ? "font-bold" : ""}`}>
+                      {t(item.labelKey)}
+                    </span>
+                  </div>
+                </button>
+              );
+            })}
+          </div>
+        </motion.nav>
+      </AnimatePresence>
 
       {/* Sliding Profile Drawer */}
       <ProfileDrawer
@@ -150,21 +142,5 @@ const NavigationLayout = () => {
     </div>
   );
 };
-
-// NavButton with forwardRef
-const NavButton = forwardRef(({ icon, label, active, onClick }, ref) => (
-  <button
-    ref={ref}
-    onClick={onClick}
-    className={`flex flex-col items-center justify-center p-1 transition duration-200 cursor-pointer hover:scale-110 ${
-      active
-        ? "text-yellow-300 scale-110 font-bold"
-        : "text-white hover:text-red-500"
-    }`}
-  >
-    <img src={icon} alt={label} className="w-10 h-10" />
-    <span className="text-xs">{label}</span>
-  </button>
-));
 
 export default NavigationLayout;

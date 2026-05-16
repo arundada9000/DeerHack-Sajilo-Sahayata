@@ -12,6 +12,12 @@ const useAuth = create((set) => ({
     localStorage.removeItem("token");
     set({ user: null, token: null });
   },
+  updateUser: (newData) => {
+    const current = useAuth.getState().user;
+    if (current) {
+      set({ user: { ...current, ...newData } });
+    }
+  },
   isAuthenticated: () => !!useAuth.getState().user,
   autoLogin: async () => {
     try {

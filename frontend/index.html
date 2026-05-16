@@ -4,7 +4,7 @@
 <head>
   <!-- Basic Meta -->
   <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=5.0, viewport-fit=cover" />
 
   <!-- SEO Title -->
   <title>Sajilo Sahayata | Disaster Management & Coordination System Nepal</title>
@@ -26,8 +26,36 @@
   <!-- Canonical URL -->
   <link rel="canonical" href="https://sajilo-sahayata.onrender.com/" />
 
-  <!-- Favicon -->
-  <link rel="icon" type="image/svg+xml" href="/favicon.ico" />
+  <!-- ═══ PWA Meta Tags ═══ -->
+  <link rel="manifest" href="/manifest.json" />
+  <meta name="theme-color" content="#e9403e" />
+  <meta name="mobile-web-app-capable" content="yes" />
+  <meta name="apple-mobile-web-app-capable" content="yes" />
+  <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent" />
+  <meta name="apple-mobile-web-app-title" content="Sahayata" />
+  <meta name="application-name" content="Sajilo Sahayata" />
+  <meta name="msapplication-TileColor" content="#e9403e" />
+  <meta name="msapplication-TileImage" content="/logos/icon-144x144.png" />
+  <meta name="msapplication-config" content="none" />
+
+  <!-- ═══ Favicon & Icons ═══ -->
+  <link rel="icon" type="image/x-icon" href="/favicon.ico" />
+  <link rel="icon" type="image/png" sizes="16x16" href="/assets/logo/icon-16x16.png" />
+  <link rel="icon" type="image/png" sizes="32x32" href="/assets/logo/icon-32x32.png" />
+  <link rel="icon" type="image/png" sizes="96x96" href="/assets/logo/icon-96x96.png" />
+
+  <!-- ═══ Apple Touch Icons ═══ -->
+  <link rel="apple-touch-icon" href="/logos/icon-192x192.png" />
+  <link rel="apple-touch-icon" sizes="60x60" href="/assets/logo/apple-touch-icon-60x60.png" />
+  <link rel="apple-touch-icon" sizes="152x152" href="/logos/icon-152x152.png" />
+  <link rel="apple-touch-icon" sizes="144x144" href="/logos/icon-144x144.png" />
+  <link rel="apple-touch-icon" sizes="192x192" href="/logos/icon-192x192.png" />
+  <link rel="apple-touch-icon" sizes="512x512" href="/logos/icon-512x512.png" />
+
+  <!-- ═══ Apple Splash Screen ═══ -->
+  <!-- iPhone (portrait) -->
+  <meta name="apple-mobile-web-app-capable" content="yes" />
+  <link rel="apple-touch-startup-image" href="/logos/icon-512x512.png" />
 
   <!-- Google Verification -->
   <meta name="google-adsense-account" content="ca-pub-1708134460872611">
@@ -49,8 +77,9 @@
   <meta name="twitter:image" content="./preview.png" />
 
   <!-- Fonts -->
-  <link href="https://fonts.googleapis.com/css2?family=Montserrat&display=swap" rel="stylesheet">
-  <link href="https://fonts.googleapis.com/css2?family=Poppins&display=swap" rel="stylesheet">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Kalam:wght@400;700&family=Khand:wght@400;500;600;700&family=Laila:wght@400;500;600;700&family=Montserrat:wght@400;500;600;700&family=Mukta:wght@400;500;600;700&family=Outfit:wght@400;500;600;700&family=Poppins:wght@400;500;600;700&family=Roboto:wght@400;500;700&family=Yantramanav:wght@400;500;700;900&display=swap" rel="stylesheet">
 
   <!-- Structured Data (JSON-LD) -->
   <script type="application/ld+json">
@@ -78,6 +107,21 @@
 <body>
   <div id="root"></div>
   <script type="module" src="/src/main.jsx"></script>
+
+  <!-- ═══ Service Worker Registration ═══ -->
+  <script>
+    if ('serviceWorker' in navigator) {
+      window.addEventListener('load', () => {
+        navigator.serviceWorker.register('/sw.js')
+          .then((reg) => {
+            console.log('[SW] Registered:', reg.scope);
+          })
+          .catch((err) => {
+            console.warn('[SW] Registration failed:', err);
+          });
+      });
+    }
+  </script>
 </body>
 
 </html>

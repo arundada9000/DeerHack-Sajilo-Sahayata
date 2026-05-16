@@ -1,107 +1,129 @@
 import { useState } from "react";
-import { Link, useLocation } from "react-router-dom";
+import { Link, useLocation, useNavigate } from "react-router-dom";
 import {
-  Home, 
+  Home,
   Menu,
   X,
   LayoutDashboard,
   FileText,
   Bell,
   Users,
+  Phone,
   LogOut,
+  ChevronLeft,
+  Shield,
 } from "lucide-react";
+
+const navItems = [
+  { label: "Home", to: "/", icon: Home },
+  { label: "Dashboard", to: "/admin", icon: LayoutDashboard, exact: true },
+  { label: "Manage Users", to: "/admin/manage-users", icon: Users },
+  { label: "Manage Reports", to: "/admin/manage-reports", icon: FileText },
+  { label: "Manage Contacts", to: "/admin/manage-contacts", icon: Phone },
+  { label: "Manage Alerts", to: "/admin/send-alerts", icon: Bell },
+  { label: "Safe Zones", to: "/admin/manage-safe-zones", icon: Shield },
+];
 
 export default function AdminSidebar() {
   const [collapsed, setCollapsed] = useState(false);
   const [mobileOpen, setMobileOpen] = useState(false);
   const location = useLocation();
+  const navigate = useNavigate();
 
-  const navItems = [
-    { label: "Home", to: "/", icon: <Home size={18} /> },
-    { label: "Dashboard", to: "/admin", icon: <LayoutDashboard size={18} /> },
-    {
-      label: "Manage Users",
-      to: "/admin/manage-users",
-      icon: <Users size={18} />,
-    },
-    {
-      label: "Manage Reports",
-      to: "/admin/manage-reports",
-      icon: <FileText size={18} />,
-    },
-    {
-      label: "Manage Alerts",
-      to: "/admin/send-alerts",
-      icon: <Bell size={18} />,
-    },
-    { label: "Logout", to: "/logout", icon: <LogOut size={18} /> },
-  ];
+  const isActive = (item) => {
+    if (item.exact) return location.pathname === item.to;
+    return location.pathname.startsWith(item.to) && item.to !== "/";
+  };
+
+  const handleLogout = () => {
+    navigate("/logout");
+  };
 
   return (
     <>
-      {/* Mobile menu toggle */}
-      <div className="md:hidden fixed top-4 left-4 z-50 min-h-screen">
-        <button
-          onClick={() => setMobileOpen(!mobileOpen)}
-          className="text-white bg-gray-800 p-2 rounded shadow"
-        >
-          {mobileOpen ? <X size={20} /> : <Menu size={20} />}
-        </button>
-      </div>
+      {/* Mobile hamburger — fixed top-left */}
+      <button
+        onClick={() => setMobileOpen(!mobileOpen)}
+        className="md:hidden fixed top-4 left-4 z-[80] p-2 bg-gray-900 text-white rounded-lg shadow-lg"
+        aria-label="Toggle sidebar"
+      >
+        {mobileOpen ? <X size={20} /> : <Menu size={20} />}
+      </button>
+
+      {/* Mobile overlay */}
+      {mobileOpen && (
+        <div
+          className="md:hidden fixed inset-0 bg-black/40 z-[69]"
+          onClick={() => setMobileOpen(false)}
+        />
+      )}
 
       {/* Sidebar */}
       <aside
-        className={`fixed top-0 left-0 h-screen z-40 bg-gray-900 text-white transform transition-all duration-300 ease-in-out
-        ${collapsed ? "w-16" : "w-64"}
-        ${
-          mobileOpen
-            ? "translate-x-0"
-            : "md:translate-x-0 -translate-x-full md:relative"
-        }`}
+        className={`
+          top-0 h-screen z-[70] bg-gray-900 text-white
+          flex flex-col shrink-0 transition-all duration-300 ease-in-out
+          ${collapsed ? "w-[68px]" : "w-64"}
+          ${mobileOpen ? "fixed inset-y-0 left-0 translate-x-0 shadow-2xl" : "fixed inset-y-0 left-0 -translate-x-full md:translate-x-0 md:sticky md:shadow-none"}
+        `}
       >
-        <div className={`p-4 flex flex-col h-full justify-between`}>
-          {/* Toggle button */}
-          <div>
-            <button
-              onClick={() => setCollapsed(!collapsed)}
-              className="mb-6 text-gray-400 hover:text-white"
-            >
-              {collapsed ? <Menu size={20} /> : <X size={20} />}
-            </button>
-
-            {!collapsed && (
-              <h2 className="text-xl font-bold mb-8">Admin Panel</h2>
-            )}
-
-            <nav className="flex flex-col gap-3">
-              {navItems.map((item) => (
-                <Link
-                  key={item.to}
-                  to={item.to}
-                  onClick={() => setMobileOpen(false)}
-                  className={`flex items-center gap-3 px-3 py-2 rounded hover:bg-gray-800 transition text-sm ${
-                    location.pathname === item.to ? "bg-gray-800" : ""
-                  }`}
-                >
-                  {item.icon}
-                  {!collapsed && <span>{item.label}</span>}
-                </Link>
-              ))}
-            </nav>
-          </div>
-
+        {/* Header */}
+        <div className="flex items-center justify-between p-4 border-b border-gray-800">
           {!collapsed && (
-            <p className="text-xs text-gray-500 mt-6">© 2025 Sajilo Sahayata</p>
+            <span className="text-lg font-bold tracking-tight">Admin</span>
+          )}
+          <button
+            onClick={() => setCollapsed(!collapsed)}
+            className="hidden md:flex p-1.5 rounded-lg text-gray-400 hover:text-white hover:bg-gray-800 transition"
+            aria-label={collapsed ? "Expand sidebar" : "Collapse sidebar"}
+          >
+            {collapsed ? <Menu size={18} /> : <ChevronLeft size={18} />}
+          </button>
+        </div>
+
+        {/* Navigation */}
+        <nav className="flex-1 flex flex-col gap-1 p-3 overflow-y-auto">
+          {navItems.map((item) => {
+            const Icon = item.icon;
+            const active = isActive(item);
+            return (
+              <Link
+                key={item.to}
+                to={item.to}
+                onClick={() => setMobileOpen(false)}
+                title={collapsed ? item.label : undefined}
+                className={`
+                  flex items-center gap-3 px-3 py-2.5 rounded-lg text-sm font-medium
+                  transition-colors duration-200
+                  ${active
+                    ? "bg-indigo-600 text-white shadow-sm"
+                    : "text-gray-400 hover:text-white hover:bg-gray-800"
+                  }
+                `}
+              >
+                <Icon size={18} className="shrink-0" />
+                {!collapsed && <span>{item.label}</span>}
+              </Link>
+            );
+          })}
+        </nav>
+
+        {/* Footer */}
+        <div className="p-3 border-t border-gray-800">
+          <button
+            onClick={handleLogout}
+            className="flex items-center gap-3 px-3 py-2.5 rounded-lg text-sm font-medium text-red-400 hover:text-red-300 hover:bg-gray-800 transition-colors duration-200 w-full"
+          >
+            <LogOut size={18} className="shrink-0" />
+            {!collapsed && <span>Logout</span>}
+          </button>
+          {!collapsed && (
+            <p className="text-[11px] text-gray-600 mt-3 px-3">
+              © 2025 Sajilo Sahayata
+            </p>
           )}
         </div>
       </aside>
-
-      {/* Padding for main content */}
-      <div
-        className={`${
-          collapsed ? "ml-8" : "ml-16"
-        } transition-all duration-300 hidden md:block`}
-      />
     </>
   );
 }

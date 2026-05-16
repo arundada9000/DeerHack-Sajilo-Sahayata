@@ -5,7 +5,8 @@ export default function requireAdmin(req: Request, res: Response, next: NextFunc
   const user = req.user as IUser;
 
   if (!user || user.role !== "admin") {
-    return res.status(403).json({ message: "Access denied. Admins only." });
+    res.status(403).json({ message: "Access denied. Admins only." });
+    return;
   }
 
   next();

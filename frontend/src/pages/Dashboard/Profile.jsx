@@ -1,57 +1,140 @@
 import { useTranslation } from "react-i18next";
-import { useEffect } from "react";
+import { useEffect, useState, useRef } from "react";
 import usePreferences from "../../stores/UsePreference.jsx";
 import { useNavigate } from "react-router-dom";
 import useAuth from "../../stores/useAuth";
 import { motion, AnimatePresence } from "framer-motion";
 import { useLocalGovStore } from "../../stores/localGovStore";
+import {
+  X, Camera, Phone, Mail, User as UserIcon,
+  IdCard, MapPin, Globe, Type, Settings,
+  Moon, Sun, LogOut, ShieldCheck, Pencil, Save, XCircle, Bell,
+} from "lucide-react";
+import usePushNotifications from "../../hooks/usePushNotifications";
 
+/* ─── Animation Variants ─── */
 const drawerVariants = {
   hidden: { x: "100%" },
-  visible: {
-    x: 0,
-    transition: {
-      type: "tween",
-      duration: 0.35,
-    },
-  },
-  exit: {
-    x: "100%",
-    transition: {
-      type: "tween",
-      duration: 0.25,
-    },
-  },
+  visible: { x: 0, transition: { type: "spring", stiffness: 300, damping: 30 } },
+  exit: { x: "100%", transition: { type: "spring", stiffness: 300, damping: 30 } },
 };
 
 const overlayVariants = {
   hidden: { opacity: 0 },
-  visible: { opacity: 0.5 },
+  visible: { opacity: 1 },
   exit: { opacity: 0 },
 };
 
+/* ─── All editable fields definition ─── */
+const profileFields = [
+  { key: "phoneNumber", labelKey: "profile.phone", icon: Phone, type: "tel", placeholder: "+977 98XXXXXXXX" },
+  { key: "email", labelKey: "profile.email", icon: Mail, type: "email", placeholder: "you@example.com" },
+  { key: "gender", labelKey: "profile.gender", icon: UserIcon, type: "select", options: ["Male", "Female", "Other"] },
+  { key: "citizenshipId", labelKey: "profile.citizenship", icon: IdCard, type: "text", placeholder: "XX-XX-XX-XXXXX" },
+  { key: "address", labelKey: "profile.address", icon: MapPin, type: "text", placeholder: "Butwal-11, Rupandehi" },
+];
+
+/* ─── Push Notifications Toggle Row ─── */
+const PushToggleRow = () => {
+  const { isSupported, isSubscribed, loading, subscribe, unsubscribe } = usePushNotifications();
+  const { t } = useTranslation();
+
+  if (!isSupported) return null;
+
+  const handleToggle = async () => {
+    if (isSubscribed) {
+      await unsubscribe();
+    } else {
+      await subscribe();
+    }
+  };
+
+  return (
+    <div className="flex items-center justify-between p-3">
+      <div className="flex items-center gap-3">
+        <div className="w-9 h-9 rounded-full bg-blue-50 flex items-center justify-center text-blue-600">
+          <Bell size={18} />
+        </div>
+        <div>
+          <span className="text-sm font-semibold text-gray-700">
+            {t("profile.pushNotifications", "Push Notifications")}
+          </span>
+          {Notification.permission === "denied" && (
+            <p className="text-xs text-red-500 mt-0.5">Blocked by browser</p>
+          )}
+        </div>
+      </div>
+      <button
+        onClick={handleToggle}
+        disabled={loading || Notification.permission === "denied"}
+        aria-label="Toggle push notifications"
+        className={`w-12 h-6 rounded-full transition-colors relative disabled:opacity-50 ${
+          isSubscribed ? "bg-blue-500" : "bg-gray-300"
+        }`}
+      >
+        <motion.div
+          className="w-5 h-5 bg-white rounded-full absolute top-0.5 left-0.5 shadow-sm"
+          animate={{ x: isSubscribed ? 24 : 0 }}
+          transition={{ type: "spring", stiffness: 500, damping: 30 }}
+        />
+      </button>
+    </div>
+  );
+};
+
+/* ═══════════════════════════════════════════
+   Main Profile Drawer
+   ═══════════════════════════════════════════ */
 const ProfileDrawer = ({ open, onClose }) => {
   const navigate = useNavigate();
   const { t } = useTranslation();
   const { localGov } = useLocalGovStore();
+  const fileInputRef = useRef(null);
 
   const {
-    theme,
-    setTheme,
-    fontSize,
-    setFontSize,
-    fontFamily,
-    setFontFamily,
-    language,
-    setLanguage,
+    theme, setTheme,
+    fontSize, setFontSize,
+    fontFamily, setFontFamily,
+    language, setLanguage,
   } = usePreferences();
 
   const user = useAuth((state) => state.user);
   const logout = useAuth((state) => state.logout);
+  const updateUser = useAuth((state) => state.updateUser);
 
+  const [avatarUrl, setAvatarUrl] = useState(user?.avatar || "/assets/dummy/krishna.jpg");
+
+  useEffect(() => {
+    if (user?.avatar) {
+      setAvatarUrl(user.avatar);
+    }
+  }, [user?.avatar]);
+
+  const [isEditing, setIsEditing] = useState(false);
+  const [editForm, setEditForm] = useState({});
+
+  // Sync edit form when user changes or editing starts
+  useEffect(() => {
+    if (isEditing && user) {
+      setEditForm({
+        phoneNumber: user.phoneNumber || "",
+        email: user.email || "",
+        gender: user.gender || "",
+        citizenshipId: user.citizenshipId || "",
+        address: user.address || "",
+      });
+    }
+  }, [isEditing, user]);
+
+  // Lock body scroll when drawer is open
   useEffect(() => {
     document.body.style.overflow = open ? "hidden" : "auto";
     return () => (document.body.style.overflow = "auto");
+  }, [open]);
+
+  // Reset edit mode when drawer closes
+  useEffect(() => {
+    if (!open) setIsEditing(false);
   }, [open]);
 
   const handleLogout = () => {
@@ -60,217 +143,345 @@ const ProfileDrawer = ({ open, onClose }) => {
     navigate("/welcome");
   };
 
+  const handleAvatarClick = () => fileInputRef.current?.click();
+
+  const handleFileChange = (e) => {
+    const file = e.target.files?.[0];
+    if (file) {
+      const reader = new FileReader();
+      reader.onloadend = () => {
+        const base64Image = reader.result;
+        setAvatarUrl(base64Image);
+        updateUser({ avatar: base64Image }); // Save to global state so it persists
+      };
+      reader.readAsDataURL(file);
+    }
+  };
+
+  const handleFormChange = (key, value) => {
+    setEditForm((prev) => ({ ...prev, [key]: value }));
+  };
+
+  const handleSave = () => {
+    updateUser(editForm);
+    setIsEditing(false);
+  };
+
+  const handleCancel = () => {
+    setIsEditing(false);
+  };
+
+  // Filter out empty fields in view mode
+  const filledFields = profileFields.filter(
+    (f) => user?.[f.key] && String(user[f.key]).trim() !== ""
+  );
+
   return (
     <AnimatePresence>
       {open && (
         <>
-          {/* Overlay */}
+          {/* ─── Overlay (z-60, above navbar z-50) ─── */}
           <motion.div
             initial="hidden"
             animate="visible"
             exit="exit"
             variants={overlayVariants}
-            className="fixed inset-0 bg-gray-500 z-40"
+            className="fixed inset-0 bg-black/40 backdrop-blur-sm z-[60]"
             onClick={onClose}
+            aria-hidden="true"
           />
 
-          {/* Drawer */}
+          {/* ─── Drawer (z-70) ─── */}
           <motion.div
             initial="hidden"
             animate="visible"
             exit="exit"
             variants={drawerVariants}
-            className="fixed top-0 right-0 h-full w-[90vw] sm:w-[380px] bg-white z-50 shadow-lg flex flex-col"
+            className="fixed top-0 right-0 h-full w-[100vw] sm:w-[420px] bg-bg-light z-[70] shadow-2xl flex flex-col overflow-hidden"
+            role="dialog"
+            aria-label="Profile"
           >
-            {/* Header */}
-            <div className="flex items-center justify-between p-4 border-b shrink-0">
+            {/* ── Gradient Header ── */}
+            <div className="relative shrink-0 bg-gradient-to-br from-[#155ac1] to-blue-400 pt-14 pb-20 px-6">
               <button
                 onClick={onClose}
-                aria-label={t("profile.back")}
-                className="text-2xl text-gray-700"
+                aria-label={t("profile.back") || "Close"}
+                className="absolute top-4 left-4 p-2 bg-white/20 hover:bg-white/30 rounded-full text-white backdrop-blur-md transition-colors"
               >
-                ←
+                <X size={22} />
               </button>
-              <h2 className="text-lg font-semibold">{t("profile.title")}</h2>
-              <span className="w-6" />
             </div>
 
-            {/* Content */}
-            <motion.div
-              className="overflow-y-auto p-4 space-y-4 text-sm text-gray-800 flex-1"
-              initial={{ opacity: 0 }}
-              animate={{ opacity: 1 }}
-              transition={{ delay: 0.2 }}
-            >
-              {/* User Info */}
-              <motion.div
-                className="flex flex-col items-center"
-                initial={{ opacity: 0, y: 10 }}
-                animate={{ opacity: 1, y: 0 }}
-                transition={{ delay: 0.3 }}
-              >
-                <div
-                  className="w-24 h-24 rounded-full relative bg-cover bg-center bg-no-repeat"
-                  style={{
-                    backgroundImage: `url('/assets/dummy/krishna.jpg')`,
-                  }}
-                >
-                  <button className="absolute bottom-1 right-1 bg-white p-1 rounded-full shadow text-xs cursor-pointer hover:bg-gray-100 transition">
-                    ✏️
-                  </button>
-                </div>
-                <p className="mt-2 text-lg font-bold">
-                  {user?.username || "Guest"}
-                </p>
-                <p className="text-gray-500 text-sm">
-                  {user?.role || "Not logged in"}
-                </p>
-                <p className="text-sm">
-                  📍 {localGov || "Detecting your local government..."}
-                </p>
-              </motion.div>
+            {/* ── Scrollable Content ── */}
+            <div className="flex-1 overflow-y-auto -mt-14 pb-10">
 
-              {user && (
-                <motion.div
-                  className="bg-gray-50 rounded-lg p-4 space-y-2"
-                  initial="hidden"
-                  animate="visible"
-                  variants={{
-                    hidden: {},
-                    visible: {
-                      transition: { staggerChildren: 0.05 },
-                    },
-                  }}
-                >
-                  {[
-                    { label: t("profile.phone"), value: user.phoneNumber },
-                    { label: t("profile.email"), value: user.email },
-                    { label: t("profile.gender"), value: user.gender },
-                    {
-                      label: t("profile.citizenship"),
-                      value: user.citizenshipId,
-                    },
-                    { label: t("profile.address"), value: user.address },
-                  ].map((info, idx) => (
-                    <motion.div
-                      key={idx}
-                      variants={{
-                        hidden: { opacity: 0, y: 5 },
-                        visible: { opacity: 1, y: 0 },
-                      }}
-                      transition={{ duration: 0.2 }}
-                    >
-                      <InfoRow label={info.label} value={info.value || "N/A"} />
-                    </motion.div>
-                  ))}
-                </motion.div>
-              )}
-
-              {/* Preferences */}
-              <div className="bg-gray-50 rounded-lg p-4 space-y-4">
-                <SelectRow
-                  label={t("profile.language")}
-                  value={language}
-                  onChange={setLanguage}
-                  options={[
-                    { value: "en", label: "English" },
-                    { value: "ne", label: "नेपाली" },
-                  ]}
-                />
-                <SelectRow
-                  label={t("profile.fontSize")}
-                  value={fontSize}
-                  onChange={setFontSize}
-                  options={[
-                    { value: "sm", label: "Small" },
-                    { value: "base", label: "Default" },
-                    { value: "lg", label: "Large" },
-                    { value: "xl", label: "Extra Large" },
-                  ]}
-                />
-                <SelectRow
-                  label={t("profile.fontFamily")}
-                  value={fontFamily}
-                  onChange={setFontFamily}
-                  options={[
-                    { value: "poppins", label: "Poppins" },
-                    { value: "arial", label: "Arial" },
-                    { value: "sans", label: "Sans" },
-                    { value: "serif", label: "Serif" },
-                    { value: "mono", label: "Monospace" },
-                    { value: "montserrat", label: "Montserrat" },
-                  ]}
-                />
-                <label className="block text-sm font-medium">
-                  {t("profile.theme")}
+              {/* Avatar + Identity Block */}
+              <div className="relative z-10 flex flex-col items-center px-6 pb-4">
+                <div className="relative">
+                  <img
+                    src={avatarUrl}
+                    alt={user?.username || "Avatar"}
+                    className="w-28 h-28 rounded-full border-[5px] border-white bg-white shadow-lg object-cover"
+                  />
                   <button
-                    onClick={() =>
-                      setTheme(theme === "light" ? "dark" : "light")
-                    }
-                    className="block w-full bg-gray-100 border rounded py-1 mt-1"
+                    onClick={handleAvatarClick}
+                    aria-label="Change profile picture"
+                    className="absolute bottom-0 right-0 bg-primary-red p-2 rounded-full shadow-md text-white hover:bg-red-700 hover:scale-105 transition-all duration-200 active:scale-95"
                   >
-                    {theme === "light" ? "🌙 Dark Mode" : "🌞 Light Mode"}
+                    <Camera size={16} strokeWidth={2.5} />
                   </button>
-                </label>
+                  <input
+                    type="file"
+                    ref={fileInputRef}
+                    onChange={handleFileChange}
+                    accept="image/*"
+                    className="hidden"
+                  />
+                </div>
+
+                <h2 className="mt-3 text-2xl font-extrabold text-gray-900 tracking-tight">
+                  {user?.username || t("profile.guest")}
+                </h2>
+
+                <div className="flex items-center gap-1.5 mt-1 text-sm">
+                  <span className="inline-flex items-center gap-1 bg-blue-50 text-blue-700 border border-blue-100 px-2.5 py-0.5 rounded-full font-medium capitalize">
+                    <ShieldCheck size={14} />
+                    {user?.role || t("profile.notLoggedIn")}
+                  </span>
+                </div>
+
+                <div className="flex items-center gap-1.5 mt-2 text-sm text-gray-500">
+                  <MapPin size={14} className="text-red-500" />
+                  <span>{localGov || t("profile.detectingLocation")}</span>
+                </div>
+
+                {/* Edit Profile Button */}
+                {user && !isEditing && (
+                  <motion.button
+                    onClick={() => setIsEditing(true)}
+                    className="mt-4 flex items-center gap-2 px-5 py-2 bg-gray-100 hover:bg-gray-200 text-gray-700 font-semibold text-sm rounded-full transition-colors active:scale-95"
+                    whileTap={{ scale: 0.95 }}
+                  >
+                    <Pencil size={15} />
+                    {t("profile.editProfile")}
+                  </motion.button>
+                )}
               </div>
 
-              {/* Community Text */}
-              <motion.div
-                className="bg-white text-center text-md font-medium p-3 rounded-lg shadow border"
-                initial={{ opacity: 0, y: 6 }}
-                animate={{ opacity: 1, y: 0 }}
-                transition={{ delay: 0.3 }}
-              >
-                🤝 {t("profile.community")}
-              </motion.div>
+              <div className="px-5 space-y-6">
 
-              {/* Admin Button */}
-              {user?.role === "admin" && (
-                <motion.div
-                  className="text-center mt-4"
-                  initial={{ scale: 0.9, opacity: 0 }}
-                  animate={{ scale: 1, opacity: 1 }}
-                  transition={{ delay: 0.4 }}
-                >
-                  <button
-                    onClick={() => {
-                      onClose();
-                      navigate("/admin");
-                    }}
-                    className="px-4 py-2 bg-indigo-600 text-white rounded hover:bg-indigo-700 transition"
-                  >
-                    🛠 Admin Dashboard
-                  </button>
-                </motion.div>
-              )}
+                {/* ═══ EDIT MODE ═══ */}
+                <AnimatePresence mode="wait">
+                  {isEditing ? (
+                    <motion.section
+                      key="edit-mode"
+                      initial={{ opacity: 0, y: 10 }}
+                      animate={{ opacity: 1, y: 0 }}
+                      exit={{ opacity: 0, y: -10 }}
+                      transition={{ duration: 0.25 }}
+                    >
+                      <h3 className="text-xs font-bold text-gray-400 uppercase tracking-wider mb-2 pl-2">
+                        {t("profile.editProfile")}
+                      </h3>
+                      <div className="bg-white rounded-3xl p-4 shadow-sm border border-gray-100/80 space-y-4">
+                        {profileFields.map((field) => (
+                          <EditField
+                            key={field.key}
+                            icon={field.icon}
+                            label={t(field.labelKey)}
+                            type={field.type}
+                            value={editForm[field.key] || ""}
+                            placeholder={field.placeholder}
+                            options={field.options}
+                            onChange={(val) => handleFormChange(field.key, val)}
+                          />
+                        ))}
+                      </div>
 
-              {/* Auth Button */}
-              <motion.div
-                className="text-center mt-4"
-                initial={{ scale: 0.95, opacity: 0 }}
-                animate={{ scale: 1, opacity: 1 }}
-                transition={{ delay: 0.4 }}
-              >
-                {user ? (
-                  <button
-                    onClick={handleLogout}
-                    className="px-4 py-2 text-white bg-red-500 rounded hover:bg-red-600 transition"
-                  >
-                    {t("auth.logout") || "Logout"}
-                  </button>
-                ) : (
-                  <button
-                    onClick={() => {
-                      onClose();
-                      navigate("/welcome");
-                    }}
-                    className="px-4 py-2 text-white bg-blue-500 rounded hover:bg-blue-600 transition"
-                  >
-                    {t("auth.login") || "Login"}
-                  </button>
-                )}
-              </motion.div>
-            </motion.div>
+                      {/* Save / Cancel Buttons */}
+                      <div className="flex gap-3 mt-4">
+                        <button
+                          onClick={handleCancel}
+                          className="flex-1 flex items-center justify-center gap-2 py-3 bg-gray-100 text-gray-600 font-bold rounded-2xl hover:bg-gray-200 transition-colors active:scale-[0.98]"
+                        >
+                          <XCircle size={18} />
+                          {t("profile.cancel")}
+                        </button>
+                        <button
+                          onClick={handleSave}
+                          className="flex-1 flex items-center justify-center gap-2 py-3 bg-blue-600 text-white font-bold rounded-2xl shadow-md hover:bg-blue-700 transition-colors active:scale-[0.98]"
+                        >
+                          <Save size={18} />
+                          {t("profile.save")}
+                        </button>
+                      </div>
+                    </motion.section>
+
+                  ) : (
+                    /* ═══ VIEW MODE ═══ */
+                    <motion.section
+                      key="view-mode"
+                      initial={{ opacity: 0, y: 10 }}
+                      animate={{ opacity: 1, y: 0 }}
+                      exit={{ opacity: 0, y: -10 }}
+                      transition={{ duration: 0.25 }}
+                    >
+                      {filledFields.length > 0 && (
+                        <>
+                          <h3 className="text-xs font-bold text-gray-400 uppercase tracking-wider mb-2 pl-2">
+                            {t("profile.personalInfo")}
+                          </h3>
+                          <div className="bg-white rounded-3xl p-1 shadow-sm border border-gray-100/80">
+                            {filledFields.map((field, idx) => (
+                              <div key={field.key}>
+                                <InfoRow
+                                  icon={field.icon}
+                                  label={t(field.labelKey)}
+                                  value={user[field.key]}
+                                />
+                                {idx < filledFields.length - 1 && (
+                                  <div className="h-[1px] bg-gray-50 ml-14" />
+                                )}
+                              </div>
+                            ))}
+                          </div>
+                        </>
+                      )}
+
+                      {filledFields.length === 0 && user && (
+                        <div className="bg-white rounded-3xl p-6 shadow-sm border border-gray-100/80 text-center">
+                          <p className="text-gray-400 text-sm">
+                            {t("profile.noProfileInfo")}
+                          </p>
+                          <button
+                            onClick={() => setIsEditing(true)}
+                            className="mt-3 text-blue-600 font-semibold text-sm hover:underline"
+                          >
+                            {t("profile.addDetails")}
+                          </button>
+                        </div>
+                      )}
+                    </motion.section>
+                  )}
+                </AnimatePresence>
+
+                {/* ═══ APP PREFERENCES ═══ */}
+                <section>
+                  <h3 className="text-xs font-bold text-gray-400 uppercase tracking-wider mb-2 pl-2">
+                    {t("profile.appPreferences")}
+                  </h3>
+                  <div className="bg-white rounded-3xl p-1 shadow-sm border border-gray-100/80">
+                    <SelectRow
+                      icon={Globe}
+                      label={t("profile.language")}
+                      value={language}
+                      onChange={setLanguage}
+                      options={[
+                        { value: "bhojpuri", label: "भोजपुरी" },
+                        { value: "en", label: "English" },
+                        { value: "hindi", label: "हिन्दी" },
+                        { value: "magar", label: "मगर" },
+                        { value: "maithili", label: "मैथिली" },
+                        { value: "ne", label: "नेपाली" },
+                        { value: "newar", label: "नेपालभाषा" },
+                        { value: "tamang", label: "तामाङ" },
+                        { value: "tharu", label: "थारु" },
+                      ]}
+                    />
+                    <div className="h-[1px] bg-gray-50 ml-14" />
+                    <SelectRow
+                      icon={Type}
+                      label={t("profile.fontSize")}
+                      value={fontSize}
+                      onChange={setFontSize}
+                      options={[
+                        { value: "sm", label: "Small" },
+                        { value: "base", label: "Default" },
+                        { value: "lg", label: "Large" },
+                        { value: "xl", label: "Extra Large" },
+                      ]}
+                    />
+                    <div className="h-[1px] bg-gray-50 ml-14" />
+                    <SelectRow
+                      icon={Settings}
+                      label={t("profile.fontFamily")}
+                      value={fontFamily}
+                      onChange={setFontFamily}
+                      options={[
+                        { value: "inter", label: "Inter (Modern)" },
+                        { value: "poppins", label: "Poppins" },
+                        { value: "montserrat", label: "Montserrat" },
+                        { value: "roboto", label: "Roboto" },
+                        { value: "outfit", label: "Outfit" },
+                        { value: "mukta", label: "Mukta (Nepali)" },
+                        { value: "yantramanav", label: "Yantramanav (Nepali)" },
+                        { value: "khand", label: "Khand (Nepali)" },
+                        { value: "kalam", label: "Kalam (Nepali / Handwriting)" },
+                        { value: "laila", label: "Laila (Nepali / Serif)" },
+                        { value: "arial", label: "Arial" },
+                        { value: "sans", label: "System Sans" },
+                        { value: "serif", label: "System Serif" },
+                        { value: "mono", label: "Monospace" },
+                      ]}
+                    />
+                    <div className="h-[1px] bg-gray-50 ml-14" />
+                    {/* Theme Toggle */}
+                    <div className="flex items-center justify-between p-3">
+                      <div className="flex items-center gap-3">
+                        <div className="w-9 h-9 rounded-full bg-purple-50 flex items-center justify-center text-purple-600">
+                          {theme === "light" ? <Sun size={18} /> : <Moon size={18} />}
+                        </div>
+                        <span className="text-sm font-semibold text-gray-700">{t("profile.theme")}</span>
+                      </div>
+                      <button
+                        onClick={() => setTheme(theme === "light" ? "dark" : "light")}
+                        aria-label="Toggle theme"
+                        className={`w-12 h-6 rounded-full transition-colors relative ${theme === "dark" ? "bg-purple-500" : "bg-gray-300"}`}
+                      >
+                        <motion.div
+                          className="w-5 h-5 bg-white rounded-full absolute top-0.5 left-0.5 shadow-sm"
+                          animate={{ x: theme === "dark" ? 24 : 0 }}
+                          transition={{ type: "spring", stiffness: 500, damping: 30 }}
+                        />
+                      </button>
+                    </div>
+                    <div className="h-[1px] bg-gray-50 ml-14" />
+                    {/* Push Notifications Toggle */}
+                    <PushToggleRow />
+                  </div>
+                </section>
+
+                {/* ═══ ACTION BUTTONS ═══ */}
+                <section className="space-y-3 pt-2 pb-6">
+                  {user?.role === "admin" && (
+                    <button
+                      onClick={() => { onClose(); navigate("/admin"); }}
+                      className="w-full flex items-center justify-center gap-2 py-3.5 bg-indigo-50 text-indigo-700 font-bold rounded-2xl hover:bg-indigo-100 transition-colors active:scale-[0.98]"
+                    >
+                      <ShieldCheck size={20} />
+                      {t("profile.adminDashboard")}
+                    </button>
+                  )}
+
+                  {user ? (
+                    <button
+                      onClick={handleLogout}
+                      className="w-full flex items-center justify-center gap-2 py-3.5 bg-red-50 text-red-600 font-bold rounded-2xl hover:bg-red-100 transition-colors active:scale-[0.98]"
+                    >
+                      <LogOut size={20} />
+                      {t("auth.logout")}
+                    </button>
+                  ) : (
+                    <button
+                      onClick={() => { onClose(); navigate("/welcome"); }}
+                      className="w-full flex items-center justify-center gap-2 py-3.5 bg-blue-600 text-white font-bold rounded-2xl shadow-md hover:bg-blue-700 transition-colors active:scale-[0.98]"
+                    >
+                      {t("auth.login")}
+                    </button>
+                  )}
+                </section>
+              </div>
+            </div>
           </motion.div>
         </>
       )}
@@ -278,28 +489,77 @@ const ProfileDrawer = ({ open, onClose }) => {
   );
 };
 
-const InfoRow = ({ label, value }) => (
-  <div className="flex justify-between">
-    <span className="text-gray-500">{label}</span>
-    <span>{value}</span>
+/* ─────────────────────────────────────────
+   Sub-components
+   ───────────────────────────────────────── */
+
+/** View-mode row: icon + label + value */
+const InfoRow = ({ icon: Icon, label, value }) => (
+  <div className="flex items-center p-3 gap-3">
+    <div className="w-9 h-9 rounded-full bg-gray-50 flex items-center justify-center text-gray-500 shrink-0">
+      <Icon size={18} />
+    </div>
+    <div className="flex flex-col flex-1 min-w-0">
+      <span className="text-[11px] font-bold text-gray-400 uppercase tracking-wider">{label}</span>
+      <span className="text-sm font-medium text-gray-800 truncate">{value}</span>
+    </div>
   </div>
 );
 
-const SelectRow = ({ label, value, onChange, options }) => (
-  <label className="block text-sm font-medium">
-    {label}
+/** Edit-mode field: icon + label + input/select */
+const EditField = ({ icon: Icon, label, type, value, placeholder, options, onChange }) => (
+  <div className="flex items-start gap-3">
+    <div className="w-9 h-9 mt-1 rounded-full bg-blue-50 flex items-center justify-center text-blue-600 shrink-0">
+      <Icon size={18} />
+    </div>
+    <div className="flex flex-col flex-1 min-w-0">
+      <label className="text-[11px] font-bold text-gray-400 uppercase tracking-wider mb-1">
+        {label}
+      </label>
+      {type === "select" ? (
+        <select
+          value={value}
+          onChange={(e) => onChange(e.target.value)}
+          className="w-full bg-gray-50 border border-gray-200 rounded-xl px-3 py-2.5 text-sm font-medium text-gray-800 focus:outline-none focus:ring-2 focus:ring-blue-300 focus:border-transparent transition"
+        >
+          <option value="">— Select —</option>
+          {options.map((opt) => (
+            <option key={opt} value={opt}>{opt}</option>
+          ))}
+        </select>
+      ) : (
+        <input
+          type={type}
+          value={value}
+          placeholder={placeholder}
+          onChange={(e) => onChange(e.target.value)}
+          className="w-full bg-gray-50 border border-gray-200 rounded-xl px-3 py-2.5 text-sm font-medium text-gray-800 placeholder:text-gray-300 focus:outline-none focus:ring-2 focus:ring-blue-300 focus:border-transparent transition"
+        />
+      )}
+    </div>
+  </div>
+);
+
+/** Preferences row: icon + label + select dropdown */
+const SelectRow = ({ icon: Icon, label, value, onChange, options }) => (
+  <div className="flex items-center justify-between p-3 gap-3">
+    <div className="flex items-center gap-3">
+      <div className="w-9 h-9 rounded-full bg-gray-50 flex items-center justify-center text-gray-500 shrink-0">
+        <Icon size={18} />
+      </div>
+      <span className="text-sm font-semibold text-gray-700">{label}</span>
+    </div>
     <select
-      className="w-full mt-1 border rounded px-2 py-1"
+      className="bg-transparent text-sm font-medium text-gray-500 text-right focus:outline-none cursor-pointer"
       value={value}
       onChange={(e) => onChange(e.target.value)}
+      aria-label={label}
     >
       {options.map((opt) => (
-        <option key={opt.value} value={opt.value}>
-          {opt.label}
-        </option>
+        <option key={opt.value} value={opt.value}>{opt.label}</option>
       ))}
     </select>
-  </label>
+  </div>
 );
 
 export default ProfileDrawer;
