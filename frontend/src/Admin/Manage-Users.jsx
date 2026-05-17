@@ -140,7 +140,7 @@ export default function ManageUsers() {
         <button 
           onClick={() => exportToCSV(filteredUsers, "users")}
           disabled={filteredUsers.length === 0}
-          className="flex items-center gap-2 bg-white border border-gray-200 text-gray-700 hover:bg-gray-50 px-4 py-2 rounded-lg shadow-sm font-medium text-sm transition focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:ring-offset-1 active:scale-95 disabled:opacity-50"
+          className="flex items-center gap-2 bg-white border border-gray-200 text-gray-700 hover:bg-gray-50 hover:-translate-y-0.5 hover:shadow-md px-4 py-2 rounded-lg shadow-sm font-medium text-sm transition-all focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:ring-offset-1 active:scale-95 disabled:opacity-50 disabled:hover:translate-y-0 disabled:hover:shadow-sm"
         >
           <Download size={16} /> Export CSV
         </button>
@@ -224,7 +224,7 @@ export default function ManageUsers() {
                     <div className="flex gap-2">
                       <button
                         onClick={() => setSelectedUser(user)}
-                        className="flex items-center gap-1 px-3 py-1.5 bg-blue-50 text-blue-600 rounded-lg hover:bg-blue-100 transition text-xs font-medium"
+                        className="flex items-center gap-1 px-3 py-1.5 bg-blue-50 text-blue-600 rounded-lg hover:bg-blue-100 hover:-translate-y-0.5 hover:shadow-sm transition-all text-xs font-medium active:scale-95"
                       >
                         <Eye size={13} /> View
                       </button>
@@ -235,14 +235,14 @@ export default function ManageUsers() {
                             user.role === "admin" ? "user" : "admin"
                           )
                         }
-                        className="flex items-center gap-1 px-3 py-1.5 bg-indigo-600 text-white rounded-lg hover:bg-indigo-700 transition text-xs font-medium"
+                        className="flex items-center gap-1 px-3 py-1.5 bg-indigo-600 text-white rounded-lg hover:bg-indigo-700 hover:-translate-y-0.5 hover:shadow-sm transition-all text-xs font-medium active:scale-95"
                       >
                         <Shield size={13} />
                         {user.role === "admin" ? "Make User" : "Make Admin"}
                       </button>
                       <button
                         onClick={() => handleDeleteUser(user._id)}
-                        className="flex items-center gap-1 px-3 py-1.5 bg-red-50 text-red-600 rounded-lg hover:bg-red-100 transition text-xs font-medium"
+                        className="flex items-center gap-1 px-3 py-1.5 bg-red-50 text-red-600 rounded-lg hover:bg-red-100 hover:-translate-y-0.5 hover:shadow-sm transition-all text-xs font-medium active:scale-95"
                       >
                         <Trash2 size={13} /> Delete
                       </button>
@@ -382,13 +382,13 @@ export default function ManageUsers() {
               <div className="flex justify-end gap-3">
                 <button
                   onClick={() => setModal({ visible: false, action: null })}
-                  className="px-4 py-2 rounded-lg bg-gray-100 hover:bg-gray-200 text-sm font-medium transition"
+                  className="px-4 py-2 rounded-lg bg-gray-100 hover:bg-gray-200 text-sm font-medium hover:-translate-y-0.5 active:scale-95 transition-all"
                 >
                   Cancel
                 </button>
                 <button
                   onClick={handleConfirm}
-                  className="px-4 py-2 rounded-lg bg-indigo-600 hover:bg-indigo-700 text-white text-sm font-medium transition"
+                  className="px-4 py-2 rounded-lg bg-indigo-600 hover:bg-indigo-700 text-white hover:shadow-md hover:-translate-y-0.5 text-sm font-medium active:scale-95 transition-all"
                 >
                   Confirm
                 </button>

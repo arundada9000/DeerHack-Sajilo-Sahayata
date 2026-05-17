@@ -64,6 +64,27 @@ const safeZoneTypesConfig = [
   { key: "distribution", label: "Distribution", color: "#f59e0b" },
 ];
 
+const incidentThemes = {
+  fire: { gradient: "from-red-600 to-red-500", text: "text-red-100", btn: "text-red-600 bg-red-50 hover:bg-red-600 hover:text-white" },
+  flood: { gradient: "from-cyan-600 to-blue-500", text: "text-cyan-100", btn: "text-cyan-600 bg-cyan-50 hover:bg-cyan-600 hover:text-white" },
+  landslide: { gradient: "from-orange-600 to-amber-500", text: "text-orange-100", btn: "text-orange-600 bg-orange-50 hover:bg-orange-600 hover:text-white" },
+  accident: { gradient: "from-rose-600 to-pink-500", text: "text-rose-100", btn: "text-rose-600 bg-rose-50 hover:bg-rose-600 hover:text-white" },
+  earthquake: { gradient: "from-amber-600 to-yellow-500", text: "text-amber-100", btn: "text-amber-600 bg-amber-50 hover:bg-amber-600 hover:text-white" },
+  garbage: { gradient: "from-teal-600 to-emerald-500", text: "text-teal-100", btn: "text-teal-600 bg-teal-50 hover:bg-teal-600 hover:text-white" },
+  relief: { gradient: "from-indigo-600 to-purple-500", text: "text-indigo-100", btn: "text-indigo-600 bg-indigo-50 hover:bg-indigo-600 hover:text-white" },
+  other: { gradient: "from-gray-600 to-slate-500", text: "text-gray-100", btn: "text-gray-600 bg-gray-50 hover:bg-gray-600 hover:text-white" },
+};
+const getIncidentTheme = (type) => incidentThemes[type] || incidentThemes.other;
+
+const safeZoneThemes = {
+  hospital: { gradient: "from-emerald-500 to-teal-400", icon: "text-emerald-500", btn: "text-emerald-700 bg-emerald-50 hover:bg-emerald-600 hover:text-white border-emerald-100/50" },
+  shelter: { gradient: "from-blue-500 to-indigo-400", icon: "text-blue-500", btn: "text-blue-700 bg-blue-50 hover:bg-blue-600 hover:text-white border-blue-100/50" },
+  police: { gradient: "from-indigo-600 to-blue-500", icon: "text-indigo-500", btn: "text-indigo-700 bg-indigo-50 hover:bg-indigo-600 hover:text-white border-indigo-100/50" },
+  fire_station: { gradient: "from-red-500 to-rose-400", icon: "text-red-500", btn: "text-red-700 bg-red-50 hover:bg-red-600 hover:text-white border-red-100/50" },
+  distribution: { gradient: "from-amber-500 to-orange-400", icon: "text-amber-500", btn: "text-amber-700 bg-amber-50 hover:bg-amber-600 hover:text-white border-amber-100/50" },
+};
+const getSafeZoneTheme = (type) => safeZoneThemes[type] || safeZoneThemes.hospital;
+
 const getIcon = (type) =>
   new L.Icon({
     iconUrl: `/icons/map-icons-red/${type}.svg`,
@@ -330,62 +351,65 @@ const MapPage = () => {
                 </motion.div>
               )}
 
-              {visibleIncidents.map((incident, index) => (
-                <motion.div
-                  key={incident.id}
-                  initial={{ opacity: 0, scale: 0.5, y: -10 }}
-                  animate={{ opacity: 1, scale: 1, y: 0 }}
-                  exit={{ opacity: 0, scale: 0.5, y: -10 }}
-                  transition={{ duration: 0.3, delay: index * 0.04 }}
-                >
-                  <Marker
-                    position={[incident.lat, incident.lng]}
-                    icon={
-                      focusedIncident?.id === incident.id
-                        ? getFocusedIcon(incident.type)
-                        : getIcon(incident.type)
-                    }
+              {visibleIncidents.map((incident, index) => {
+                const theme = getIncidentTheme(incident.type);
+                return (
+                  <motion.div
+                    key={incident.id}
+                    initial={{ opacity: 0, scale: 0.5, y: -10 }}
+                    animate={{ opacity: 1, scale: 1, y: 0 }}
+                    exit={{ opacity: 0, scale: 0.5, y: -10 }}
+                    transition={{ duration: 0.3, delay: index * 0.04 }}
                   >
-                    <Tooltip direction="top" offset={[0, -20]} opacity={1}>
-                      {incident.title}
-                    </Tooltip>
+                    <Marker
+                      position={[incident.lat, incident.lng]}
+                      icon={
+                        focusedIncident?.id === incident.id
+                          ? getFocusedIcon(incident.type)
+                          : getIcon(incident.type)
+                      }
+                    >
+                      <Tooltip direction="top" offset={[0, -20]} opacity={1}>
+                        {incident.title}
+                      </Tooltip>
 
-                    <Popup className="premium-popup">
-                      <div className="w-[220px]">
-                        {/* Header */}
-                        <div className="bg-gradient-to-r from-red-600 to-rose-500 p-4 rounded-t-xl text-white relative overflow-hidden">
-                          <div className="absolute -right-4 -top-4 opacity-20">
-                            <img src={`/icons/map-icons-red/${incident.type}.svg`} alt="" className="w-20 h-20 filter invert" />
+                      <Popup className="premium-popup">
+                        <div className="w-[220px]">
+                          {/* Header */}
+                          <div className={`bg-gradient-to-r ${theme.gradient} p-4 rounded-t-xl text-white relative overflow-hidden`}>
+                            <div className="absolute -right-4 -top-4 opacity-20">
+                              <img src={`/icons/map-icons-red/${incident.type}.svg`} alt="" className="w-20 h-20 filter invert" />
+                            </div>
+                            <div className="relative z-10">
+                              <span className="bg-black/20 px-2 py-0.5 rounded-full text-[10px] font-bold uppercase tracking-wider backdrop-blur-sm mb-2 inline-block">
+                                {t(`incidentTypes.${incident.type}`)}
+                              </span>
+                              <h3 className="font-bold text-sm leading-tight text-white mb-1 drop-shadow-sm">{incident.title}</h3>
+                              <p className={`text-xs ${theme.text} flex items-center gap-1`}>
+                                <Info size={12} /> {incident.time}
+                              </p>
+                            </div>
                           </div>
-                          <div className="relative z-10">
-                            <span className="bg-black/20 px-2 py-0.5 rounded-full text-[10px] font-bold uppercase tracking-wider backdrop-blur-sm mb-2 inline-block">
-                              {t(`incidentTypes.${incident.type}`)}
-                            </span>
-                            <h3 className="font-bold text-sm leading-tight text-white mb-1 drop-shadow-sm">{incident.title}</h3>
-                            <p className="text-xs text-red-100 flex items-center gap-1">
-                              <Info size={12} /> {incident.time}
-                            </p>
+                          {/* Body */}
+                          <div className="p-4 bg-white rounded-b-xl flex justify-center">
+                            <button
+                              onClick={() => {
+                                const destination = `${incident.lat},${incident.lng}`;
+                                const url = `https://www.google.com/maps/dir//${destination}`;
+                                window.open(url, "_blank");
+                              }}
+                              className={`w-full flex justify-center items-center gap-2 font-bold py-2.5 rounded-lg transition-all duration-200 shadow-sm active:scale-95 ${theme.btn}`}
+                            >
+                              <Navigation size={16} />
+                              {t("map.showPath")}
+                            </button>
                           </div>
                         </div>
-                        {/* Body */}
-                        <div className="p-4 bg-white rounded-b-xl flex justify-center">
-                          <button
-                            onClick={() => {
-                              const destination = `${incident.lat},${incident.lng}`;
-                              const url = `https://www.google.com/maps/dir//${destination}`;
-                              window.open(url, "_blank");
-                            }}
-                            className="w-full flex justify-center items-center gap-2 bg-blue-50 hover:bg-blue-600 hover:text-white text-blue-600 font-bold py-2.5 rounded-lg transition-all duration-200 shadow-sm"
-                          >
-                            <Navigation size={16} />
-                            {t("map.showPath")}
-                          </button>
-                        </div>
-                      </div>
-                    </Popup>
-                  </Marker>
-                </motion.div>
-              ))}
+                      </Popup>
+                    </Marker>
+                  </motion.div>
+                );
+              })}
             </AnimatePresence>
           </MarkerClusterGroup>
 
@@ -410,7 +434,7 @@ const MapPage = () => {
                 <Popup className="premium-popup">
                   <div className="w-[220px]">
                     {/* Header */}
-                    <div className="bg-gradient-to-r from-emerald-500 to-teal-400 p-4 rounded-t-xl text-white relative overflow-hidden">
+                    <div className={`bg-gradient-to-r ${getSafeZoneTheme(zone.type).gradient} p-4 rounded-t-xl text-white relative overflow-hidden`}>
                       <div className="absolute -right-4 -bottom-4 opacity-20">
                         <Shield size={80} />
                       </div>
@@ -425,14 +449,14 @@ const MapPage = () => {
                     <div className="p-4 bg-white rounded-b-xl space-y-3">
                       {zone.address && (
                         <div className="flex items-start gap-2 text-gray-600">
-                          <MapPin size={14} className="mt-0.5 flex-shrink-0 text-emerald-500" />
+                          <MapPin size={14} className={`mt-0.5 flex-shrink-0 ${getSafeZoneTheme(zone.type).icon}`} />
                           <span className="text-xs font-medium leading-relaxed">{zone.address}</span>
                         </div>
                       )}
                       {zone.phone && (
                         <a
                           href={`tel:${zone.phone}`}
-                          className="w-full flex justify-center items-center gap-2 bg-emerald-50 hover:bg-emerald-600 hover:text-white text-emerald-700 font-bold py-2.5 rounded-lg transition-all duration-200 shadow-sm border border-emerald-100/50"
+                          className={`w-full flex justify-center items-center gap-2 font-bold py-2.5 rounded-lg transition-all duration-200 shadow-sm border active:scale-95 ${getSafeZoneTheme(zone.type).btn}`}
                         >
                           <Phone size={14} />
                           {t("map.call", "Call")} {zone.phone}

@@ -87,11 +87,11 @@ export default function ManageAlerts() {
           <button 
             onClick={() => exportToCSV(filtered, "alerts")}
             disabled={filtered.length === 0}
-            className="flex items-center gap-2 bg-white border border-gray-200 text-gray-700 hover:bg-gray-50 px-4 py-2 rounded-lg shadow-sm font-medium text-sm transition focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:ring-offset-1 active:scale-95 disabled:opacity-50"
+            className="flex items-center gap-2 bg-white border border-gray-200 text-gray-700 hover:bg-gray-50 hover:-translate-y-0.5 hover:shadow-md px-4 py-2 rounded-lg shadow-sm font-medium text-sm transition-all focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:ring-offset-1 active:scale-95 disabled:opacity-50 disabled:hover:translate-y-0 disabled:hover:shadow-sm"
           >
             <Download size={16} /> Export CSV
           </button>
-          <button onClick={() => { setSelectedAlert(null); setShowModal(true); }} className="flex items-center gap-2 bg-indigo-600 hover:bg-indigo-700 text-white px-4 py-2 rounded-lg shadow-sm text-sm font-medium transition focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:ring-offset-1 active:scale-95">
+          <button onClick={() => { setSelectedAlert(null); setShowModal(true); }} className="flex items-center gap-2 bg-indigo-600 hover:bg-indigo-700 hover:-translate-y-0.5 hover:shadow-md text-white px-4 py-2 rounded-lg shadow-sm text-sm font-medium transition-all focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:ring-offset-1 active:scale-95">
             <Plus size={16} /> Create Alert
           </button>
         </div>
@@ -115,8 +115,8 @@ export default function ManageAlerts() {
                 <td className="px-6 py-4 text-sm text-gray-600">{alert.location}</td>
                 <td className="px-6 py-4 text-sm text-gray-500 tabular-nums">{new Date(alert.timestamp).toLocaleString()}</td>
                 <td className="px-6 py-4 flex gap-2">
-                  <button onClick={() => { setSelectedAlert(alert); setShowModal(true); }} className="flex items-center gap-1 px-3 py-1.5 text-xs bg-indigo-600 hover:bg-indigo-700 text-white rounded-lg font-medium transition"><Pencil size={13} /> Edit</button>
-                  <button onClick={() => handleDelete(alert._id)} className="flex items-center gap-1 px-3 py-1.5 text-xs bg-red-50 text-red-600 rounded-lg hover:bg-red-100 font-medium transition"><Trash2 size={13} /> Delete</button>
+                  <button onClick={() => { setSelectedAlert(alert); setShowModal(true); }} className="flex items-center gap-1 px-3 py-1.5 text-xs bg-indigo-600 hover:bg-indigo-700 hover:-translate-y-0.5 hover:shadow-sm text-white rounded-lg font-medium transition-all active:scale-95"><Pencil size={13} /> Edit</button>
+                  <button onClick={() => handleDelete(alert._id)} className="flex items-center gap-1 px-3 py-1.5 text-xs bg-red-50 text-red-600 rounded-lg hover:bg-red-100 hover:-translate-y-0.5 hover:shadow-sm font-medium transition-all active:scale-95"><Trash2 size={13} /> Delete</button>
                 </td>
               </motion.tr>
             ))}

@@ -90,11 +90,11 @@ export default function ManageContacts() {
           <button 
             onClick={() => exportToCSV(filtered, "contacts")}
             disabled={filtered.length === 0}
-            className="flex items-center gap-2 bg-white border border-gray-200 text-gray-700 hover:bg-gray-50 px-4 py-2 rounded-lg shadow-sm font-medium text-sm transition focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:ring-offset-1 active:scale-95 disabled:opacity-50"
+            className="flex items-center gap-2 bg-white border border-gray-200 text-gray-700 hover:bg-gray-50 hover:-translate-y-0.5 hover:shadow-md px-4 py-2 rounded-lg shadow-sm font-medium text-sm transition-all focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:ring-offset-1 active:scale-95 disabled:opacity-50 disabled:hover:translate-y-0 disabled:hover:shadow-sm"
           >
             <Download size={16} /> Export CSV
           </button>
-          <button onClick={openCreateModal} className="flex items-center gap-1.5 bg-indigo-600 hover:bg-indigo-700 text-white px-4 py-2 rounded-lg shadow-sm font-medium text-sm transition focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:ring-offset-1 active:scale-95">
+          <button onClick={openCreateModal} className="flex items-center gap-1.5 bg-indigo-600 hover:bg-indigo-700 hover:-translate-y-0.5 hover:shadow-md text-white px-4 py-2 rounded-lg shadow-sm font-medium text-sm transition-all focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:ring-offset-1 active:scale-95">
             <Plus size={16} /> Add New
           </button>
         </div>
@@ -117,8 +117,8 @@ export default function ManageContacts() {
                 <td className="px-6 py-4 text-sm capitalize"><span className="bg-gray-100 text-gray-700 px-2.5 py-1 rounded-full text-xs font-semibold">{record.department}</span></td>
                 <td className="px-6 py-4 text-sm text-gray-600"><div className="flex flex-col gap-1">{record.contacts.map((c, j) => (<div key={j}><span className="font-medium text-gray-800">{c.name}</span>: {c.phone}</div>))}</div></td>
                 <td className="px-6 py-4 text-sm"><div className="flex gap-2">
-                  <button onClick={() => openEditModal(record)} className="flex items-center gap-1 px-3 py-1.5 bg-gray-100 text-gray-700 rounded-lg hover:bg-gray-200 transition text-xs font-medium"><Edit3 size={13} /> Edit</button>
-                  <button onClick={() => handleDelete(record._id)} disabled={deleteMutation.isPending} className="flex items-center gap-1 px-3 py-1.5 bg-red-50 text-red-600 rounded-lg hover:bg-red-100 transition text-xs font-medium disabled:opacity-50"><Trash2 size={13} /> Delete</button>
+                  <button onClick={() => openEditModal(record)} className="flex items-center gap-1 px-3 py-1.5 bg-gray-100 text-gray-700 rounded-lg hover:bg-gray-200 hover:-translate-y-0.5 hover:shadow-sm transition-all text-xs font-medium active:scale-95"><Edit3 size={13} /> Edit</button>
+                  <button onClick={() => handleDelete(record._id)} disabled={deleteMutation.isPending} className="flex items-center gap-1 px-3 py-1.5 bg-red-50 text-red-600 rounded-lg hover:bg-red-100 hover:-translate-y-0.5 hover:shadow-sm transition-all text-xs font-medium active:scale-95 disabled:opacity-50 disabled:hover:translate-y-0"><Trash2 size={13} /> Delete</button>
                 </div></td>
               </motion.tr>
             ))}

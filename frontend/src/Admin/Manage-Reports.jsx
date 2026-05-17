@@ -87,7 +87,7 @@ export default function Reports() {
         <button 
           onClick={() => exportToCSV(filtered, "reports")}
           disabled={filtered.length === 0}
-          className="flex items-center gap-2 bg-white border border-gray-200 text-gray-700 hover:bg-gray-50 px-4 py-2 rounded-lg shadow-sm font-medium text-sm transition focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:ring-offset-1 active:scale-95 disabled:opacity-50"
+          className="flex items-center gap-2 bg-white border border-gray-200 text-gray-700 hover:bg-gray-50 hover:-translate-y-0.5 hover:shadow-md px-4 py-2 rounded-lg shadow-sm font-medium text-sm transition-all focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:ring-offset-1 active:scale-95 disabled:opacity-50 disabled:hover:translate-y-0 disabled:hover:shadow-sm"
         >
           <Download size={16} /> Export CSV
         </button>
@@ -134,7 +134,7 @@ export default function Reports() {
                 <td className="px-6 py-4 text-sm"><span className={`inline-block px-2.5 py-1 rounded-full text-xs font-semibold capitalize ${statusColor(r.status)}`}>{r.status}</span></td>
                 <td className="px-6 py-4 text-sm text-gray-600 max-w-[200px] truncate">{r.description?.slice(0, 50)}{r.description?.length > 50 ? "…" : ""}</td>
                 <td className="px-6 py-4 text-sm text-gray-500">{r.localGovName || "—"}</td>
-                <td className="px-6 py-4"><button onClick={() => handleEdit(r)} className="px-4 py-1.5 text-xs font-medium bg-indigo-600 text-white rounded-lg hover:bg-indigo-700 transition">Edit</button></td>
+                <td className="px-6 py-4"><button onClick={() => handleEdit(r)} className="px-4 py-1.5 text-xs font-medium bg-indigo-600 text-white rounded-lg hover:bg-indigo-700 transition-all hover:-translate-y-0.5 hover:shadow-md active:scale-95">Edit</button></td>
               </motion.tr>
             ))}
           </tbody>

@@ -6,7 +6,16 @@ import Skeleton from "react-loading-skeleton";
 import "react-loading-skeleton/dist/skeleton.css";
 import { useQuery, useQueries } from "@tanstack/react-query";
 import { Helmet } from "react-helmet-async";
-import { Phone, BellRing } from "lucide-react";
+import {
+  Phone,
+  BellRing,
+  ChevronDown,
+  ChevronUp,
+  MapPin as MapPinIcon,
+  Clock,
+  CircleAlert,
+  X,
+} from "lucide-react";
 import API from "../../api/axios";
 import OfflineSyncBanner from "../../components/OfflineSyncBanner";
 
@@ -24,18 +33,92 @@ const fetchAlerts = async () => {
     location: alert.location || "Unknown area",
     description: alert.description,
     timeAgo: new Date(alert.timestamp).toLocaleTimeString(),
+    timestamp: alert.timestamp,
   }));
+};
+
+// Alert type visual config
+const alertMeta = {
+  fire: {
+    icon: "/icons/fire-red.svg",
+    bg: "bg-red-50",
+    border: "border-red-200",
+    accent: "bg-red-500",
+    iconColor: "text-red-500",
+    badge: "bg-red-100 text-red-700",
+  },
+  police: {
+    icon: "/icons/police-red.svg",
+    bg: "bg-blue-50",
+    border: "border-blue-200",
+    accent: "bg-blue-500",
+    iconColor: "text-blue-500",
+    badge: "bg-blue-100 text-blue-700",
+  },
+  flood: {
+    icon: "/icons/flood-red.svg",
+    bg: "bg-cyan-50",
+    border: "border-cyan-200",
+    accent: "bg-cyan-500",
+    iconColor: "text-cyan-500",
+    badge: "bg-cyan-100 text-cyan-700",
+  },
+  earthquake: {
+    icon: "/icons/others-red.svg",
+    bg: "bg-amber-50",
+    border: "border-amber-200",
+    accent: "bg-amber-500",
+    iconColor: "text-amber-500",
+    badge: "bg-amber-100 text-amber-700",
+  },
+  accident: {
+    icon: "/icons/accident-red.svg",
+    bg: "bg-rose-50",
+    border: "border-rose-200",
+    accent: "bg-rose-500",
+    iconColor: "text-rose-500",
+    badge: "bg-rose-100 text-rose-700",
+  },
+  landslide: {
+    icon: "/icons/landslide-red.svg",
+    bg: "bg-orange-50",
+    border: "border-orange-200",
+    accent: "bg-orange-500",
+    iconColor: "text-orange-500",
+    badge: "bg-orange-100 text-orange-700",
+  },
+  other: {
+    icon: "/icons/others-red.svg",
+    bg: "bg-gray-50",
+    border: "border-gray-200",
+    accent: "bg-gray-500",
+    iconColor: "text-gray-500",
+    badge: "bg-gray-100 text-gray-700",
+  },
+};
+
+const getRelativeTime = (timestamp) => {
+  const diff = Date.now() - new Date(timestamp).getTime();
+  const mins = Math.floor(diff / 60000);
+  if (mins < 1) return "Just now";
+  if (mins < 60) return `${mins}m ago`;
+  const hrs = Math.floor(mins / 60);
+  if (hrs < 24) return `${hrs}h ago`;
+  const days = Math.floor(hrs / 24);
+  return `${days}d ago`;
 };
 
 // Nominatim Reverse Geocoding fetcher (with rate limit awareness)
 const fetchReverseGeocode = async (lat, lon) => {
   const res = await fetch(
-    `https://nominatim.openstreetmap.org/reverse?format=jsonv2&lat=${lat}&lon=${lon}`
+    `https://nominatim.openstreetmap.org/reverse?format=jsonv2&lat=${lat}&lon=${lon}`,
   );
   if (!res.ok) throw new Error("Geocoding failed");
   const json = await res.json();
   return json.display_name;
 };
+
+const INITIAL_VISIBLE = 10;
 
 const Dashboard = () => {
   const { t } = useTranslation();
@@ -43,6 +126,8 @@ const Dashboard = () => {
   const [filterType, setFilterType] = useState("all");
   const [sortOrder] = useState("latest");
   const [expandedLocationId, setExpandedLocationId] = useState(null);
+  const [visibleCount, setVisibleCount] = useState(INITIAL_VISIBLE);
+  const [selectedNotification, setSelectedNotification] = useState(null);
 
   // 1. Fetch Alerts (React Query)
   const { data: notifications = [], isLoading: loadingAlerts } = useQuery({
@@ -64,8 +149,9 @@ const Dashboard = () => {
     queries: incidents.map((incident) => {
       const coords = incident.location?.coordinates;
       const isValidCoords = coords && coords.length === 2;
-      
-      let lat = null, lng = null;
+
+      let lat = null,
+        lng = null;
       if (isValidCoords) {
         // Nepal Lat is ~26-30, Lng is ~80-88
         // If coords[0] is > 70, it's the longitude (new format [lng, lat])
@@ -107,7 +193,7 @@ const Dashboard = () => {
     .sort((a, b) =>
       sortOrder === "latest"
         ? new Date(b.timestamp) - new Date(a.timestamp)
-        : new Date(a.timestamp) - new Date(b.timestamp)
+        : new Date(a.timestamp) - new Date(b.timestamp),
     );
 
   const statusDotColor = {
@@ -122,7 +208,8 @@ const Dashboard = () => {
     if (!location) return t("Unknown Location");
     if (locationNames[incident._id]) return locationNames[incident._id];
     if (typeof location === "string") return location;
-    if (location.city && location.area) return `${location.area}, ${location.city}`;
+    if (location.city && location.area)
+      return `${location.area}, ${location.city}`;
     if (location.city) return location.city;
     return t("Unknown Location");
   };
@@ -143,7 +230,7 @@ const Dashboard = () => {
       </div>
 
       <motion.div
-        className="mt-0 px-4 py-4 space-y-4 max-w-md sm:max-w-xl md:max-w-3xl lg:max-w-4xl min-h-full mx-auto bg-bg-card shadow-sm rounded-lg"
+        className="mt-0 px-4 py-4 pb-48 space-y-4 max-w-md sm:max-w-xl md:max-w-3xl lg:max-w-4xl min-h-[calc(100vh-80px)] mx-auto bg-bg-card shadow-sm rounded-lg relative"
         initial={{ opacity: 0, y: 20 }}
         animate={{ opacity: 1, y: 0 }}
         transition={{ duration: 0.4 }}
@@ -151,37 +238,91 @@ const Dashboard = () => {
       >
         {/* Alerts Section */}
         {loadingAlerts ? (
-          <Skeleton height={60} borderRadius={16} />
+          <Skeleton height={80} borderRadius={16} />
         ) : notifications.length > 0 ? (
-          <div className="flex overflow-x-auto md:grid md:grid-cols-2 lg:grid-cols-3 gap-4 p-2 scroll-smooth scrollbar-hide md:overflow-visible">
-            <AnimatePresence>
-              {notifications.map((notification, index) => (
-                <motion.div
-                  key={index}
-                  className="min-w-[280px] md:min-w-0 bg-accent-yellow text-black p-5 rounded-3xl shadow-sm relative border border-yellow-200"
-                  initial={{ opacity: 0, scale: 0.95 }}
-                  animate={{ opacity: 1, scale: 1 }}
-                  exit={{ opacity: 0, scale: 0.95 }}
-                  transition={{ delay: index * 0.05 }}
-                  role="alert"
-                  aria-live="polite"
-                >
-                  <div className="flex items-center gap-2 mb-2">
-                    <BellRing size={16} className="text-primary-red" />
-                    <strong className="text-primary-red font-extrabold tracking-wide uppercase text-xs">
-                      {t("Notification!")}
-                    </strong>
-                  </div>
-                  <p className="text-sm text-text-dark font-medium mt-1">
-                    {notification.timeAgo}, a {notification.type} was reported in{" "}
-                    {notification.location}.
-                  </p>
-                  <p className="text-xs mt-1.5 text-gray-800 opacity-90">
-                    {notification.description}
-                  </p>
-                </motion.div>
-              ))}
-            </AnimatePresence>
+          <div className="space-y-3">
+            <div className="flex items-center gap-2 px-1">
+              <BellRing size={18} className="text-red-500" />
+              <h2 className="text-lg font-bold text-gray-800 tracking-tight">
+                {t("Active Alerts")}
+              </h2>
+              <span className="ml-auto text-xs font-semibold bg-red-100 text-red-700 px-2.5 py-0.5 rounded-full">
+                {notifications.length}
+              </span>
+            </div>
+            <div className="flex overflow-x-auto md:grid md:grid-cols-2 lg:grid-cols-3 gap-3 scroll-smooth scrollbar-hide md:overflow-visible pb-1">
+              <AnimatePresence>
+                {notifications.map((notification, index) => {
+                  const meta = alertMeta[notification.type] || alertMeta.other;
+                  return (
+                    <motion.button
+                      key={index}
+                      onClick={() => setSelectedNotification(notification)}
+                      className={`min-w-[280px] md:min-w-0 relative overflow-hidden rounded-2xl border ${meta.border} ${meta.bg} shadow-sm hover:shadow-md transition-all group text-left cursor-pointer active:scale-[0.98] focus:outline-none focus:ring-2 focus:ring-red-400`}
+                      initial={{ opacity: 0, x: -10 }}
+                      animate={{ opacity: 1, x: 0 }}
+                      exit={{ opacity: 0, x: 10 }}
+                      transition={{
+                        delay: index * 0.06,
+                        type: "spring",
+                        stiffness: 300,
+                        damping: 25,
+                      }}
+                      whileHover={{ y: -2 }}
+                      role="alert"
+                      aria-live="polite"
+                    >
+                      {/* Left accent bar */}
+                      <div
+                        className={`absolute left-0 top-0 bottom-0 w-1 ${meta.accent} rounded-l-2xl`}
+                      />
+
+                      <div className="pl-4 pr-4 py-4">
+                        {/* Top row: type badge + time */}
+                        <div className="flex items-center justify-between mb-2.5">
+                          <div
+                            className={`flex items-center gap-1.5 px-2.5 py-1 rounded-full text-xs font-bold uppercase tracking-wider ${meta.badge}`}
+                          >
+                            <img
+                              src={meta.icon}
+                              alt={notification.type}
+                              className="w-3.5 h-3.5 object-contain filter drop-shadow-sm"
+                            />
+                            <span>{notification.type}</span>
+                          </div>
+                          <div className="flex items-center gap-1 text-[11px] text-gray-500 font-medium">
+                            <Clock size={11} />
+                            <span>
+                              {notification.timestamp
+                                ? getRelativeTime(notification.timestamp)
+                                : notification.timeAgo}
+                            </span>
+                          </div>
+                        </div>
+
+                        {/* Location */}
+                        <div className="flex items-start gap-1.5 mb-1.5">
+                          <MapPinIcon
+                            size={13}
+                            className="text-gray-500 mt-0.5 flex-shrink-0"
+                          />
+                          <span className="text-sm font-semibold text-gray-800 leading-snug">
+                            {notification.location}
+                          </span>
+                        </div>
+
+                        {/* Description */}
+                        {notification.description && (
+                          <p className="text-xs text-gray-600 leading-relaxed line-clamp-1 pl-5">
+                            {notification.description}
+                          </p>
+                        )}
+                      </div>
+                    </motion.button>
+                  );
+                })}
+              </AnimatePresence>
+            </div>
           </div>
         ) : null}
 
@@ -216,123 +357,307 @@ const Dashboard = () => {
               {t("No incidents reported yet.")}
             </div>
           ) : (
-            <div className="flex overflow-x-auto md:grid md:grid-cols-2 lg:grid-cols-3 gap-6 p-2 scrollbar-hide md:overflow-visible pb-6">
-              <AnimatePresence>
-                {filteredIncidents.map((incident, index) => {
-                  const status = incident.status || "reported";
-                  const queryIndex = incidents.findIndex((i) => i._id === incident._id);
-                  const isGeoLoading = locationQueries[queryIndex]?.isLoading;
+            <>
+              <div className="flex overflow-x-auto md:grid md:grid-cols-2 lg:grid-cols-3 gap-6 p-2 scrollbar-hide md:overflow-visible pb-6">
+                <AnimatePresence>
+                  {filteredIncidents
+                    .slice(0, visibleCount)
+                    .map((incident, index) => {
+                      const status = incident.status || "reported";
+                      const queryIndex = incidents.findIndex(
+                        (i) => i._id === incident._id,
+                      );
+                      const isGeoLoading =
+                        locationQueries[queryIndex]?.isLoading;
 
-                  return (
-                    <motion.div
-                      key={incident._id}
-                      className="relative min-w-[270px] md:min-w-0 rounded-[2rem] shadow-sm bg-white p-4 border border-gray-100 flex flex-col h-full snap-center hover:shadow-md transition-shadow"
-                      initial={{ opacity: 0, y: 20 }}
-                      animate={{ opacity: 1, y: 0 }}
-                      exit={{ opacity: 0, scale: 0.95 }}
-                      transition={{ delay: index * 0.05 }}
-                    >
-                      <div className="relative overflow-hidden rounded-2xl group">
-                        <img
-                          src={incident.imageUrl?.startsWith("http") ? incident.imageUrl : `${import.meta.env.VITE_API_URL.replace("/api", "")}${incident.imageUrl}`}
-                          alt={incident.type}
-                          loading="lazy"
-                          className="h-56 w-full object-cover cursor-pointer group-hover:scale-105 transition-transform duration-500"
-                          onClick={() => {
-                            const c = incident.location.coordinates;
-                            const isValid = c && c.length === 2;
-                            let lat = 0, lng = 0;
-                            if (isValid) {
-                              if (c[0] > 70) {
-                                lng = c[0];
-                                lat = c[1];
-                              } else {
-                                lat = c[0];
-                                lng = c[1];
-                              }
-                            }
-                            navigate("/dashboard/map", {
-                              state: {
-                                focus: {
-                                  id: incident._id,
-                                  lat,
-                                  lng,
-                                  title: incident.title,
-                                  type: incident.type,
-                                },
-                              },
-                            });
-                          }}
-                        />
-
-                        {/* Location label */}
-                        <div
-                          className="absolute bottom-3 left-3 max-w-[85%] cursor-pointer"
-                          onClick={() =>
-                            setExpandedLocationId(
-                              expandedLocationId === incident._id ? null : incident._id
-                            )
-                          }
-                          aria-expanded={expandedLocationId === incident._id}
+                      return (
+                        <motion.div
+                          key={incident._id}
+                          className="relative min-w-[270px] md:min-w-0 rounded-[2rem] shadow-sm bg-white p-4 border border-gray-100 flex flex-col h-full snap-center hover:shadow-md transition-shadow"
+                          initial={{ opacity: 0, y: 20 }}
+                          animate={{ opacity: 1, y: 0 }}
+                          exit={{ opacity: 0, scale: 0.95 }}
+                          transition={{ delay: index * 0.05 }}
                         >
-                          <div
-                            className={`text-white transition-all duration-300 ${
-                              expandedLocationId === incident._id
-                                ? "bg-black/90 text-[11px] px-3 py-2 rounded-xl shadow-lg z-10 whitespace-normal backdrop-blur-md"
-                                : "bg-black/60 backdrop-blur-md text-[10px] px-3 py-1.5 rounded-lg truncate shadow-sm hover:bg-black/80"
-                            }`}
-                          >
-                            {isGeoLoading ? (
-                              <Skeleton width={80} height={12} baseColor="#333" highlightColor="#555" />
-                            ) : (
-                              formatLocation(incident)
-                            )}
+                          <div className="relative overflow-hidden rounded-2xl group">
+                            <img
+                              src={
+                                incident.imageUrl?.startsWith("http")
+                                  ? incident.imageUrl
+                                  : `${import.meta.env.VITE_API_URL.replace("/api", "")}${incident.imageUrl}`
+                              }
+                              alt={incident.type}
+                              loading="lazy"
+                              className="h-56 w-full object-cover cursor-pointer group-hover:scale-105 transition-transform duration-500"
+                              onClick={() => {
+                                const c = incident.location.coordinates;
+                                const isValid = c && c.length === 2;
+                                let lat = 0,
+                                  lng = 0;
+                                if (isValid) {
+                                  if (c[0] > 70) {
+                                    lng = c[0];
+                                    lat = c[1];
+                                  } else {
+                                    lat = c[0];
+                                    lng = c[1];
+                                  }
+                                }
+                                navigate("/dashboard/map", {
+                                  state: {
+                                    focus: {
+                                      id: incident._id,
+                                      lat,
+                                      lng,
+                                      title: incident.title,
+                                      type: incident.type,
+                                    },
+                                  },
+                                });
+                              }}
+                            />
+
+                            {/* Location label */}
+                            <div
+                              className="absolute bottom-3 left-3 max-w-[85%] cursor-pointer"
+                              onClick={() =>
+                                setExpandedLocationId(
+                                  expandedLocationId === incident._id
+                                    ? null
+                                    : incident._id,
+                                )
+                              }
+                              aria-expanded={
+                                expandedLocationId === incident._id
+                              }
+                            >
+                              <div
+                                className={`text-white transition-all duration-300 ${
+                                  expandedLocationId === incident._id
+                                    ? "bg-black/90 text-[11px] px-3 py-2 rounded-xl shadow-lg z-10 whitespace-normal backdrop-blur-md"
+                                    : "bg-black/60 backdrop-blur-md text-[10px] px-3 py-1.5 rounded-lg truncate shadow-sm hover:bg-black/80"
+                                }`}
+                              >
+                                {isGeoLoading ? (
+                                  <Skeleton
+                                    width={80}
+                                    height={12}
+                                    baseColor="#333"
+                                    highlightColor="#555"
+                                  />
+                                ) : (
+                                  formatLocation(incident)
+                                )}
+                              </div>
+                            </div>
+
+                            {/* Status Dot */}
+                            <div
+                              className={`absolute top-3 right-3 w-4 h-4 rounded-full border-2 border-white shadow-sm ${
+                                statusDotColor[status] || "bg-gray-400"
+                              }`}
+                              title={`Status: ${status}`}
+                            ></div>
                           </div>
-                        </div>
 
-                        {/* Status Dot */}
-                        <div
-                          className={`absolute top-3 right-3 w-4 h-4 rounded-full border-2 border-white shadow-sm ${
-                            statusDotColor[status] || "bg-gray-400"
-                          }`}
-                          title={`Status: ${status}`}
-                        ></div>
-                      </div>
+                          <div className="pt-4 pb-1 px-2 flex-grow flex flex-col">
+                            <div className="text-[15px] font-black capitalize text-gray-900 tracking-tight">
+                              {t(`incidentTypes.${incident.type}`)}
+                            </div>
+                            <p className="text-[13px] text-gray-600 mt-2 line-clamp-3 leading-relaxed flex-grow">
+                              {incident.description}
+                            </p>
+                          </div>
+                        </motion.div>
+                      );
+                    })}
 
-                      <div className="pt-4 pb-1 px-2 flex-grow flex flex-col">
-                        <div className="text-[15px] font-black capitalize text-gray-900 tracking-tight">
-                          {t(`incidentTypes.${incident.type}`)}
-                        </div>
-                        <p className="text-[13px] text-gray-600 mt-2 line-clamp-3 leading-relaxed flex-grow">
-                          {incident.description}
-                        </p>
-                      </div>
+                  {/* Show More / Less Card - Inside the Grid */}
+                  {filteredIncidents.length > INITIAL_VISIBLE && (
+                    <motion.div
+                      key="show-more-card"
+                      className="relative min-w-[270px] md:min-w-0 rounded-[2rem] shadow-sm bg-gray-50/50 p-4 border border-dashed border-gray-300 flex flex-col h-full items-center justify-center snap-center hover:bg-gray-50 transition-colors min-h-[300px]"
+                      initial={{ opacity: 0 }}
+                      animate={{ opacity: 1 }}
+                      exit={{ opacity: 0 }}
+                    >
+                      <button
+                        onClick={() =>
+                          setVisibleCount(
+                            visibleCount >= filteredIncidents.length
+                              ? INITIAL_VISIBLE
+                              : visibleCount + INITIAL_VISIBLE,
+                          )
+                        }
+                        className="flex flex-col items-center gap-2 text-gray-600 hover:text-primary-red transition-colors"
+                      >
+                        {visibleCount >= filteredIncidents.length ? (
+                          <>
+                            <div className="w-12 h-12 rounded-full bg-white shadow-sm flex items-center justify-center border border-gray-100">
+                              <ChevronUp size={24} />
+                            </div>
+                            <span className="font-semibold text-sm">
+                              {t("Show Less")}
+                            </span>
+                          </>
+                        ) : (
+                          <>
+                            <div className="w-12 h-12 rounded-full bg-white shadow-sm flex items-center justify-center border border-gray-100">
+                              <ChevronDown size={24} />
+                            </div>
+                            <span className="font-semibold text-sm">
+                              {t("Show More")}
+                            </span>
+                            <span className="text-xs text-gray-400">
+                              ({filteredIncidents.length - visibleCount} more)
+                            </span>
+                          </>
+                        )}
+                      </button>
                     </motion.div>
-                  );
-                })}
-              </AnimatePresence>
-            </div>
+                  )}
+                </AnimatePresence>
+              </div>
+            </>
           )}
         </div>
 
-        {/* SOS Button */}
-        <motion.div
-          className="bg-primary-red mt-6 mb-24 p-1 rounded-full shadow-lg border border-red-500/20"
-          animate={{ scale: [1, 1.015, 1] }}
-          transition={{ repeat: Infinity, duration: 2.5, ease: "easeInOut" }}
-        >
-          <motion.button
-            className="flex items-center justify-center gap-3 bg-primary-red text-white font-bold text-3xl sm:text-4xl w-full rounded-full shadow-inner hover:bg-primary-red-hover transition-colors py-3 sm:py-4 px-6 focus:outline-none focus:ring-4 focus:ring-red-300"
-            onClick={() => navigate("/dashboard/emergency-type-selection")}
-            whileHover={{ scale: 1.02 }}
-            whileTap={{ scale: 0.97 }}
-            aria-label="Call for emergency assistance"
+        {/* SOS Floating Button — Always visible above Navigation Bar */}
+        <div className="fixed bottom-[104px] left-1/2 -translate-x-1/2 z-50 w-[calc(100%-2rem)] max-w-[320px]">
+          <motion.div
+            className="relative"
+            animate={{ scale: [1, 1.02, 1] }}
+            transition={{ repeat: Infinity, duration: 2, ease: "easeInOut" }}
           >
-            <Phone size={36} strokeWidth={2.5} className="animate-pulse drop-shadow-md sm:w-12 sm:h-12" />
-            <span className="tracking-wide">{t("dashboard.sahayatacall")}</span>
-          </motion.button>
-        </motion.div>
+            {/* Pulsing glow ring */}
+            <div
+              className="absolute inset-0 rounded-full bg-red-500/20 animate-ping"
+              style={{ animationDuration: "2s" }}
+            />
+
+            <motion.button
+              className="relative flex items-center justify-center gap-3 bg-gradient-to-r from-red-600 to-red-500 text-white font-bold text-2xl sm:text-3xl w-full rounded-full shadow-[0_4px_20px_rgba(220,38,38,0.4)] hover:shadow-[0_6px_30px_rgba(220,38,38,0.55)] py-3.5 sm:py-4 px-6 focus:outline-none focus:ring-4 focus:ring-red-300 transition-shadow"
+              onClick={() => navigate("/dashboard/emergency-type-selection")}
+              whileHover={{ scale: 1.02 }}
+              whileTap={{ scale: 0.95 }}
+              aria-label="Call for emergency assistance"
+            >
+              <Phone
+                size={30}
+                strokeWidth={2.5}
+                className="drop-shadow-md animate-pulse"
+              />
+              <span className="tracking-wide">
+                {t("dashboard.sahayatacall")}
+              </span>
+            </motion.button>
+          </motion.div>
+        </div>
       </motion.div>
+
+      {/* Notification Modal */}
+      <AnimatePresence>
+        {selectedNotification && (
+          <div className="fixed inset-0 z-[60] flex items-center justify-center p-4">
+            {/* Backdrop */}
+            <motion.div
+              initial={{ opacity: 0 }}
+              animate={{ opacity: 1 }}
+              exit={{ opacity: 0 }}
+              onClick={() => setSelectedNotification(null)}
+              className="absolute inset-0 bg-gray-900/40 backdrop-blur-sm cursor-pointer"
+            />
+
+            {/* Modal Content */}
+            <motion.div
+              initial={{ opacity: 0, scale: 0.95, y: 20 }}
+              animate={{ opacity: 1, scale: 1, y: 0 }}
+              exit={{ opacity: 0, scale: 0.95, y: 20 }}
+              transition={{ type: "spring", stiffness: 300, damping: 25 }}
+              className="relative w-full max-w-md bg-white rounded-3xl shadow-2xl overflow-hidden flex flex-col max-h-[85vh]"
+              onClick={(e) => e.stopPropagation()}
+            >
+              {(() => {
+                const meta =
+                  alertMeta[selectedNotification.type] || alertMeta.other;
+                return (
+                  <>
+                    <div
+                      className={`${meta.bg} px-6 py-5 border-b ${meta.border} flex items-center justify-between`}
+                    >
+                      <div className="flex items-center gap-3">
+                        <div
+                          className={`w-10 h-10 rounded-full bg-white shadow-sm flex items-center justify-center p-2`}
+                        >
+                          <img
+                            src={meta.icon}
+                            alt={selectedNotification.type}
+                            className="w-full h-full object-contain filter drop-shadow-sm"
+                          />
+                        </div>
+                        <div>
+                          <h3 className="font-bold text-gray-900 capitalize text-lg leading-tight">
+                            {selectedNotification.type} Alert
+                          </h3>
+                          <span className="text-xs font-medium text-gray-500">
+                            {selectedNotification.timestamp
+                              ? new Date(
+                                  selectedNotification.timestamp,
+                                ).toLocaleString()
+                              : selectedNotification.timeAgo}
+                          </span>
+                        </div>
+                      </div>
+                      <button
+                        onClick={() => setSelectedNotification(null)}
+                        className="w-8 h-8 flex items-center justify-center rounded-full bg-black/5 hover:bg-black/10 text-gray-600 transition-colors focus:outline-none focus:ring-2 focus:ring-gray-300 active:scale-95"
+                      >
+                        <X size={18} strokeWidth={2.5} />
+                      </button>
+                    </div>
+
+                    <div className="p-6 overflow-y-auto flex-1">
+                      <div className="mb-5">
+                        <div className="flex items-center gap-2 mb-1">
+                          <MapPinIcon size={16} className="text-gray-400" />
+                          <h4 className="font-semibold text-gray-500 text-sm uppercase tracking-wider">
+                            Location
+                          </h4>
+                        </div>
+                        <p className="font-bold text-gray-900 text-base pl-6 leading-snug">
+                          {selectedNotification.location}
+                        </p>
+                      </div>
+
+                      <div>
+                        <div className="flex items-center gap-2 mb-1">
+                          <CircleAlert size={16} className="text-gray-400" />
+                          <h4 className="font-semibold text-gray-500 text-sm uppercase tracking-wider">
+                            Details
+                          </h4>
+                        </div>
+                        <p className="text-gray-700 text-[15px] leading-relaxed pl-6 whitespace-pre-wrap">
+                          {selectedNotification.description ||
+                            "No additional details provided."}
+                        </p>
+                      </div>
+                    </div>
+
+                    <div className="p-4 border-t border-gray-100 bg-gray-50/50 flex justify-end">
+                      <button
+                        onClick={() => setSelectedNotification(null)}
+                        className={`px-6 py-2.5 ${meta.accent} text-white font-bold rounded-xl shadow-sm hover:shadow-md transition-all active:scale-95 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-${meta.accent.replace("bg-", "")}`}
+                      >
+                        Close
+                      </button>
+                    </div>
+                  </>
+                );
+              })()}
+            </motion.div>
+          </div>
+        )}
+      </AnimatePresence>
     </>
   );
 };
