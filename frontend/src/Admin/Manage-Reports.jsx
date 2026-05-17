@@ -2,7 +2,7 @@ import React, { useEffect, useState, useMemo } from "react";
 import API from "../api/axios";
 import Modal from "../components/ReportEditModal";
 import { motion, AnimatePresence } from "framer-motion";
-import { ListChecks, Clock, ShieldCheck, Hammer, CheckCircle } from "lucide-react";
+import { ListChecks, Clock, ShieldCheck, Hammer, CheckCircle, FileText } from "lucide-react";
 import useDebounce from "../hooks/useDebounce";
 import useAdminLocationStore from "../stores/useAdminLocationStore";
 import AdminFilterBar from "../components/admin/AdminFilterBar";
@@ -82,13 +82,22 @@ export default function Reports() {
   return (
     <>
       <div className="flex items-center gap-3 mb-6">
-        <img src="/assets/logo.png" alt="Logo" className="w-10 h-10" />
-        <h1 className="text-3xl font-bold text-gray-800 tracking-tight">Manage Reports</h1>
+        <h1 className="text-3xl font-bold text-gray-800 tracking-tight flex items-center gap-3 hover:text-indigo-600 transition-colors cursor-pointer">
+          <FileText className="text-indigo-500" size={32} />
+          Manage Reports
+        </h1>
       </div>
 
       <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-5 gap-4 mb-6">
         {cards.map(({ label, color, count, icon }, i) => (
-          <motion.div key={label} initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: i * 0.08 }} className={`rounded-xl p-4 shadow-sm text-center ${color} flex flex-col items-center`}>
+          <motion.div 
+            key={label} 
+            initial={{ opacity: 0, y: 20 }} 
+            animate={{ opacity: 1, y: 0 }} 
+            transition={{ delay: i * 0.08 }} 
+            onClick={() => setStatusFilter(label === "Total" ? "" : label.toLowerCase())}
+            className={`rounded-xl p-4 shadow-sm text-center ${color} flex flex-col items-center cursor-pointer hover:shadow-md hover:-translate-y-1 active:scale-95 transition-all`}
+          >
             <div className="mb-1.5">{icon}</div>
             <div className="text-xs font-semibold uppercase tracking-wider">{label}</div>
             <div className="text-2xl font-bold mt-1">{loading ? "—" : count}</div>

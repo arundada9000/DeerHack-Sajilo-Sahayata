@@ -1,7 +1,7 @@
 import React, { useState, useEffect, useMemo } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 import API from "../api/axios";
-import { Plus, Trash2, Edit3, Save, X, MapPin } from "lucide-react";
+import { Plus, Trash2, Edit3, Save, X, MapPin, Contact } from "lucide-react";
 import toast from "react-hot-toast";
 import useDebounce from "../hooks/useDebounce";
 import useAdminLocationStore from "../stores/useAdminLocationStore";
@@ -95,8 +95,9 @@ export default function ManageContacts() {
     <>
       <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between mb-6 gap-4">
         <div className="flex items-center gap-3">
-          <img src="/assets/logo.png" alt="Logo" className="w-10 h-10" />
-          <h1 className="text-3xl font-bold text-gray-800 tracking-tight">Manage Contacts</h1>
+          <h1 className="text-3xl font-bold text-gray-800 tracking-tight flex items-center gap-3 hover:text-indigo-600 transition-colors cursor-pointer">
+            <Contact className="text-indigo-500" size={32} /> Manage Contacts
+          </h1>
           <span className="text-sm text-gray-500 bg-gray-100 px-3 py-1 rounded-full font-medium">{filtered.length} record{filtered.length !== 1 ? "s" : ""}</span>
         </div>
         <button onClick={openCreateModal} className="flex items-center gap-1.5 bg-indigo-600 hover:bg-indigo-700 text-white px-4 py-2 rounded-lg shadow transition font-medium text-sm"><Plus size={16} /> Add New</button>

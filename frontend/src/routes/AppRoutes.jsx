@@ -30,6 +30,7 @@ const ManageReports = React.lazy(() => import("../Admin/Manage-Reports"));
 const ManageContacts = React.lazy(() => import("../Admin/ManageContacts"));
 const SendAlerts = React.lazy(() => import("../Admin/SendAlerts"));
 const ManageSafeZones = React.lazy(() => import("../Admin/ManageSafeZones"));
+const NotFound = React.lazy(() => import("../pages/NotFound"));
 
 // ─── Eagerly loaded (small, critical-path components) ───
 import Navigation from "../layouts/Navigation";
@@ -96,7 +97,7 @@ const AnimatedRoutes = () => {
           </Route>
 
           {/* Catch-all route */}
-          <Route path="*" element={<Navigate to="/dashboard/home" replace />} />
+          <Route path="*" element={<NotFound />} />
         </Routes>
       </AnimatePresence>
     </Suspense>

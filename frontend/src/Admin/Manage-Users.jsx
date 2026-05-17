@@ -1,6 +1,6 @@
 import { useEffect, useState, useMemo } from "react";
 import API from "../api/axios";
-import { Trash2, Shield, Search, Eye, X, User, MapPin, Mail, Phone, Calendar, IdCard } from "lucide-react";
+import { Trash2, Shield, Search, Eye, X, User, Users, MapPin, Mail, Phone, Calendar, IdCard } from "lucide-react";
 import toast from "react-hot-toast";
 import { motion, AnimatePresence } from "framer-motion";
 import useDebounce from "../hooks/useDebounce";
@@ -142,8 +142,8 @@ export default function ManageUsers() {
     <>
       {/* Header */}
       <div className="flex items-center gap-3 mb-6">
-        <img src="/assets/logo.png" alt="Logo" className="w-10 h-10" />
-        <h1 className="text-3xl font-bold text-gray-800 tracking-tight">
+        <h1 className="text-3xl font-bold text-gray-800 tracking-tight flex items-center gap-3 hover:text-indigo-600 transition-colors cursor-pointer">
+          <Users className="text-indigo-500" size={32} />
           Manage Users
         </h1>
         <span className="ml-auto text-sm text-gray-500 bg-gray-100 px-3 py-1 rounded-full font-medium">

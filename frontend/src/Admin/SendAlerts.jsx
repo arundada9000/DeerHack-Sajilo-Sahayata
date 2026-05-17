@@ -1,6 +1,6 @@
 import { useEffect, useState, useMemo } from "react";
 import API from "../api/axios";
-import { Pencil, Trash2, Plus } from "lucide-react";
+import { Pencil, Trash2, Plus, Bell } from "lucide-react";
 import toast from "react-hot-toast";
 import { motion } from "framer-motion";
 import AlertModal from "../components/AlertModal";
@@ -67,7 +67,9 @@ export default function ManageAlerts() {
   return (
     <>
       <div className="flex items-center justify-between mb-6">
-        <h1 className="text-3xl font-bold text-gray-800 tracking-tight">Manage Alerts</h1>
+        <h1 className="text-3xl font-bold text-gray-800 tracking-tight flex items-center gap-3 hover:text-indigo-600 transition-colors cursor-pointer">
+          <Bell className="text-indigo-500" size={32} /> Manage Alerts
+        </h1>
         <button onClick={() => { setSelectedAlert(null); setShowModal(true); }} className="flex items-center gap-2 bg-indigo-600 hover:bg-indigo-700 text-white px-4 py-2 rounded-lg shadow text-sm font-medium transition">
           <Plus size={16} /> Create Alert
         </button>

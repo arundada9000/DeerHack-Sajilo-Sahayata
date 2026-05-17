@@ -16,7 +16,7 @@ const PageLoader = () => (
       <motion.img
         src="/assets/logo.png"
         alt="Loading..."
-        className="w-16 h-16 rounded-full shadow-lg"
+        className="w-64 h-64 rounded-full shadow-lg"
         animate={{ scale: [1, 1.08, 1], opacity: [0.7, 1, 0.7] }}
         transition={{ duration: 1.6, repeat: Infinity, ease: "easeInOut" }}
       />

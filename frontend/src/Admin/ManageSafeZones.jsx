@@ -317,7 +317,7 @@ export default function ManageSafeZones() {
   return (
     <>
       <div className="flex items-center justify-between mb-6">
-        <h1 className="text-3xl font-bold text-gray-800 tracking-tight flex items-center gap-3">
+        <h1 className="text-3xl font-bold text-gray-800 tracking-tight flex items-center gap-3 hover:text-emerald-600 transition-colors cursor-pointer">
           <Shield className="text-emerald-600" size={28} />
           Safe Zones
         </h1>
