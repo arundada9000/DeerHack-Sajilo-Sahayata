@@ -20,11 +20,19 @@ dotenv.config();
 app.use("/uploads", express.static(path.join(__dirname, "../uploads"))); // Serve static files from the uploads directory
 app.use(
   cors({
-    origin: [
-      process.env.CLIENT_URL || "http://localhost:5173",
-      "http://localhost:5174",
-      "http://localhost:5175",
-    ],
+    origin: (origin, callback) => {
+      const allowedOrigins = [
+        process.env.CLIENT_URL || "http://localhost:5173",
+        "http://localhost:5174",
+        "http://localhost:5175",
+      ];
+      // Allow Vercel preview and production deployments automatically
+      if (!origin || allowedOrigins.includes(origin) || /\.vercel\.app$/.test(origin)) {
+        callback(null, true);
+      } else {
+        callback(new Error("Not allowed by CORS"));
+      }
+    },
     credentials: true,
   }),
 ); // Apply CORS middleware with the configuration
@@ -51,7 +59,13 @@ app.use((err: any, req: express.Request, res: express.Response, next: express.Ne
   res.status(status).json({ success: false, message });
 });
 
-const PORT = process.env.PORT || 3000;
-app.listen(PORT, () => {
-  console.log(`Server running on port ${PORT}`);
-});
+// Start the server if running locally, otherwise export for Vercel Serverless
+if (process.env.NODE_ENV !== 'production' || process.env.IS_LOCAL === 'true') {
+  const PORT = process.env.PORT || 3000;
+  app.listen(PORT, () => {
+    console.log(`Server running on port ${PORT}`);
+  });
+}
+
+// Export the Express API
+export default app;

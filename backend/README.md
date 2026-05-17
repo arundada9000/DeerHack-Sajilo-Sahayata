@@ -44,8 +44,9 @@ It provides APIs for user authentication, incident reporting, and alert broadcas
 ### 1. Clone Repository
 
 ````bash
-git clone https://github.com/arundada9000/sajilo-sahayata.git
-cd sajilo-sahayata/backend
+git clone https://github.com/arundada9000/DeerHack-Sajilo-Sahayata.git
+cd DeerHack-Sajilo-Sahayata
+cd backend
 npm install
 npm run dev
 

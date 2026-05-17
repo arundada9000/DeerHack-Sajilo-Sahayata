@@ -42,7 +42,10 @@ In addition, the platform offers:
 
 ## 🛠 Tech Stack
 
-**Frontend:** React.js 18, Vite, Tailwind CSS  
+**Frontend:** React.js 18, Vite, Tailwind CSS, Framer Motion
+**Backend:** Node.js, Express, TypeScript
+**Database:** MongoDB
+**Hosting:** Vercel (Serverless Functions)
 **Backend:** Node.js, Express.js, MongoDB  
 **Other Tools:** Zustand (State Management), Chart.js, Leaflet.js
 
@@ -203,6 +206,26 @@ Special thanks to these technologies and tools:
 
 ---
 
+## 🚀 Deployment (Vercel)
+
+Sajilo Sahayata is optimized for deployment on **Vercel** as two separate projects from a single monorepo.
+
+### 1. Frontend Deployment
+1. Import the repository in Vercel.
+2. Set the **Framework Preset** to **Vite**.
+3. Set the **Root Directory** to `frontend`.
+4. Add the Environment Variable: `VITE_API_URL` (pointing to your deployed backend URL).
+5. The included `frontend/vercel.json` will automatically handle React Router SPA routing.
+
+### 2. Backend Deployment
+1. Import the repository again as a new project in Vercel.
+2. Set the **Framework Preset** to **Other**.
+3. Set the **Root Directory** to `backend`.
+4. Add Environment Variables: `MONGO_URI`, `JWT_SECRET`, `CLIENT_URL` (pointing to your deployed frontend URL).
+5. The included `backend/vercel.json` configures `@vercel/node` to run Express as Serverless Functions via `src/main.ts`.
+
+---
+
 ## Contributing
 
 Contributions are welcome! 🚀
@@ -235,7 +258,8 @@ If you have questions, feedback, or ideas:
 
 ## Changelog
 
-- v1.0.0 — initial release (August 2, 2025)
+- **v1.1.0 (Latest)** — UI/UX Overhaul, Admin Polish, Custom SVG Map/Notification Themes, Vercel Serverless Ready
+- **v1.0.0** — Initial release (August 2, 2025)
 
 ## Final Note
 

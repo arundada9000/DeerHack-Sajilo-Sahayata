@@ -39,13 +39,13 @@ A full-stack application built using React, Tailwind CSS, Node.js, Express, Mong
 
 ---
 
-## 🚀 Quick Start
+## Quick Start
 
 ### 1. Clone:
 
 ````bash
-git clone https://github.com/arundada9000/Sajilo-Sahayata.git
-cd Sajilo-Sahayata
+git clone https://github.com/arundada9000/DeerHack-Sajilo-Sahayata.git
+cd DeerHack-Sajilo-Sahayata
 cd frontend
 npm install
 npm run dev
