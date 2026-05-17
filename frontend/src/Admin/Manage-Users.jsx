@@ -1,7 +1,7 @@
 import { useEffect, useState, useMemo } from "react";
 import { useQuery, useQueryClient } from "@tanstack/react-query";
 import API from "../api/axios";
-import { Trash2, Shield, Search, Eye, X, User, Users, MapPin, Mail, Phone, Calendar, IdCard } from "lucide-react";
+import { Trash2, Shield, Search, Eye, X, User, Users, MapPin, Mail, Phone, Calendar, IdCard, Download } from "lucide-react";
 import toast from "react-hot-toast";
 import { motion, AnimatePresence } from "framer-motion";
 import useDebounce from "../hooks/useDebounce";
@@ -9,6 +9,7 @@ import useAdminLocationStore from "../stores/useAdminLocationStore";
 import AdminFilterBar from "../components/admin/AdminFilterBar";
 import TableSkeleton from "../components/admin/TableSkeleton";
 import Pagination from "../components/admin/Pagination";
+import { exportToCSV } from "../utils/exportCsv";
 
 const PAGE_SIZE = 10;
 
@@ -126,14 +127,23 @@ export default function ManageUsers() {
   return (
     <>
       {/* Header */}
-      <div className="flex items-center gap-3 mb-6">
-        <h1 className="text-3xl font-bold text-gray-800 tracking-tight flex items-center gap-3 hover:text-indigo-600 transition-colors cursor-pointer">
-          <Users className="text-indigo-500" size={32} />
-          Manage Users
-        </h1>
-        <span className="ml-auto text-sm text-gray-500 bg-gray-100 px-3 py-1 rounded-full font-medium">
-          {filteredUsers.length} user{filteredUsers.length !== 1 ? "s" : ""}
-        </span>
+      <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between mb-6 gap-4">
+        <div className="flex items-center gap-3">
+          <h1 className="text-3xl font-bold text-gray-800 tracking-tight flex items-center gap-3 hover:text-indigo-600 transition-colors cursor-pointer">
+            <Users className="text-indigo-500" size={32} />
+            Manage Users
+          </h1>
+          <span className="text-sm text-gray-500 bg-gray-100 px-3 py-1 rounded-full font-medium">
+            {filteredUsers.length} user{filteredUsers.length !== 1 ? "s" : ""}
+          </span>
+        </div>
+        <button 
+          onClick={() => exportToCSV(filteredUsers, "users")}
+          disabled={filteredUsers.length === 0}
+          className="flex items-center gap-2 bg-white border border-gray-200 text-gray-700 hover:bg-gray-50 px-4 py-2 rounded-lg shadow-sm font-medium text-sm transition focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:ring-offset-1 active:scale-95 disabled:opacity-50"
+        >
+          <Download size={16} /> Export CSV
+        </button>
       </div>
 
       {/* Filter Bar */}

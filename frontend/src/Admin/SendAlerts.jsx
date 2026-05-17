@@ -1,7 +1,7 @@
 import { useState, useMemo, useEffect } from "react";
 import { useQuery, useQueryClient } from "@tanstack/react-query";
 import API from "../api/axios";
-import { Pencil, Trash2, Plus, Bell } from "lucide-react";
+import { Pencil, Trash2, Plus, Bell, Download } from "lucide-react";
 import toast from "react-hot-toast";
 import { motion } from "framer-motion";
 import AlertModal from "../components/AlertModal";
@@ -10,6 +10,7 @@ import useAdminLocationStore from "../stores/useAdminLocationStore";
 import AdminFilterBar from "../components/admin/AdminFilterBar";
 import TableSkeleton from "../components/admin/TableSkeleton";
 import Pagination from "../components/admin/Pagination";
+import { exportToCSV } from "../utils/exportCsv";
 
 const ALERT_TYPES = ["flood", "earthquake", "fire", "landslide", "storm", "other"];
 const PAGE_SIZE = 10;
@@ -75,13 +76,25 @@ export default function ManageAlerts() {
 
   return (
     <>
-      <div className="flex items-center justify-between mb-6">
-        <h1 className="text-3xl font-bold text-gray-800 tracking-tight flex items-center gap-3 hover:text-indigo-600 transition-colors cursor-pointer">
-          <Bell className="text-indigo-500" size={32} /> Manage Alerts
-        </h1>
-        <button onClick={() => { setSelectedAlert(null); setShowModal(true); }} className="flex items-center gap-2 bg-indigo-600 hover:bg-indigo-700 text-white px-4 py-2 rounded-lg shadow text-sm font-medium transition">
-          <Plus size={16} /> Create Alert
-        </button>
+      <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between mb-6 gap-4">
+        <div className="flex items-center gap-3">
+          <h1 className="text-3xl font-bold text-gray-800 tracking-tight flex items-center gap-3 hover:text-indigo-600 transition-colors cursor-pointer">
+            <Bell className="text-indigo-500" size={32} /> Manage Alerts
+          </h1>
+          <span className="text-sm text-gray-500 bg-gray-100 px-3 py-1 rounded-full font-medium">{filtered.length} alert{filtered.length !== 1 ? "s" : ""}</span>
+        </div>
+        <div className="flex items-center gap-2">
+          <button 
+            onClick={() => exportToCSV(filtered, "alerts")}
+            disabled={filtered.length === 0}
+            className="flex items-center gap-2 bg-white border border-gray-200 text-gray-700 hover:bg-gray-50 px-4 py-2 rounded-lg shadow-sm font-medium text-sm transition focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:ring-offset-1 active:scale-95 disabled:opacity-50"
+          >
+            <Download size={16} /> Export CSV
+          </button>
+          <button onClick={() => { setSelectedAlert(null); setShowModal(true); }} className="flex items-center gap-2 bg-indigo-600 hover:bg-indigo-700 text-white px-4 py-2 rounded-lg shadow-sm text-sm font-medium transition focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:ring-offset-1 active:scale-95">
+            <Plus size={16} /> Create Alert
+          </button>
+        </div>
       </div>
 
       <AdminFilterBar search={search} onSearchChange={setSearch} searchPlaceholder="Search by title or description..." locationFilter={locationFilter} onLocationChange={setLocationFilter}

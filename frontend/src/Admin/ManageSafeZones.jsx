@@ -1,12 +1,14 @@
 import { useEffect, useState, useMemo } from "react";
 import API from "../api/axios";
-import { Pencil, Trash2, Plus, Shield, MapPin } from "lucide-react";
+import { Pencil, Trash2, Plus, Shield, MapPin, Download } from "lucide-react";
 import toast from "react-hot-toast";
 import { motion, AnimatePresence } from "framer-motion";
 import useDebounce from "../hooks/useDebounce";
 import AdminFilterBar from "../components/admin/AdminFilterBar";
 import TableSkeleton from "../components/admin/TableSkeleton";
 import Pagination from "../components/admin/Pagination";
+import { useQuery, useQueryClient } from "@tanstack/react-query";
+import { exportToCSV } from "../utils/exportCsv";
 
 const ZONE_TYPES = ["hospital", "shelter", "police", "fire_station", "distribution"];
 const PAGE_SIZE = 10;
@@ -164,7 +166,7 @@ function SafeZoneModal({ open, onClose, onSubmit, initialData }) {
             <button
               type="button"
               onClick={handleUseMyLocation}
-              className="flex items-center gap-2 text-sm text-emerald-600 font-semibold hover:text-emerald-700 transition"
+              className="flex items-center gap-2 text-sm text-emerald-600 font-semibold hover:text-emerald-700 transition focus:outline-none focus:ring-2 focus:ring-emerald-500 rounded p-1"
             >
               <MapPin size={14} /> Use my current location
             </button>
@@ -197,7 +199,8 @@ function SafeZoneModal({ open, onClose, onSubmit, initialData }) {
                 <button
                   type="button"
                   onClick={() => setIsActive(!isActive)}
-                  className={`w-12 h-6 rounded-full transition-colors relative ${isActive ? "bg-emerald-500" : "bg-gray-300"}`}
+                  className={`w-12 h-6 rounded-full transition-colors relative focus:outline-none focus:ring-2 focus:ring-emerald-500 focus:ring-offset-1 ${isActive ? "bg-emerald-500" : "bg-gray-300"}`}
+                  aria-label="Toggle active status"
                 >
                   <div
                     className={`w-5 h-5 bg-white rounded-full absolute top-0.5 shadow-sm transition-transform ${isActive ? "left-[26px]" : "left-0.5"}`}
@@ -210,13 +213,13 @@ function SafeZoneModal({ open, onClose, onSubmit, initialData }) {
               <button
                 type="button"
                 onClick={onClose}
-                className="flex-1 bg-gray-100 text-gray-700 font-bold py-2.5 rounded-xl hover:bg-gray-200 transition text-sm"
+                className="flex-1 bg-gray-100 text-gray-700 font-bold py-2.5 rounded-xl hover:bg-gray-200 transition text-sm focus:outline-none focus:ring-2 focus:ring-gray-400 active:scale-95"
               >
                 Cancel
               </button>
               <button
                 type="submit"
-                className="flex-1 bg-emerald-600 text-white font-bold py-2.5 rounded-xl hover:bg-emerald-700 transition text-sm"
+                className="flex-1 bg-emerald-600 text-white font-bold py-2.5 rounded-xl hover:bg-emerald-700 transition text-sm focus:outline-none focus:ring-2 focus:ring-emerald-500 active:scale-95"
               >
                 {initialData ? "Update" : "Create"}
               </button>
@@ -229,8 +232,6 @@ function SafeZoneModal({ open, onClose, onSubmit, initialData }) {
 }
 
 // ═══ Main Admin Page ═══
-import { useQuery, useQueryClient } from "@tanstack/react-query";
-
 export default function ManageSafeZones() {
   const queryClient = useQueryClient();
   const [search, setSearch] = useState("");
@@ -306,20 +307,32 @@ export default function ManageSafeZones() {
 
   return (
     <>
-      <div className="flex items-center justify-between mb-6">
-        <h1 className="text-3xl font-bold text-gray-800 tracking-tight flex items-center gap-3 hover:text-emerald-600 transition-colors cursor-pointer">
-          <Shield className="text-emerald-600" size={28} />
-          Safe Zones
-        </h1>
-        <button
-          onClick={() => {
-            setSelectedZone(null);
-            setShowModal(true);
-          }}
-          className="flex items-center gap-2 bg-emerald-600 hover:bg-emerald-700 text-white px-4 py-2 rounded-lg shadow text-sm font-medium transition"
-        >
-          <Plus size={16} /> Add Zone
-        </button>
+      <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between mb-6 gap-4">
+        <div className="flex items-center gap-3">
+          <h1 className="text-3xl font-bold text-gray-800 tracking-tight flex items-center gap-3 hover:text-emerald-600 transition-colors cursor-pointer">
+            <Shield className="text-emerald-600" size={28} />
+            Safe Zones
+          </h1>
+          <span className="text-sm text-gray-500 bg-gray-100 px-3 py-1 rounded-full font-medium">{filtered.length} zone{filtered.length !== 1 ? "s" : ""}</span>
+        </div>
+        <div className="flex items-center gap-2">
+          <button 
+            onClick={() => exportToCSV(filtered, "safe-zones")}
+            disabled={filtered.length === 0}
+            className="flex items-center gap-2 bg-white border border-gray-200 text-gray-700 hover:bg-gray-50 px-4 py-2 rounded-lg shadow-sm font-medium text-sm transition focus:outline-none focus:ring-2 focus:ring-emerald-500 focus:ring-offset-1 active:scale-95 disabled:opacity-50"
+          >
+            <Download size={16} /> Export CSV
+          </button>
+          <button
+            onClick={() => {
+              setSelectedZone(null);
+              setShowModal(true);
+            }}
+            className="flex items-center gap-2 bg-emerald-600 hover:bg-emerald-700 text-white px-4 py-2 rounded-lg shadow-sm text-sm font-medium transition focus:outline-none focus:ring-2 focus:ring-emerald-500 focus:ring-offset-1 active:scale-95"
+          >
+            <Plus size={16} /> Add Zone
+          </button>
+        </div>
       </div>
 
       <AdminFilterBar

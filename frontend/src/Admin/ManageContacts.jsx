@@ -2,7 +2,7 @@ import React, { useState, useMemo, useEffect } from "react";
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import { motion, AnimatePresence } from "framer-motion";
 import API from "../api/axios";
-import { Plus, Trash2, Edit3, MapPin, Contact } from "lucide-react";
+import { Plus, Trash2, Edit3, MapPin, Contact, Download } from "lucide-react";
 import toast from "react-hot-toast";
 import useDebounce from "../hooks/useDebounce";
 import useAdminLocationStore from "../stores/useAdminLocationStore";
@@ -10,6 +10,7 @@ import AdminFilterBar from "../components/admin/AdminFilterBar";
 import TableSkeleton from "../components/admin/TableSkeleton";
 import Pagination from "../components/admin/Pagination";
 import ContactEditModal from "../components/admin/ContactEditModal";
+import { exportToCSV } from "../utils/exportCsv";
 
 const departments = ["fire", "police", "flood", "accident", "landslide", "other"];
 const PAGE_SIZE = 10;
@@ -85,7 +86,18 @@ export default function ManageContacts() {
           </h1>
           <span className="text-sm text-gray-500 bg-gray-100 px-3 py-1 rounded-full font-medium">{filtered.length} record{filtered.length !== 1 ? "s" : ""}</span>
         </div>
-        <button onClick={openCreateModal} className="flex items-center gap-1.5 bg-indigo-600 hover:bg-indigo-700 text-white px-4 py-2 rounded-lg shadow transition font-medium text-sm"><Plus size={16} /> Add New</button>
+        <div className="flex items-center gap-2">
+          <button 
+            onClick={() => exportToCSV(filtered, "contacts")}
+            disabled={filtered.length === 0}
+            className="flex items-center gap-2 bg-white border border-gray-200 text-gray-700 hover:bg-gray-50 px-4 py-2 rounded-lg shadow-sm font-medium text-sm transition focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:ring-offset-1 active:scale-95 disabled:opacity-50"
+          >
+            <Download size={16} /> Export CSV
+          </button>
+          <button onClick={openCreateModal} className="flex items-center gap-1.5 bg-indigo-600 hover:bg-indigo-700 text-white px-4 py-2 rounded-lg shadow-sm font-medium text-sm transition focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:ring-offset-1 active:scale-95">
+            <Plus size={16} /> Add New
+          </button>
+        </div>
       </div>
 
       <AdminFilterBar search={search} onSearchChange={setSearch} searchPlaceholder="Search by location, dept or name..." locationFilter={locationFilter} onLocationChange={setLocationFilter}

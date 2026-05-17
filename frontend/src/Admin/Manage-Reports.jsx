@@ -3,12 +3,13 @@ import { useQuery, useQueryClient } from "@tanstack/react-query";
 import API from "../api/axios";
 import Modal from "../components/ReportEditModal";
 import { motion, AnimatePresence } from "framer-motion";
-import { ListChecks, Clock, ShieldCheck, Hammer, CheckCircle, FileText } from "lucide-react";
+import { ListChecks, Clock, ShieldCheck, Hammer, CheckCircle, FileText, Download } from "lucide-react";
 import useDebounce from "../hooks/useDebounce";
 import useAdminLocationStore from "../stores/useAdminLocationStore";
 import AdminFilterBar from "../components/admin/AdminFilterBar";
 import TableSkeleton from "../components/admin/TableSkeleton";
 import Pagination from "../components/admin/Pagination";
+import { exportToCSV } from "../utils/exportCsv";
 
 const REPORT_TYPES = ["fire", "police", "flood", "accident", "landslide", "other"];
 const STATUS_TYPES = ["pending", "verified", "solved", "working"];
@@ -78,11 +79,18 @@ export default function Reports() {
 
   return (
     <>
-      <div className="flex items-center gap-3 mb-6">
+      <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between mb-6 gap-4">
         <h1 className="text-3xl font-bold text-gray-800 tracking-tight flex items-center gap-3 hover:text-indigo-600 transition-colors cursor-pointer">
           <FileText className="text-indigo-500" size={32} />
           Manage Reports
         </h1>
+        <button 
+          onClick={() => exportToCSV(filtered, "reports")}
+          disabled={filtered.length === 0}
+          className="flex items-center gap-2 bg-white border border-gray-200 text-gray-700 hover:bg-gray-50 px-4 py-2 rounded-lg shadow-sm font-medium text-sm transition focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:ring-offset-1 active:scale-95 disabled:opacity-50"
+        >
+          <Download size={16} /> Export CSV
+        </button>
       </div>
 
       <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-5 gap-4 mb-6">

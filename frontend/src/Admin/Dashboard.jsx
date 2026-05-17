@@ -23,12 +23,13 @@ export default function AdminDashboard() {
     }
   }, [adminLocation, hasInitialized]);
 
-  // Optimized data fetching with react-query
-  const { data: reports = [], isLoading: loadingReports } = useQuery({ queryKey: ["reports"], queryFn: () => API.get("/reports").then(res => res.data) });
-  const { data: users = [], isLoading: loadingUsers } = useQuery({ queryKey: ["users"], queryFn: () => API.get("/auth/users").then(res => res.data) });
-  const { data: alerts = [], isLoading: loadingAlerts } = useQuery({ queryKey: ["alerts"], queryFn: () => API.get("/alerts").then(res => res.data) });
-  const { data: safeZones = [], isLoading: loadingSafeZones } = useQuery({ queryKey: ["safe-zones"], queryFn: () => API.get("/safe-zones").then(res => res.data) });
-  const { data: contacts = [], isLoading: loadingContacts } = useQuery({ queryKey: ["contacts"], queryFn: () => API.get("/contacts").then(res => res.data) });
+  // Optimized data fetching with react-query and real-time polling
+  const queryConfig = { refetchInterval: 30000, staleTime: 10000 };
+  const { data: reports = [], isLoading: loadingReports } = useQuery({ queryKey: ["reports"], queryFn: () => API.get("/reports").then(res => res.data), ...queryConfig });
+  const { data: users = [], isLoading: loadingUsers } = useQuery({ queryKey: ["users"], queryFn: () => API.get("/auth/users").then(res => res.data), ...queryConfig });
+  const { data: alerts = [], isLoading: loadingAlerts } = useQuery({ queryKey: ["alerts"], queryFn: () => API.get("/alerts").then(res => res.data), ...queryConfig });
+  const { data: safeZones = [], isLoading: loadingSafeZones } = useQuery({ queryKey: ["safe-zones"], queryFn: () => API.get("/safe-zones").then(res => res.data), ...queryConfig });
+  const { data: contacts = [], isLoading: loadingContacts } = useQuery({ queryKey: ["contacts"], queryFn: () => API.get("/contacts").then(res => res.data), ...queryConfig });
 
   const loading = loadingReports || loadingUsers || loadingAlerts || loadingSafeZones || loadingContacts;
 
@@ -174,16 +175,26 @@ export default function AdminDashboard() {
   return (
     <div className="pb-10">
       <motion.div initial={{ opacity: 0, y: -10 }} animate={{ opacity: 1, y: 0 }} className="mb-8 flex flex-col sm:flex-row sm:items-center justify-between gap-4">
-        <h1 className="text-3xl font-bold text-gray-800 tracking-tight flex items-center gap-3 hover:text-indigo-600 transition-colors cursor-pointer">
-          <LayoutDashboard className="text-indigo-500" size={32} />
-          Admin Dashboard
-        </h1>
-        <div className="flex items-center gap-2 bg-white p-1.5 rounded-xl border border-gray-200 shadow-sm">
+        <div className="flex items-center gap-4">
+          <h1 className="text-3xl font-bold text-gray-800 tracking-tight flex items-center gap-3 hover:text-indigo-600 transition-colors cursor-pointer">
+            <LayoutDashboard className="text-indigo-500" size={32} />
+            Admin Dashboard
+          </h1>
+          <div className="flex items-center gap-1.5 bg-emerald-50 text-emerald-700 px-2.5 py-1 rounded-full border border-emerald-100 shadow-sm" title="Data updates automatically every 30s">
+            <span className="relative flex h-2.5 w-2.5">
+              <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-emerald-400 opacity-75"></span>
+              <span className="relative inline-flex rounded-full h-2.5 w-2.5 bg-emerald-500"></span>
+            </span>
+            <span className="text-xs font-bold tracking-wide uppercase">Live</span>
+          </div>
+        </div>
+        <div className="flex items-center gap-2 bg-white p-1.5 rounded-xl border border-gray-200 shadow-sm focus-within:ring-2 focus-within:ring-indigo-500 transition-shadow">
           <div className="pl-3 pr-1 text-gray-400"><MapPin size={18} /></div>
           <select 
             value={locationFilter} 
             onChange={(e) => setLocationFilter(e.target.value)} 
             className="px-2 py-1.5 bg-transparent text-sm font-medium text-gray-700 focus:outline-none cursor-pointer"
+            aria-label="Filter by location"
           >
             <option value="">All Locations</option>
             {availableLocations.map((loc) => (<option key={loc} value={loc}>{loc}</option>))}
