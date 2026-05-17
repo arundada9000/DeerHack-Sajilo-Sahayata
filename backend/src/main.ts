@@ -10,14 +10,12 @@ import safeZoneRoutes from "./routes/safeZoneRoutes";
 import cookieParser from "cookie-parser";
 import dotenv from "dotenv";
 import cors from "cors";
-import path from "path";
 import dns from "dns";
 dns.setServers(["1.1.1.1", "8.8.8.8"]);
 const app = express();
 
 dotenv.config();
 // Middleware
-app.use("/uploads", express.static(path.join(__dirname, "../uploads"))); // Serve static files from the uploads directory
 app.use(
   cors({
     origin: (origin, callback) => {

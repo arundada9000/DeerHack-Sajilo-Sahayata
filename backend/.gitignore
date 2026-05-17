@@ -84,3 +84,5 @@ vite.config.ts.timestamp*
 
 # User Uploads
 uploads/
+
+*.env.deploy

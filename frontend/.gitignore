@@ -33,6 +33,7 @@ dist-ssr
 .env.development
 .env.production
 .env.test
+.env.deploy
 frontend/.env
 backend/.env
 

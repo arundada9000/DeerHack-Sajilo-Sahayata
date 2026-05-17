@@ -7,17 +7,13 @@ import bcrypt from "bcrypt";
 import { JwtPayload } from "jsonwebtoken";
 import { resolveGaPa } from "../utils/resolveGaPa";
 
-const storage = multer.diskStorage({
-  destination: (req, file, cb) => {
-    cb(null, "uploads/");
-  },
-  filename: (req, file, cb) => {
-    cb(null, `${crypto.randomUUID()}.jpeg`);
-  },
-});
+// Use memory storage so the file lives in req.file.buffer
+// This is required for Vercel serverless (no writable disk)
+const storage = multer.memoryStorage();
 
 const upload = multer({
   storage,
+  limits: { fileSize: 5 * 1024 * 1024 }, // 5 MB max
   fileFilter: (req, file, cb) => {
     const fileTypes = /jpeg|jpg|png|gif/;
     const extname = fileTypes.test(

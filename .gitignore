@@ -43,6 +43,7 @@ pnpm-debug.log*
 .env.development
 .env.production
 .env.test
+.env.deploy
 
 # Editor directories and files
 .vscode/

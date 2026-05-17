@@ -12,6 +12,20 @@ cloudinary.config({
   api_secret: process.env.CLOUDINARY_API_SECRET,
 });
 
+// Helper: upload a buffer to Cloudinary via stream
+const uploadToCloudinary = (buffer: Buffer, folder: string): Promise<{ secure_url: string; public_id: string }> => {
+  return new Promise((resolve, reject) => {
+    const stream = cloudinary.uploader.upload_stream(
+      { folder, resource_type: "image" },
+      (error, result) => {
+        if (error || !result) return reject(error || new Error("No result from Cloudinary"));
+        resolve({ secure_url: result.secure_url, public_id: result.public_id });
+      }
+    );
+    stream.end(buffer);
+  });
+};
+
 export const createReport = async (req: Request, res: Response) => {
   const allowedTypes = [
     "fire",
@@ -53,24 +67,13 @@ export const createReport = async (req: Request, res: Response) => {
     let imageUrl = "";
     let imageId = "";
 
-    if (req.file) {
-      // Check if Cloudinary is configured
-      if (process.env.CLOUDINARY_API_KEY) {
-        try {
-          const uploadResult = await cloudinary.uploader.upload(req.file.path, {
-            folder: "reports",
-          });
-          imageUrl = uploadResult.secure_url;
-          imageId = uploadResult.public_id;
-        } catch (err) {
-          console.error("Cloudinary upload failed, falling back to local:", err);
-          imageUrl = `/${req.file.path.replace(/\\/g, "/")}`;
-          imageId = req.file.filename;
-        }
-      } else {
-        // Fallback to local storage if no Cloudinary keys
-        imageUrl = `/${req.file.path.replace(/\\/g, "/")}`;
-        imageId = req.file.filename;
+    if (req.file && req.file.buffer) {
+      try {
+        const result = await uploadToCloudinary(req.file.buffer, "reports");
+        imageUrl = result.secure_url;
+        imageId = result.public_id;
+      } catch (err) {
+        console.error("Cloudinary upload failed:", err);
       }
     }
 
@@ -230,18 +233,19 @@ export const updateReport = async (req: Request, res: Response) => {
     }
 
     // ✅ Handle image update
-    if (req.file) {
+    if (req.file && req.file.buffer) {
       // Delete old image from Cloudinary if exists
       if (report.imageId) {
-        await cloudinary.uploader.destroy(report.imageId);
+        try {
+          await cloudinary.uploader.destroy(report.imageId);
+        } catch (err) {
+          console.error("Failed to delete old Cloudinary image:", err);
+        }
       }
 
-      const uploadResult = await cloudinary.uploader.upload(req.file.path, {
-        folder: "reports",
-      });
-
-      report.imageUrl = uploadResult.secure_url;
-      report.imageId = uploadResult.public_id;
+      const result = await uploadToCloudinary(req.file.buffer, "reports");
+      report.imageUrl = result.secure_url;
+      report.imageId = result.public_id;
     }
 
     await report.save();
