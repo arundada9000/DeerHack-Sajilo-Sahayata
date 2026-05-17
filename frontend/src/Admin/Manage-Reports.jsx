@@ -1,4 +1,5 @@
-import React, { useEffect, useState, useMemo } from "react";
+import React, { useState, useMemo, useEffect } from "react";
+import { useQuery, useQueryClient } from "@tanstack/react-query";
 import API from "../api/axios";
 import Modal from "../components/ReportEditModal";
 import { motion, AnimatePresence } from "framer-motion";
@@ -14,8 +15,7 @@ const STATUS_TYPES = ["pending", "verified", "solved", "working"];
 const PAGE_SIZE = 10;
 
 export default function Reports() {
-  const [reports, setReports] = useState([]);
-  const [loading, setLoading] = useState(true);
+  const queryClient = useQueryClient();
   const [search, setSearch] = useState("");
   const [statusFilter, setStatusFilter] = useState("");
   const [typeFilter, setTypeFilter] = useState("");
@@ -31,12 +31,10 @@ export default function Reports() {
     if (adminLocation && !locationFilter) setLocationFilter(adminLocation);
   }, [adminLocation]);
 
-  useEffect(() => {
-    API.get("/reports")
-      .then((res) => setReports(res.data))
-      .catch((err) => console.error("Error loading reports", err))
-      .finally(() => setLoading(false));
-  }, []);
+  const { data: reports = [], isLoading: loading } = useQuery({
+    queryKey: ["reports"],
+    queryFn: () => API.get("/reports").then((res) => res.data),
+  });
 
   const filtered = useMemo(() => {
     let data = [...reports];
@@ -56,9 +54,8 @@ export default function Reports() {
   const paginated = filtered.slice((currentPage - 1) * PAGE_SIZE, currentPage * PAGE_SIZE);
 
   const handleEdit = (report) => { setSelectedReport(report); setShowModal(true); };
-  const handleUpdate = (updated) => {
-    if (updated.deleted) setReports((p) => p.filter((r) => r._id !== updated._id));
-    else setReports((p) => p.map((r) => (r._id === updated._id ? updated : r)));
+  const handleUpdate = () => {
+    queryClient.invalidateQueries({ queryKey: ["reports"] });
     setShowModal(false);
   };
   const clearAll = () => { setSearch(""); setStatusFilter(""); setTypeFilter(""); setLocationFilter(""); };

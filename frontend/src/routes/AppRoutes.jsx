@@ -9,6 +9,7 @@ import {
 } from "react-router-dom";
 import { AnimatePresence } from "framer-motion";
 import PageLoader from "../components/PageLoader";
+import ErrorBoundary from "../components/ErrorBoundary";
 
 // ─── Lazy-loaded page components ───
 const Signin = React.lazy(() => import("../pages/Auth/Login"));
@@ -107,9 +108,12 @@ const AnimatedRoutes = () => {
 const AppRoutes = () => {
   return (
     <Router>
-      <AnimatedRoutes />
+      <ErrorBoundary>
+        <AnimatedRoutes />
+      </ErrorBoundary>
     </Router>
   );
 };
 
 export default AppRoutes;
+

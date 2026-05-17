@@ -8,10 +8,22 @@ import { useLocalGovStore } from "../../stores/localGovStore";
 
 const emergencyTypes = [
   { type: "fire", icon: "/icons/fire-red.svg", labelKey: "emergency.fire" },
-  { type: "police", icon: "/icons/police-red.svg", labelKey: "emergency.police" },
+  {
+    type: "police",
+    icon: "/icons/police-red.svg",
+    labelKey: "emergency.police",
+  },
   { type: "flood", icon: "/icons/flood-red.svg", labelKey: "emergency.flood" },
-  { type: "accident", icon: "/icons/accident-red.svg", labelKey: "emergency.accident" },
-  { type: "landslide", icon: "/icons/landslide-red.svg", labelKey: "emergency.landslide" },
+  {
+    type: "accident",
+    icon: "/icons/accident-red.svg",
+    labelKey: "emergency.accident",
+  },
+  {
+    type: "landslide",
+    icon: "/icons/landslide-red.svg",
+    labelKey: "emergency.landslide",
+  },
   { type: "other", icon: "/icons/others-red.svg", labelKey: "emergency.other" },
 ];
 
@@ -33,7 +45,7 @@ const EmergencyTypeSelection = () => {
           content="Select an emergency type to view rapid response contact information."
         />
       </Helmet>
-      
+
       {/* Main Container - Premium iOS/Android app feel */}
       <motion.main
         className="relative min-h-screen bg-bg-light text-gray-900 flex flex-col"
@@ -51,12 +63,11 @@ const EmergencyTypeSelection = () => {
           >
             <ChevronLeft size={24} strokeWidth={2.5} />
           </button>
-          
           <h1 className="text-lg font-bold tracking-tight text-text-dark absolute left-1/2 -translate-x-1/2">
             {t("selectEmergencyType")}
           </h1>
-          
-          <div className="w-10 h-10" aria-hidden="true" /> {/* Spacer for centering */}
+          <div className="w-10 h-10" aria-hidden="true" />{" "}
+          {/* Spacer for centering */}
         </header>
 
         {/* Content Area */}
@@ -91,7 +102,7 @@ const EmergencyTypeSelection = () => {
               >
                 {/* Subtle gradient glow behind the icon */}
                 <div className="absolute inset-0 bg-gradient-to-br from-red-50/50 to-transparent opacity-0 group-hover:opacity-100 rounded-3xl transition-opacity duration-300 pointer-events-none" />
-                
+
                 <motion.div
                   className="w-16 h-16 sm:w-20 sm:h-20 mb-3 bg-red-50/50 rounded-2xl flex items-center justify-center p-3 shadow-inner"
                   initial={{ scale: 0.8 }}
@@ -102,10 +113,10 @@ const EmergencyTypeSelection = () => {
                     src={icon}
                     alt=""
                     aria-hidden="true"
-                    className="w-full h-full object-contain filter drop-shadow-sm group-hover:scale-110 transition-transform duration-300"
+                    className="w-full h-full object-contain filter drop-shadow-sm group-hover:scale-210 transition-transform duration-300 scale-200"
                   />
                 </motion.div>
-                
+
                 <span className="text-sm sm:text-base font-semibold text-gray-800 tracking-tight capitalize z-10">
                   {t(labelKey)}
                 </span>

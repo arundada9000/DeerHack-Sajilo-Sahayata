@@ -1,4 +1,5 @@
-import { useEffect, useState, useMemo } from "react";
+import { useState, useMemo, useEffect } from "react";
+import { useQuery, useQueryClient } from "@tanstack/react-query";
 import API from "../api/axios";
 import { Pencil, Trash2, Plus, Bell } from "lucide-react";
 import toast from "react-hot-toast";
@@ -14,8 +15,7 @@ const ALERT_TYPES = ["flood", "earthquake", "fire", "landslide", "storm", "other
 const PAGE_SIZE = 10;
 
 export default function ManageAlerts() {
-  const [alerts, setAlerts] = useState([]);
-  const [loading, setLoading] = useState(true);
+  const queryClient = useQueryClient();
   const [search, setSearch] = useState("");
   const [typeFilter, setTypeFilter] = useState("");
   const [locationFilter, setLocationFilter] = useState("");
@@ -27,13 +27,11 @@ export default function ManageAlerts() {
   const debouncedSearch = useDebounce(search, 300);
 
   useEffect(() => { if (adminLocation && !locationFilter) setLocationFilter(adminLocation); }, [adminLocation]);
-  useEffect(() => { fetchAlerts(); }, []);
 
-  const fetchAlerts = async () => {
-    try { const res = await API.get("/alerts"); setAlerts(res.data); }
-    catch { toast.error("Failed to fetch alerts"); }
-    finally { setLoading(false); }
-  };
+  const { data: alerts = [], isLoading: loading } = useQuery({
+    queryKey: ["alerts"],
+    queryFn: () => API.get("/alerts").then((res) => res.data),
+  });
 
   const filtered = useMemo(() => {
     let data = [...alerts];
@@ -50,14 +48,25 @@ export default function ManageAlerts() {
 
   const handleDelete = async (id) => {
     if (!confirm("Delete this alert?")) return;
-    try { await API.delete(`/alerts/${id}`); setAlerts((p) => p.filter((a) => a._id !== id)); toast.success("Alert deleted"); }
+    try { 
+      await API.delete(`/alerts/${id}`); 
+      toast.success("Alert deleted"); 
+      queryClient.invalidateQueries({ queryKey: ["alerts"] });
+    }
     catch { toast.error("Failed to delete alert"); }
   };
 
   const handleModalSubmit = async (data) => {
     try {
-      if (selectedAlert) { const res = await API.put(`/alerts/${selectedAlert._id}`, data); setAlerts((p) => p.map((a) => (a._id === selectedAlert._id ? res.data : a))); toast.success("Alert updated"); }
-      else { const res = await API.post("/alerts", data); setAlerts((p) => [res.data, ...p]); toast.success("Alert created"); }
+      if (selectedAlert) { 
+        await API.put(`/alerts/${selectedAlert._id}`, data); 
+        toast.success("Alert updated"); 
+      }
+      else { 
+        await API.post("/alerts", data); 
+        toast.success("Alert created"); 
+      }
+      queryClient.invalidateQueries({ queryKey: ["alerts"] });
     } catch { toast.error("Operation failed"); }
     finally { setSelectedAlert(null); setShowModal(false); }
   };

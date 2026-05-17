@@ -229,9 +229,10 @@ function SafeZoneModal({ open, onClose, onSubmit, initialData }) {
 }
 
 // ═══ Main Admin Page ═══
+import { useQuery, useQueryClient } from "@tanstack/react-query";
+
 export default function ManageSafeZones() {
-  const [zones, setZones] = useState([]);
-  const [loading, setLoading] = useState(true);
+  const queryClient = useQueryClient();
   const [search, setSearch] = useState("");
   const [typeFilter, setTypeFilter] = useState("");
   const [currentPage, setCurrentPage] = useState(1);
@@ -240,20 +241,10 @@ export default function ManageSafeZones() {
 
   const debouncedSearch = useDebounce(search, 300);
 
-  useEffect(() => {
-    fetchZones();
-  }, []);
-
-  const fetchZones = async () => {
-    try {
-      const res = await API.get("/safe-zones");
-      setZones(res.data);
-    } catch {
-      toast.error("Failed to fetch safe zones");
-    } finally {
-      setLoading(false);
-    }
-  };
+  const { data: zones = [], isLoading: loading } = useQuery({
+    queryKey: ["safe-zones"],
+    queryFn: () => API.get("/safe-zones").then((res) => res.data),
+  });
 
   const filtered = useMemo(() => {
     let data = [...zones];
@@ -283,8 +274,8 @@ export default function ManageSafeZones() {
     if (!confirm("Delete this safe zone?")) return;
     try {
       await API.delete(`/safe-zones/${id}`);
-      setZones((p) => p.filter((z) => z._id !== id));
       toast.success("Safe zone deleted");
+      queryClient.invalidateQueries({ queryKey: ["safe-zones"] });
     } catch {
       toast.error("Failed to delete");
     }
@@ -293,14 +284,13 @@ export default function ManageSafeZones() {
   const handleModalSubmit = async (data) => {
     try {
       if (selectedZone) {
-        const res = await API.put(`/safe-zones/${selectedZone._id}`, data);
-        setZones((p) => p.map((z) => (z._id === selectedZone._id ? res.data : z)));
+        await API.put(`/safe-zones/${selectedZone._id}`, data);
         toast.success("Safe zone updated");
       } else {
-        const res = await API.post("/safe-zones", data);
-        setZones((p) => [res.data, ...p]);
+        await API.post("/safe-zones", data);
         toast.success("Safe zone created");
       }
+      queryClient.invalidateQueries({ queryKey: ["safe-zones"] });
     } catch {
       toast.error("Operation failed");
     } finally {

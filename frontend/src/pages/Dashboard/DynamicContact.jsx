@@ -23,7 +23,8 @@ const DynamicContact = () => {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
 
-  const icon = departmentIcons[department?.toLowerCase()] || "/icons/others-red.svg";
+  const icon =
+    departmentIcons[department?.toLowerCase()] || "/icons/others-red.svg";
 
   useEffect(() => {
     const fetchContacts = async () => {
@@ -56,7 +57,7 @@ const DynamicContact = () => {
           content={`Emergency ${department} contacts for ${localGov} municipality.`}
         />
       </Helmet>
-      
+
       {/* Main Container - Premium native feel */}
       <motion.main
         className="relative min-h-screen bg-bg-light text-gray-900 flex flex-col"
@@ -74,40 +75,54 @@ const DynamicContact = () => {
           >
             <ChevronLeft size={24} strokeWidth={2.5} />
           </button>
-          
           <h1 className="text-lg font-bold tracking-tight text-text-dark absolute left-1/2 -translate-x-1/2 capitalize whitespace-nowrap">
-            {t(`emergency.${department?.toLowerCase()}`)} {t("emergency.contacts")}
+            {t(`emergency.${department?.toLowerCase()}`)}{" "}
+            {t("emergency.contacts")}
           </h1>
-          
           <div className="w-10 h-10" aria-hidden="true" /> {/* Spacer */}
         </header>
 
         {/* Content Area */}
         <section className="flex-1 px-4 pt-6 pb-24 overflow-y-auto max-w-md mx-auto w-full">
           <div className="mb-6 flex flex-col items-center justify-center text-center">
-            <motion.div 
+            <motion.div
               className="w-16 h-16 bg-white rounded-2xl shadow-sm border border-gray-100 flex items-center justify-center mb-3 p-3"
               initial={{ scale: 0.8, opacity: 0 }}
               animate={{ scale: 1, opacity: 1 }}
               transition={{ type: "spring", damping: 15 }}
             >
-              <img src={icon} alt="" aria-hidden="true" className="w-full h-full object-contain" />
+              <img
+                src={icon}
+                alt="Logo"
+                aria-hidden="true"
+                className="w-full h-full object-contain scale-300"
+              />
             </motion.div>
             <h2 className="text-gray-500 text-sm font-medium">
               {t("emergency.verifiedContactsFor")}
               <br />
-              <span className="font-bold text-text-dark text-base">{localGov}</span>
+              <span className="font-bold text-text-dark text-base">
+                {localGov}
+              </span>
             </h2>
           </div>
 
           {/* Contact List */}
           {loading ? (
             <div className="flex justify-center items-center py-12">
-              <div className="w-8 h-8 border-4 border-primary-red border-t-transparent rounded-full animate-spin" aria-label={t("emergency.loadingContacts")} role="status" />
+              <div
+                className="w-8 h-8 border-4 border-primary-red border-t-transparent rounded-full animate-spin"
+                aria-label={t("emergency.loadingContacts")}
+                role="status"
+              />
             </div>
           ) : error ? (
             <div className="text-center py-12 text-red-500 bg-red-50/50 rounded-2xl p-6 border border-red-100 shadow-sm">
-              <p className="font-medium">{error ? t("emergency.errorLoading") : t("emergency.errorLoading")}</p>
+              <p className="font-medium">
+                {error
+                  ? t("emergency.errorLoading")
+                  : t("emergency.errorLoading")}
+              </p>
             </div>
           ) : contacts.length === 0 ? (
             <div className="text-center py-12 text-gray-500 bg-white rounded-2xl p-6 shadow-sm border border-gray-100">
@@ -120,17 +135,28 @@ const DynamicContact = () => {
                   key={index}
                   initial={{ opacity: 0, y: 15 }}
                   animate={{ opacity: 1, y: 0 }}
-                  transition={{ delay: index * 0.08, type: "spring", stiffness: 300, damping: 25 }}
+                  transition={{
+                    delay: index * 0.08,
+                    type: "spring",
+                    stiffness: 300,
+                    damping: 25,
+                  }}
                   className="group relative flex flex-col sm:flex-row sm:items-center justify-between bg-white rounded-3xl p-5 shadow-sm border border-gray-100 hover:shadow-md hover:border-gray-200 transition-all duration-300 gap-4"
                 >
                   <div className="flex flex-col">
-                    <h3 className="font-bold text-base text-gray-900 tracking-tight">{contact.name}</h3>
+                    <h3 className="font-bold text-base text-gray-900 tracking-tight">
+                      {contact.name}
+                    </h3>
                     <p className="text-sm font-medium text-gray-600 mt-1 flex items-center gap-1.5">
                       <span className="tabular-nums">{contact.phone}</span>
                       {contact.description && (
                         <>
-                          <span className="text-gray-300" aria-hidden="true">•</span>
-                          <span className="text-gray-500">{contact.description}</span>
+                          <span className="text-gray-300" aria-hidden="true">
+                            •
+                          </span>
+                          <span className="text-gray-500">
+                            {contact.description}
+                          </span>
                         </>
                       )}
                     </p>
@@ -141,7 +167,11 @@ const DynamicContact = () => {
                     aria-label={`Call ${contact.name} at ${contact.phone}`}
                     className="flex-shrink-0 flex items-center justify-center gap-2 bg-primary-red text-white font-semibold text-sm px-6 py-3 sm:py-2.5 rounded-full shadow-md hover:bg-primary-red-hover hover:shadow-lg focus-visible:ring-4 focus-visible:ring-red-200 outline-none transition-all duration-200 active:scale-95"
                   >
-                    <Phone size={18} strokeWidth={2.5} className="animate-pulse" />
+                    <Phone
+                      size={18}
+                      strokeWidth={2.5}
+                      className="animate-pulse"
+                    />
                     <span>{t("fireAuthorities.call")}</span>
                   </a>
                 </motion.div>

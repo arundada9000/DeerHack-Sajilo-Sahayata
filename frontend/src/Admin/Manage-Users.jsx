@@ -1,4 +1,5 @@
 import { useEffect, useState, useMemo } from "react";
+import { useQuery, useQueryClient } from "@tanstack/react-query";
 import API from "../api/axios";
 import { Trash2, Shield, Search, Eye, X, User, Users, MapPin, Mail, Phone, Calendar, IdCard } from "lucide-react";
 import toast from "react-hot-toast";
@@ -12,8 +13,7 @@ import Pagination from "../components/admin/Pagination";
 const PAGE_SIZE = 10;
 
 export default function ManageUsers() {
-  const [users, setUsers] = useState([]);
-  const [loading, setLoading] = useState(true);
+  const queryClient = useQueryClient();
   const [search, setSearch] = useState("");
   const [roleFilter, setRoleFilter] = useState("");
   const [locationFilter, setLocationFilter] = useState("");
@@ -31,21 +31,10 @@ export default function ManageUsers() {
     }
   }, [adminLocation]);
 
-  useEffect(() => {
-    fetchUsers();
-  }, []);
-
-  const fetchUsers = async () => {
-    try {
-      const res = await API.get("/auth/users");
-      setUsers(res.data);
-    } catch (err) {
-      console.error("Error fetching users", err);
-      toast.error("Failed to load users");
-    } finally {
-      setLoading(false);
-    }
-  };
+  const { data: users = [], isLoading: loading } = useQuery({
+    queryKey: ["users"],
+    queryFn: () => API.get("/auth/users").then((res) => res.data),
+  });
 
   // Derived filtered list (memoized)
   const filteredUsers = useMemo(() => {
@@ -105,12 +94,8 @@ export default function ManageUsers() {
       async () => {
         try {
           await API.put(`/auth/users/${userId}/role`, { role: newRole });
-          setUsers((prev) =>
-            prev.map((user) =>
-              user._id === userId ? { ...user, role: newRole } : user
-            )
-          );
           toast.success("Role updated successfully");
+          queryClient.invalidateQueries({ queryKey: ["users"] });
         } catch (err) {
           console.error("Failed to update role", err);
           toast.error("Failed to update role");
@@ -123,8 +108,8 @@ export default function ManageUsers() {
     confirmAction("Are you sure you want to delete this user?", async () => {
       try {
         await API.delete(`/auth/users/${id}`);
-        setUsers((prev) => prev.filter((u) => u._id !== id));
         toast.success("User deleted successfully");
+        queryClient.invalidateQueries({ queryKey: ["users"] });
       } catch (err) {
         console.error("Failed to delete user", err);
         toast.error("Failed to delete user");
