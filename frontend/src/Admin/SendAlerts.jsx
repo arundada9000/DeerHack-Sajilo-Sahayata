@@ -12,7 +12,7 @@ import TableSkeleton from "../components/admin/TableSkeleton";
 import Pagination from "../components/admin/Pagination";
 import { exportToCSV } from "../utils/exportCsv";
 
-const ALERT_TYPES = ["flood", "earthquake", "fire", "landslide", "storm", "other"];
+const ALERT_TYPES = ["fire", "flood", "earthquake", "landslide", "storm", "police", "accident", "other"];
 const PAGE_SIZE = 10;
 
 export default function ManageAlerts() {

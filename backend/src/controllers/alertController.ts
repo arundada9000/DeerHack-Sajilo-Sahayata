@@ -29,7 +29,8 @@ export const createAlert = async (req: Request, res: Response) => {
 
     res.status(201).json(newAlert);
   } catch (err) {
-    res.status(500).json({ message: "Failed to create alert", error: err });
+    console.error("[Alert] Failed to create alert:", err);
+    res.status(500).json({ message: "Failed to create alert", error: err instanceof Error ? err.message : err });
   }
 };
 

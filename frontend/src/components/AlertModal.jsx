@@ -2,6 +2,8 @@ import { useState, useEffect } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 import { BellRing, FileText, MapPin, Tag, X } from "lucide-react";
 
+const ALERT_TYPES = ["fire", "flood", "earthquake", "landslide", "storm", "police", "accident", "other"];
+
 export default function AlertModal({ open, onClose, onSubmit, initialData }) {
   const [form, setForm] = useState({
     title: "",
@@ -86,14 +88,18 @@ export default function AlertModal({ open, onClose, onSubmit, initialData }) {
               <div className="absolute top-3 left-3 text-gray-400">
                 <FileText size={18} />
               </div>
-              <input
+              <select
                 name="type"
                 value={form.type}
                 onChange={handleChange}
-                placeholder="Emergency Type (e.g., flood, fire)"
                 required
-                className="w-full border border-gray-200 pl-10 pr-4 py-2.5 rounded-xl text-sm focus:ring-2 focus:ring-indigo-500 focus:border-transparent outline-none transition"
-              />
+                className="w-full border border-gray-200 pl-10 pr-4 py-2.5 rounded-xl text-sm focus:ring-2 focus:ring-indigo-500 focus:border-transparent outline-none transition appearance-none bg-white"
+              >
+                <option value="" disabled>Select Emergency Type</option>
+                {ALERT_TYPES.map((t) => (
+                  <option key={t} value={t}>{t.charAt(0).toUpperCase() + t.slice(1)}</option>
+                ))}
+              </select>
             </div>
 
             <div className="relative">

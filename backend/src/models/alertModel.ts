@@ -15,7 +15,7 @@ const AlertSchema: Schema = new Schema({
   type: {
     type: String,
     required: true,
-    enum: ["fire", "flood", "police", "landslide", "accident", "other"],
+    enum: ["fire", "flood", "earthquake", "landslide", "storm", "police", "accident", "other"],
   },
   location: { type: String, required: true },
   timestamp: { type: Date, default: Date.now },
