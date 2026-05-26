@@ -2,7 +2,7 @@ import React, { useState } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 import { X, FileEdit, Trash2, MapPin, Tag, Activity, FileText, Maximize2 } from "lucide-react";
 import API from "../api/axios";
-import useImagePreview from "../hooks/useImagePreview";
+import useImagePreview from "../hooks/useImagePreview.jsx";
 
 const REPORT_TYPES = ["fire", "police", "flood", "accident", "landslide", "other"];
 const STATUS_TYPES = ["pending", "verified", "solved", "working"];
