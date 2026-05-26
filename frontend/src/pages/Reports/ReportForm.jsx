@@ -1,8 +1,9 @@
-import React, { useEffect, useRef, useState } from "react";
+import React, { useEffect, useRef, useState, useCallback } from "react";
 import { useTranslation } from "react-i18next";
 import { useNavigate } from "react-router-dom";
 import { motion, AnimatePresence } from "framer-motion";
 import { saveReportOffline, prepareOfflineReport } from "../../utils/offlineQueue";
+import { useLocalGovStore } from "../../stores/localGovStore";
 import {
   Camera,
   MapPin,
@@ -32,16 +33,18 @@ export default function ReportForm() {
   const [locating, setLocating] = useState(true);
   const [type, setType] = useState("");
   const [description, setDescription] = useState("");
-  
+
   const [photoFile, setPhotoFile] = useState(null);
   const [preview, setPreview] = useState(null);
-  const [mediaSource, setMediaSource] = useState("");
-  
-  // States: "idle" | "submitting" | "success" | "failed" | "queued"
+
   const [status, setStatus] = useState("idle");
   const [errorMessage, setErrorMessage] = useState("");
 
-  const fileInputRef = useRef(null);
+  const [showCamera, setShowCamera] = useState(false);
+  const [cameraReady, setCameraReady] = useState(false);
+  const videoRef = useRef(null);
+  const canvasRef = useRef(null);
+  const streamRef = useRef(null);
 
   const tags = [
     { id: "fire", icon: <Flame size={20} /> },
@@ -53,7 +56,14 @@ export default function ReportForm() {
   ];
 
   useEffect(() => {
-    detectLocation();
+    const cached = useLocalGovStore.getState().getCoordinates();
+    if (cached && cached.length === 2) {
+      setLocation({ lat: cached[0], lng: cached[1] });
+      setLocating(false);
+    } else {
+      detectLocation();
+    }
+    return () => stopCamera();
   }, []);
 
   const detectLocation = () => {
@@ -70,53 +80,82 @@ export default function ReportForm() {
         setLocation({ lat: pos.coords.latitude, lng: pos.coords.longitude });
         setLocating(false);
       },
-      (err) => {
+      () => {
         toast.error(t("report.locationError", "Failed to secure location."));
         setLocating(false);
       },
-      { enableHighAccuracy: true, timeout: 10000, maximumAge: 0 }
+      { enableHighAccuracy: false, timeout: 5000, maximumAge: 60000 }
     );
   };
 
-  const handleMediaCapture = (e) => {
-    const file = e.target.files[0];
-    if (!file) return;
-
-    if (!file.type.startsWith("image/")) {
-      toast.error(t("report.invalidFormat", "Please select an image file."));
-      return;
+  const stopCamera = useCallback(() => {
+    if (streamRef.current) {
+      streamRef.current.getTracks().forEach((t) => t.stop());
+      streamRef.current = null;
     }
+    setCameraReady(false);
+  }, []);
 
-    // Live image or not check
-    const now = Date.now();
-    const timeDiff = now - file.lastModified;
-    const isCameraPhoto = timeDiff < 5000;
+  const openCamera = async () => {
+    try {
+      setShowCamera(true);
+      setCameraReady(false);
+      const stream = await navigator.mediaDevices.getUserMedia({
+        video: { facingMode: "environment", width: { ideal: 1280 }, height: { ideal: 720 } },
+      });
+      streamRef.current = stream;
+      if (videoRef.current) {
+        videoRef.current.srcObject = stream;
+      }
+    } catch {
+      setShowCamera(false);
+      toast.error("Camera access denied or unavailable.");
+    }
+  };
 
-    setMediaSource(isCameraPhoto ? "camera" : "gallery");
-    setPhotoFile(file);
+  const handleVideoLoaded = () => {
+    setCameraReady(true);
+  };
 
-    const reader = new FileReader();
-    reader.onload = (ev) => setPreview(ev.target.result);
-    reader.readAsDataURL(file);
+  const capturePhoto = () => {
+    const video = videoRef.current;
+    const canvas = canvasRef.current;
+    if (!video || !canvas) return;
+
+    canvas.width = video.videoWidth;
+    canvas.height = video.videoHeight;
+    const ctx = canvas.getContext("2d");
+    ctx.drawImage(video, 0, 0);
+
+    canvas.toBlob((blob) => {
+      if (!blob) return;
+      const file = new File([blob], `live-${Date.now()}.jpg`, { type: "image/jpeg" });
+      setPhotoFile(file);
+
+      const reader = new FileReader();
+      reader.onload = (ev) => setPreview(ev.target.result);
+      reader.readAsDataURL(file);
+
+      stopCamera();
+      setShowCamera(false);
+    }, "image/jpeg", 0.85);
   };
 
   const clearPhoto = () => {
     setPreview(null);
     setPhotoFile(null);
-    setMediaSource("");
   };
 
   const handleSubmit = async (e) => {
     e.preventDefault();
-    
+
     if (!location) {
       detectLocation();
       return toast.error(t("report.locationFetching", "Location is required."));
     }
-    
-    // Enforce live photos only
-    if (mediaSource === "gallery" || !photoFile) {
-      return toast.error(t("report.mediaRequired", "A live photo is required. Gallery uploads are not allowed."));
+
+    if (!photoFile) {
+      return toast.error(t("report.mediaRequired", "A live photo is required."));
     }
 
     if (description.length < 10) {
@@ -134,48 +173,35 @@ export default function ReportForm() {
       const formData = new FormData();
       formData.append("type", type);
       formData.append("description", description);
-      // The backend schema expects [lng, lat] for GeoJSON.
-      formData.append("location", locationString); 
+      formData.append("location", locationString);
       formData.append("image", photoFile);
 
       await API.post("/reports", formData);
       setStatus("success");
     } catch (err) {
       console.error(err);
-
-      // Detect network error (offline or server unreachable)
-      const isNetworkError = !err.response || err.code === "ERR_NETWORK" || err.message === "Network Error";
-
-      if (isNetworkError) {
-        // Queue the report for later sync
-        try {
-          const offlineData = await prepareOfflineReport({
-            type,
-            description,
-            location: locationString,
-            photoFile,
-          });
-          await saveReportOffline(offlineData);
-          setStatus("queued");
-        } catch (queueErr) {
-          console.error("Failed to queue offline:", queueErr);
-          setErrorMessage("Failed to save report offline. Please try again.");
-          setStatus("failed");
-        }
-      } else {
-        // Server returned an error (4xx/5xx)
-        setErrorMessage(err.response?.data?.message || err.message || t("report.submitError", "Failed to submit report."));
+      try {
+        const offlineData = await prepareOfflineReport({
+          type,
+          description,
+          location: locationString,
+          photoFile,
+        });
+        await saveReportOffline(offlineData);
+        setStatus("queued");
+      } catch (queueErr) {
+        console.error("Failed to queue offline:", queueErr);
+        setErrorMessage("Failed to save report offline. Please try again.");
         setStatus("failed");
       }
     }
   };
 
-  // ---- FULL SCREEN STATES ----
   if (status === "submitting" || status === "success" || status === "failed" || status === "queued") {
     return (
       <div className="fixed inset-0 z-50 flex items-center justify-center bg-gray-950/40 backdrop-blur-xl">
         <AnimatePresence mode="wait">
-          
+
           {status === "submitting" && (
             <motion.div key="submitting" initial={{ opacity: 0, scale: 0.9 }} animate={{ opacity: 1, scale: 1 }} exit={{ opacity: 0, scale: 0.9 }} className="flex flex-col items-center">
               <div className="relative flex items-center justify-center w-24 h-24 mb-6">
@@ -237,12 +263,10 @@ export default function ReportForm() {
     );
   }
 
-  // ---- MAIN FORM ----
   return (
     <div className="min-h-screen bg-gray-50 pb-24">
       <Toaster position="top-center" />
 
-      {/* Modern Header */}
       <header className="sticky top-0 z-40 bg-white/80 backdrop-blur-md border-b border-gray-200">
         <div className="flex items-center justify-between p-4 max-w-xl mx-auto">
           <div className="flex items-center gap-3">
@@ -256,7 +280,7 @@ export default function ReportForm() {
 
       <main className="max-w-xl mx-auto p-4 space-y-6 mt-4">
         <form onSubmit={handleSubmit} className="space-y-6">
-          
+
           {/* 1. Location Card */}
           <motion.section initial={{ y: 10, opacity: 0 }} animate={{ y: 0, opacity: 1 }} className="bg-white rounded-2xl shadow-sm border border-gray-100 p-5">
             <div className="flex items-center justify-between mb-4">
@@ -267,7 +291,7 @@ export default function ReportForm() {
                 <RefreshCcw size={14} className={locating ? "animate-spin" : ""} /> {t("report.refresh", "Refresh")}
               </button>
             </div>
-            
+
             <div className={`p-4 rounded-xl border ${location ? "bg-green-50/50 border-green-200" : "bg-gray-50 border-gray-200"}`}>
               {locating ? (
                 <div className="flex items-center gap-3 text-gray-600 font-medium text-sm">
@@ -301,24 +325,58 @@ export default function ReportForm() {
                 <Camera className="text-blue-600" size={18} /> {t("report.photo", "Visual Evidence")}
               </h2>
             </div>
-            
+
             <div className="p-5">
               <AnimatePresence mode="wait">
-                {preview ? (
+                {showCamera ? (
+                  <motion.div key="camera" initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }} className="relative rounded-xl overflow-hidden bg-black">
+                    <video
+                      ref={videoRef}
+                      autoPlay
+                      playsInline
+                      onCanPlay={handleVideoLoaded}
+                      className="w-full aspect-[4/3] object-cover"
+                    />
+                    {!cameraReady && (
+                      <div className="absolute inset-0 flex items-center justify-center">
+                        <Loader2 className="animate-spin text-white w-8 h-8" />
+                      </div>
+                    )}
+                    <div className="absolute bottom-4 left-1/2 -translate-x-1/2 flex gap-4">
+                      <button
+                        type="button"
+                        onClick={() => { stopCamera(); setShowCamera(false); }}
+                        className="px-5 py-2.5 rounded-full bg-white/20 backdrop-blur-md text-white font-semibold text-sm hover:bg-white/30 transition"
+                      >
+                        Cancel
+                      </button>
+                      <button
+                        type="button"
+                        onClick={capturePhoto}
+                        disabled={!cameraReady}
+                        className="w-14 h-14 rounded-full bg-white flex items-center justify-center shadow-lg hover:scale-105 transition disabled:opacity-50"
+                      >
+                        <div className="w-10 h-10 rounded-full border-4 border-gray-800" />
+                      </button>
+                    </div>
+                  </motion.div>
+                ) : preview ? (
                   <motion.div key="preview" initial={{ opacity: 0, scale: 0.95 }} animate={{ opacity: 1, scale: 1 }} exit={{ opacity: 0 }} className="relative rounded-xl overflow-hidden shadow-md">
                     <img src={preview} alt="Incident" className="w-full aspect-[4/3] object-cover" />
                     <button type="button" onClick={clearPhoto} className="absolute top-3 right-3 bg-red-500 hover:bg-red-600 text-white p-2 rounded-full shadow-lg transition">
                       <X size={18} />
                     </button>
-                    {mediaSource === "gallery" && (
-                      <div className="absolute bottom-0 inset-x-0 bg-red-500 text-white text-center text-xs py-1.5 font-semibold">
-                        {t("report.mediaRequired", "Live photo is required")}
-                      </div>
-                    )}
+                    <button
+                      type="button"
+                      onClick={openCamera}
+                      className="absolute bottom-3 left-3 bg-white/90 backdrop-blur-md text-gray-800 px-3 py-1.5 rounded-lg text-xs font-semibold hover:bg-white transition shadow"
+                    >
+                      Retake
+                    </button>
                   </motion.div>
                 ) : (
                   <motion.div key="placeholder" initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }}>
-                    <button type="button" onClick={() => fileInputRef.current?.click()} className="w-full flex flex-col items-center justify-center gap-3 p-8 rounded-xl border-2 border-dashed border-gray-300 bg-gray-50 hover:bg-gray-100 transition group">
+                    <button type="button" onClick={openCamera} className="w-full flex flex-col items-center justify-center gap-3 p-8 rounded-xl border-2 border-dashed border-gray-300 bg-gray-50 hover:bg-gray-100 transition group">
                       <div className="w-16 h-16 bg-blue-100 rounded-full flex items-center justify-center text-blue-600 group-hover:scale-110 transition-transform">
                         <Camera size={32} />
                       </div>
@@ -327,7 +385,7 @@ export default function ReportForm() {
                   </motion.div>
                 )}
               </AnimatePresence>
-              <input type="file" accept="image/*" capture="environment" ref={fileInputRef} onChange={handleMediaCapture} className="hidden" />
+              <canvas ref={canvasRef} className="hidden" />
             </div>
           </motion.section>
 
@@ -337,10 +395,10 @@ export default function ReportForm() {
               <label className="block text-sm font-bold text-gray-700 mb-3">{t("report.selectAuthority", "Select Incident Type")}</label>
               <div className="grid grid-cols-2 sm:grid-cols-3 gap-3">
                 {tags.map((tItem) => (
-                  <button 
-                    key={tItem.id} 
-                    type="button" 
-                    onClick={() => setType(tItem.id)} 
+                  <button
+                    key={tItem.id}
+                    type="button"
+                    onClick={() => setType(tItem.id)}
                     className={`flex flex-col items-center justify-center gap-2 p-3 rounded-xl border-2 transition-all ${type === tItem.id ? 'border-blue-600 bg-blue-50 text-blue-700' : 'border-gray-200 bg-white text-gray-600 hover:bg-gray-50'}`}
                   >
                     <span className={type === tItem.id ? "text-blue-600" : "text-gray-500"}>{tItem.icon}</span>
@@ -349,24 +407,23 @@ export default function ReportForm() {
                 ))}
               </div>
             </div>
-            
+
             <div>
               <label className="block text-sm font-bold text-gray-700 mb-2">{t("report.description", "Description")}</label>
-              <textarea 
-                rows={3} 
-                value={description} 
-                onChange={(e) => setDescription(e.target.value)} 
-                placeholder={t("report.descriptionPlaceholder", "Provide specific details...")} 
-                className="w-full border-2 border-gray-200 rounded-xl focus:ring-0 focus:border-blue-500 p-3 text-sm bg-gray-50 transition resize-none" 
+              <textarea
+                rows={3}
+                value={description}
+                onChange={(e) => setDescription(e.target.value)}
+                placeholder={t("report.descriptionPlaceholder", "Provide specific details...")}
+                className="w-full border-2 border-gray-200 rounded-xl focus:ring-0 focus:border-blue-500 p-3 text-sm bg-gray-50 transition resize-none"
               />
             </div>
           </motion.section>
 
-          {/* Submit Action */}
           <motion.div initial={{ y: 10, opacity: 0 }} animate={{ y: 0, opacity: 1 }} transition={{ delay: 0.3 }} className="pt-2">
-            <button 
-              type="submit" 
-              disabled={status === "submitting" || locating} 
+            <button
+              type="submit"
+              disabled={status === "submitting" || locating}
               className="w-full bg-[#e9403e] hover:bg-[#d82e2c] disabled:opacity-70 text-white text-lg font-bold py-3.5 rounded-xl shadow-md transition-all active:scale-95"
             >
               {t("report.submit", "Submit")}
