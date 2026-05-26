@@ -81,10 +81,9 @@ export default function DetailModal({ open, onClose, title, icon, fields, imageU
               Close
             </button>
           </div>
+          {ImagePreview}
         </motion.div>
       </motion.div>
-
-      {ImagePreview}
     </AnimatePresence>
   );
 }

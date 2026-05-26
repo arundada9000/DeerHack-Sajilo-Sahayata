@@ -10,7 +10,7 @@ export default function useImagePreview() {
   const closePreview = useCallback(() => setPreviewUrl(null), []);
 
   const ImagePreview = previewUrl ? createPortal(
-    <AnimatePresence>
+    <AnimatePresence initial={false}>
       <motion.div
         key="image-preview-backdrop"
         initial={{ opacity: 0 }}
