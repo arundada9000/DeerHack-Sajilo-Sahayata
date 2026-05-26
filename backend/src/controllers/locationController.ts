@@ -35,7 +35,7 @@ export const detectLocation = (req: Request, res: Response) => {
   try {
     const { lat, lng } = req.query;
 
-    if (!lat || !lng) {
+    if (lat == null || lng == null) {
       res.status(400).json({ message: "Latitude and longitude are required." });
       return;
     }

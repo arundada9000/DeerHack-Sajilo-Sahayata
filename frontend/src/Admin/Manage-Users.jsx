@@ -60,7 +60,7 @@ export default function ManageUsers() {
     // Location filter
     if (locationFilter) {
       data = data.filter(
-        (u) => u.address?.toLowerCase().includes(locationFilter.toLowerCase())
+        (u) => u.localGovName?.toLowerCase().includes(locationFilter.toLowerCase())
       );
     }
 
@@ -321,28 +321,24 @@ export default function ManageUsers() {
                   <div className="flex items-center gap-3 text-sm text-gray-700 bg-gray-50 p-3 rounded-xl">
                     <MapPin size={16} className="text-gray-400" />
                     <div className="flex flex-col">
-                      <span className="text-xs text-gray-400 font-semibold uppercase">Address</span>
-                      <span className="font-medium">{selectedUser.address || "Not provided"}</span>
+                      <span className="text-xs text-gray-400 font-semibold uppercase">VDC / Municipality</span>
+                      <span className="font-medium">{selectedUser.localGovName || "Not provided"}</span>
                     </div>
                   </div>
-                  
                   <div className="flex items-center gap-3 text-sm text-gray-700 bg-gray-50 p-3 rounded-xl">
-                    <User size={16} className="text-gray-400" />
+                    <MapPin size={16} className="text-gray-400" />
                     <div className="flex flex-col">
-                      <span className="text-xs text-gray-400 font-semibold uppercase">Gender</span>
-                      <span className="font-medium capitalize">{selectedUser.gender || "Not provided"}</span>
+                      <span className="text-xs text-gray-400 font-semibold uppercase">Coordinates</span>
+                      <span className="font-medium">
+                        {selectedUser.location?.coordinates
+                          ? `[${selectedUser.location.coordinates[0]?.toFixed(4)}, ${selectedUser.location.coordinates[1]?.toFixed(4)}]`
+                          : "Not provided"}
+                      </span>
                     </div>
                   </div>
                 </div>
 
                 <div className="grid grid-cols-2 gap-4">
-                  <div className="flex items-center gap-3 text-sm text-gray-700 bg-gray-50 p-3 rounded-xl">
-                    <IdCard size={16} className="text-gray-400" />
-                    <div className="flex flex-col">
-                      <span className="text-xs text-gray-400 font-semibold uppercase">Citizenship ID</span>
-                      <span className="font-medium">{selectedUser.citizenshipId || "Not provided"}</span>
-                    </div>
-                  </div>
                   <div className="flex items-center gap-3 text-sm text-gray-700 bg-gray-50 p-3 rounded-xl">
                     <Calendar size={16} className="text-gray-400" />
                     <div className="flex flex-col">

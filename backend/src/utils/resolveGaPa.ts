@@ -38,7 +38,7 @@ const loadGeoJsonData = () => {
  * Returns "Unknown" if no match is found or coordinates are invalid.
  */
 export function resolveGaPa(lat: number, lng: number): string {
-  if (!lat || !lng || isNaN(lat) || isNaN(lng)) return "Unknown";
+  if (lat == null || isNaN(lat) || lng == null || isNaN(lng)) return "Unknown";
 
   loadGeoJsonData();
 
