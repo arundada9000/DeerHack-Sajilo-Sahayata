@@ -23,7 +23,7 @@ const UserSchema: Schema = new Schema({
     type: { type: String, default: "Point" },
     coordinates: { type: [Number], default: [0, 0] },
   },
-});
+}, { timestamps: true });
 
 // Create a 2dsphere index for geospatial queries
 UserSchema.index({ location: "2dsphere" });
