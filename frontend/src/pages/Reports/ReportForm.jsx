@@ -124,9 +124,9 @@ export default function ReportForm() {
       toast.error("Please select an image file.");
       return;
     }
-    const elapsed = Date.now() - (captureStartRef.current || 0);
-    if (elapsed > 5000) {
-      toast.error("Photo must be taken within 5 seconds. Try again.");
+    const timeDiff = Date.now() - file.lastModified;
+    if (!file.lastModified || timeDiff > 5000) {
+      toast.error("Only live photos are allowed. Please use the camera.");
       e.target.value = "";
       return;
     }
