@@ -36,6 +36,7 @@ export default function ReportForm() {
 
   const [photoFile, setPhotoFile] = useState(null);
   const [preview, setPreview] = useState(null);
+  const [mediaSource, setMediaSource] = useState("");
 
   const [status, setStatus] = useState("idle");
   const [errorMessage, setErrorMessage] = useState("");
@@ -45,6 +46,8 @@ export default function ReportForm() {
   const videoRef = useRef(null);
   const canvasRef = useRef(null);
   const streamRef = useRef(null);
+  const fileInputRef = useRef(null);
+  const captureStartRef = useRef(null);
 
   const tags = [
     { id: "fire", icon: <Flame size={20} /> },
@@ -97,6 +100,7 @@ export default function ReportForm() {
   }, []);
 
   const openCamera = async () => {
+    captureStartRef.current = Date.now();
     try {
       setShowCamera(true);
       setCameraReady(false);
@@ -109,8 +113,28 @@ export default function ReportForm() {
       }
     } catch {
       setShowCamera(false);
-      toast.error("Camera access denied or unavailable.");
+      fileInputRef.current?.click();
     }
+  };
+
+  const handleFileFallback = (e) => {
+    const file = e.target.files[0];
+    if (!file) return;
+    if (!file.type.startsWith("image/")) {
+      toast.error("Please select an image file.");
+      return;
+    }
+    const elapsed = Date.now() - (captureStartRef.current || 0);
+    if (elapsed > 5000) {
+      toast.error("Photo must be taken within 5 seconds. Try again.");
+      e.target.value = "";
+      return;
+    }
+    setMediaSource("fallback");
+    setPhotoFile(file);
+    const reader = new FileReader();
+    reader.onload = (ev) => setPreview(ev.target.result);
+    reader.readAsDataURL(file);
   };
 
   const handleVideoLoaded = () => {
@@ -130,6 +154,7 @@ export default function ReportForm() {
     canvas.toBlob((blob) => {
       if (!blob) return;
       const file = new File([blob], `live-${Date.now()}.jpg`, { type: "image/jpeg" });
+      setMediaSource("camera");
       setPhotoFile(file);
 
       const reader = new FileReader();
@@ -144,6 +169,7 @@ export default function ReportForm() {
   const clearPhoto = () => {
     setPreview(null);
     setPhotoFile(null);
+    setMediaSource("");
   };
 
   const handleSubmit = async (e) => {
@@ -155,7 +181,7 @@ export default function ReportForm() {
     }
 
     if (!photoFile) {
-      return toast.error(t("report.mediaRequired", "A live photo is required."));
+      return toast.error("A live photo is required. Please take a photo.");
     }
 
     if (description.length < 10) {
@@ -385,6 +411,7 @@ export default function ReportForm() {
                   </motion.div>
                 )}
               </AnimatePresence>
+              <input type="file" accept="image/*" capture="environment" ref={fileInputRef} onChange={handleFileFallback} className="hidden" />
               <canvas ref={canvasRef} className="hidden" />
             </div>
           </motion.section>
