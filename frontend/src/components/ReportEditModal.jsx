@@ -1,7 +1,8 @@
 import React, { useState } from "react";
 import { motion, AnimatePresence } from "framer-motion";
-import { X, FileEdit, Trash2, MapPin, Tag, Activity, FileText } from "lucide-react";
+import { X, FileEdit, Trash2, MapPin, Tag, Activity, FileText, Maximize2 } from "lucide-react";
 import API from "../api/axios";
+import useImagePreview from "../hooks/useImagePreview";
 
 const REPORT_TYPES = ["fire", "police", "flood", "accident", "landslide", "other"];
 const STATUS_TYPES = ["pending", "verified", "solved", "working"];
@@ -16,6 +17,7 @@ export default function ReportEditModal({ report, onClose, onUpdate }) {
     image: null,
   });
   const [loading, setLoading] = useState(false);
+  const { openPreview, ImagePreview } = useImagePreview();
 
   const handleChange = (e) => {
     const { name, value } = e.target;
@@ -180,15 +182,22 @@ export default function ReportEditModal({ report, onClose, onUpdate }) {
             {report.imageUrl && (
               <div>
                 <label className="block text-sm font-semibold text-gray-700 mb-1.5">Evidence Photo</label>
-                <div className="w-full h-48 bg-gray-50 rounded-xl border border-gray-200 overflow-hidden">
+                <div
+                  className="relative w-full h-48 bg-gray-50 rounded-xl border border-gray-200 overflow-hidden group cursor-pointer"
+                  onClick={() => openPreview(report.imageUrl.startsWith("http") ? report.imageUrl : `${import.meta.env.VITE_API_URL.replace("/api", "")}${report.imageUrl}`)}
+                >
                   <img
                     src={report.imageUrl.startsWith("http") ? report.imageUrl : `${import.meta.env.VITE_API_URL.replace("/api", "")}${report.imageUrl}`}
                     alt="Incident Evidence"
-                    className="w-full h-full object-cover"
+                    className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-300"
                   />
+                  <div className="absolute inset-0 bg-black/0 group-hover:bg-black/30 transition-colors flex items-center justify-center">
+                    <Maximize2 size={24} className="text-white opacity-0 group-hover:opacity-100 transition-opacity drop-shadow-lg" />
+                  </div>
                 </div>
               </div>
             )}
+            <ImagePreview />
           </div>
 
           {/* Footer Actions */}
