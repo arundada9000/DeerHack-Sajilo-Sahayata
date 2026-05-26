@@ -1,4 +1,4 @@
-const CACHE_NAME = "sajilo-sahayata-v1";
+const CACHE_NAME = "sajilo-sahayata-v2";
 
 // Assets to pre-cache on install
 const PRECACHE_ASSETS = [
@@ -11,12 +11,11 @@ const PRECACHE_ASSETS = [
 ];
 
 // Install: Pre-cache core shell
+// New SW waits for user confirmation (SKIP_WAITING message) instead of auto-activating.
+// This lets the UpdateBanner prompt the user before refreshing.
 self.addEventListener("install", (event) => {
   event.waitUntil(
-    caches
-      .open(CACHE_NAME)
-      .then((cache) => cache.addAll(PRECACHE_ASSETS))
-      .then(() => self.skipWaiting())
+    caches.open(CACHE_NAME).then((cache) => cache.addAll(PRECACHE_ASSETS))
   );
 });
 

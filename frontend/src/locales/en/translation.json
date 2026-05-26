@@ -410,6 +410,11 @@
     "all": "All",
     "clear": "Clear"
   },
+  "updateBanner": {
+    "title": "New Version Available",
+    "message": "Update to get the latest features and fixes.",
+    "action": "Update"
+  },
   "pagination": {
     "showing": "Showing",
     "of": "of",
