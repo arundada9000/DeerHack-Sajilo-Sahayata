@@ -1,6 +1,6 @@
 import { useEffect, useState, useMemo } from "react";
 import API from "../api/axios";
-import { Pencil, Trash2, Plus, Shield, MapPin, Download } from "lucide-react";
+import { Pencil, Trash2, Plus, Shield, MapPin, Download, Eye } from "lucide-react";
 import toast from "react-hot-toast";
 import { motion, AnimatePresence } from "framer-motion";
 import useDebounce from "../hooks/useDebounce";
@@ -9,6 +9,7 @@ import TableSkeleton from "../components/admin/TableSkeleton";
 import Pagination from "../components/admin/Pagination";
 import { useQuery, useQueryClient } from "@tanstack/react-query";
 import { exportToCSV } from "../utils/exportCsv";
+import DetailModal from "../components/DetailModal";
 
 const ZONE_TYPES = ["hospital", "shelter", "police", "fire_station", "distribution"];
 const PAGE_SIZE = 10;
@@ -239,6 +240,8 @@ export default function ManageSafeZones() {
   const [currentPage, setCurrentPage] = useState(1);
   const [showModal, setShowModal] = useState(false);
   const [selectedZone, setSelectedZone] = useState(null);
+  const [viewItem, setViewItem] = useState(null);
+  const [viewOpen, setViewOpen] = useState(false);
 
   const debouncedSearch = useDebounce(search, 300);
 
@@ -400,6 +403,12 @@ export default function ManageSafeZones() {
                   </td>
                   <td className="px-6 py-4 flex gap-2">
                     <button
+                      onClick={() => { setViewItem(zone); setViewOpen(true); }}
+                      className="flex items-center gap-1 px-3 py-1.5 text-xs bg-gray-100 text-gray-700 rounded-lg hover:bg-gray-200 hover:-translate-y-0.5 hover:shadow-sm font-medium transition-all active:scale-95"
+                    >
+                      <Eye size={13} /> View
+                    </button>
+                    <button
                       onClick={() => {
                         setSelectedZone(zone);
                         setShowModal(true);
@@ -429,6 +438,22 @@ export default function ManageSafeZones() {
         />
       </div>
 
+      <DetailModal
+        open={viewOpen}
+        onClose={() => { setViewOpen(false); setViewItem(null); }}
+        title="Safe Zone Details"
+        icon={<Shield size={20} />}
+        fields={[
+          { label: "Name", value: viewItem?.name },
+          { label: "Type", value: viewItem?.type, render: (v) => <span className={`px-2.5 py-1 rounded-full text-xs font-semibold capitalize ${typeColors[v] || "bg-gray-100 text-gray-700"}`}>{v?.replace("_", " ")}</span> },
+          { label: "Address", value: viewItem?.address },
+          { label: "Phone", value: viewItem?.phone },
+          { label: "Coordinates", value: viewItem?.location?.coordinates ? `[${viewItem.location.coordinates[0]?.toFixed(5)}, ${viewItem.location.coordinates[1]?.toFixed(5)}]` : "—" },
+          { label: "Status", value: viewItem?.isActive, render: (v) => <span className={`px-2 py-1 rounded-full text-xs font-bold ${v ? "bg-green-100 text-green-700" : "bg-gray-100 text-gray-500"}`}>{v ? "Active" : "Inactive"}</span> },
+          { label: "Created At", value: viewItem?.createdAt ? new Date(viewItem.createdAt).toLocaleString() : "—" },
+          { label: "Updated At", value: viewItem?.updatedAt ? new Date(viewItem.updatedAt).toLocaleString() : "—" },
+        ]}
+      />
       <SafeZoneModal
         open={showModal}
         onClose={() => {

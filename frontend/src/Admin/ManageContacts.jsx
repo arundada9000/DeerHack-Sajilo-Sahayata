@@ -2,7 +2,7 @@ import React, { useState, useMemo, useEffect } from "react";
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import { motion, AnimatePresence } from "framer-motion";
 import API from "../api/axios";
-import { Plus, Trash2, Edit3, MapPin, Contact, Download } from "lucide-react";
+import { Plus, Trash2, Edit3, MapPin, Contact, Download, Eye } from "lucide-react";
 import toast from "react-hot-toast";
 import useDebounce from "../hooks/useDebounce";
 import useAdminLocationStore from "../stores/useAdminLocationStore";
@@ -11,6 +11,7 @@ import TableSkeleton from "../components/admin/TableSkeleton";
 import Pagination from "../components/admin/Pagination";
 import ContactEditModal from "../components/admin/ContactEditModal";
 import { exportToCSV } from "../utils/exportCsv";
+import DetailModal from "../components/DetailModal";
 
 const departments = ["fire", "police", "flood", "accident", "landslide", "other"];
 const PAGE_SIZE = 10;
@@ -24,6 +25,8 @@ export default function ManageContacts() {
 
   const [modalOpen, setModalOpen] = useState(false);
   const [editingRecord, setEditingRecord] = useState(null);
+  const [viewItem, setViewItem] = useState(null);
+  const [viewOpen, setViewOpen] = useState(false);
 
   const { adminLocation, availableLocations } = useAdminLocationStore();
   const debouncedSearch = useDebounce(search, 300);
@@ -117,6 +120,7 @@ export default function ManageContacts() {
                 <td className="px-6 py-4 text-sm capitalize"><span className="bg-gray-100 text-gray-700 px-2.5 py-1 rounded-full text-xs font-semibold">{record.department}</span></td>
                 <td className="px-6 py-4 text-sm text-gray-600"><div className="flex flex-col gap-1">{record.contacts.map((c, j) => (<div key={j}><span className="font-medium text-gray-800">{c.name}</span>: {c.phone}</div>))}</div></td>
                 <td className="px-6 py-4 text-sm"><div className="flex gap-2">
+                  <button onClick={() => { setViewItem(record); setViewOpen(true); }} className="flex items-center gap-1 px-3 py-1.5 bg-gray-100 text-gray-700 rounded-lg hover:bg-gray-200 hover:-translate-y-0.5 hover:shadow-sm transition-all text-xs font-medium active:scale-95"><Eye size={13} /> View</button>
                   <button onClick={() => openEditModal(record)} className="flex items-center gap-1 px-3 py-1.5 bg-gray-100 text-gray-700 rounded-lg hover:bg-gray-200 hover:-translate-y-0.5 hover:shadow-sm transition-all text-xs font-medium active:scale-95"><Edit3 size={13} /> Edit</button>
                   <button onClick={() => handleDelete(record._id)} disabled={deleteMutation.isPending} className="flex items-center gap-1 px-3 py-1.5 bg-red-50 text-red-600 rounded-lg hover:bg-red-100 hover:-translate-y-0.5 hover:shadow-sm transition-all text-xs font-medium active:scale-95 disabled:opacity-50 disabled:hover:translate-y-0"><Trash2 size={13} /> Delete</button>
                 </div></td>
@@ -127,6 +131,30 @@ export default function ManageContacts() {
         <Pagination currentPage={currentPage} totalPages={totalPages} onPageChange={setCurrentPage} totalItems={filtered.length} pageSize={PAGE_SIZE} />
       </div>
 
+      <DetailModal
+        open={viewOpen}
+        onClose={() => { setViewOpen(false); setViewItem(null); }}
+        title="Contact Details"
+        icon={<Contact size={20} />}
+        fields={[
+          { label: "Local Government", value: viewItem?.localGovName },
+          { label: "Department", value: viewItem?.department, render: (v) => <span className="capitalize">{v}</span> },
+          { label: "Contacts", value: viewItem?.contacts, render: (contacts) => (
+            <div className="space-y-2">
+              {contacts?.length ? contacts.map((c, i) => (
+                <div key={i} className="bg-gray-50 rounded-lg p-3 border border-gray-100">
+                  <div className="font-semibold text-gray-900">{c.name}</div>
+                  <div className="text-gray-600 text-xs mt-0.5">{c.phone}</div>
+                  {c.role && <div className="text-gray-500 text-xs mt-0.5 capitalize">{c.role}</div>}
+                  {c.description && <div className="text-gray-500 text-xs mt-0.5">{c.description}</div>}
+                </div>
+              )) : <span className="text-gray-400">No contacts</span>}
+            </div>
+          )},
+          { label: "Created At", value: viewItem?.createdAt ? new Date(viewItem.createdAt).toLocaleString() : "—" },
+          { label: "Updated At", value: viewItem?.updatedAt ? new Date(viewItem.updatedAt).toLocaleString() : "—" },
+        ]}
+      />
       {/* Modal */}
       <AnimatePresence>
         {modalOpen && (

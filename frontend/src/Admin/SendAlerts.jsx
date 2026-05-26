@@ -1,7 +1,7 @@
 import { useState, useMemo, useEffect } from "react";
 import { useQuery, useQueryClient } from "@tanstack/react-query";
 import API from "../api/axios";
-import { Pencil, Trash2, Plus, Bell, Download } from "lucide-react";
+import { Pencil, Trash2, Plus, Bell, Download, Eye } from "lucide-react";
 import toast from "react-hot-toast";
 import { motion } from "framer-motion";
 import AlertModal from "../components/AlertModal";
@@ -11,6 +11,7 @@ import AdminFilterBar from "../components/admin/AdminFilterBar";
 import TableSkeleton from "../components/admin/TableSkeleton";
 import Pagination from "../components/admin/Pagination";
 import { exportToCSV } from "../utils/exportCsv";
+import DetailModal from "../components/DetailModal";
 
 const ALERT_TYPES = ["fire", "flood", "earthquake", "landslide", "storm", "police", "accident", "other"];
 const PAGE_SIZE = 10;
@@ -24,6 +25,8 @@ export default function ManageAlerts() {
   const [showModal, setShowModal] = useState(false);
   const [submitting, setSubmitting] = useState(false);
   const [selectedAlert, setSelectedAlert] = useState(null);
+  const [viewItem, setViewItem] = useState(null);
+  const [viewOpen, setViewOpen] = useState(false);
 
   const { adminLocation } = useAdminLocationStore();
   const debouncedSearch = useDebounce(search, 300);
@@ -120,6 +123,7 @@ export default function ManageAlerts() {
                 <td className="px-6 py-4 text-sm text-gray-600">{alert.location}</td>
                 <td className="px-6 py-4 text-sm text-gray-500 tabular-nums">{new Date(alert.timestamp).toLocaleString()}</td>
                 <td className="px-6 py-4 flex gap-2">
+                  <button onClick={() => { setViewItem(alert); setViewOpen(true); }} className="flex items-center gap-1 px-3 py-1.5 text-xs bg-gray-100 text-gray-700 rounded-lg hover:bg-gray-200 hover:-translate-y-0.5 hover:shadow-sm font-medium transition-all active:scale-95"><Eye size={13} /> View</button>
                   <button onClick={() => { setSelectedAlert(alert); setShowModal(true); }} className="flex items-center gap-1 px-3 py-1.5 text-xs bg-indigo-600 hover:bg-indigo-700 hover:-translate-y-0.5 hover:shadow-sm text-white rounded-lg font-medium transition-all active:scale-95"><Pencil size={13} /> Edit</button>
                   <button onClick={() => handleDelete(alert._id)} className="flex items-center gap-1 px-3 py-1.5 text-xs bg-red-50 text-red-600 rounded-lg hover:bg-red-100 hover:-translate-y-0.5 hover:shadow-sm font-medium transition-all active:scale-95"><Trash2 size={13} /> Delete</button>
                 </td>
@@ -130,6 +134,19 @@ export default function ManageAlerts() {
         <Pagination currentPage={currentPage} totalPages={totalPages} onPageChange={setCurrentPage} totalItems={filtered.length} pageSize={PAGE_SIZE} />
       </div>
 
+      <DetailModal
+        open={viewOpen}
+        onClose={() => { setViewOpen(false); setViewItem(null); }}
+        title="Alert Details"
+        icon={<Bell size={20} />}
+        fields={[
+          { label: "Title", value: viewItem?.title },
+          { label: "Type", value: viewItem?.type, render: (v) => <span className="capitalize bg-gray-100 px-2.5 py-1 rounded-full text-xs font-semibold">{v}</span> },
+          { label: "Location", value: viewItem?.location },
+          { label: "Description", value: viewItem?.description },
+          { label: "Timestamp", value: viewItem?.timestamp ? new Date(viewItem.timestamp).toLocaleString() : "—" },
+        ]}
+      />
       <AlertModal open={showModal} onClose={() => { setSelectedAlert(null); setShowModal(false); }} onSubmit={handleModalSubmit} initialData={selectedAlert} submitting={submitting} />
     </>
   );
