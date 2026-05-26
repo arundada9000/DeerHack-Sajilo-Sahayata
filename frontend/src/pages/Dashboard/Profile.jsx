@@ -3,14 +3,16 @@ import { useEffect, useState, useRef } from "react";
 import usePreferences from "../../stores/UsePreference.jsx";
 import { useNavigate } from "react-router-dom";
 import useAuth from "../../stores/useAuth";
+import API from "../../api/axios";
 import { motion, AnimatePresence } from "framer-motion";
 import { useLocalGovStore } from "../../stores/localGovStore";
 import {
-  X, Camera, Phone, Mail, User as UserIcon,
-  IdCard, MapPin, Globe, Type, Settings,
-  Moon, Sun, LogOut, ShieldCheck, Pencil, Save, XCircle, Bell,
+  X, Camera, Phone, Mail, User as UserIcon, IdCard,
+  MapPin, Globe, Type, Settings,
+  Moon, Sun, LogOut, ShieldCheck, Pencil, Save, XCircle, Bell, Loader2,
 } from "lucide-react";
 import usePushNotifications from "../../hooks/usePushNotifications";
+import toast from "react-hot-toast";
 
 /* ─── Animation Variants ─── */
 const drawerVariants = {
@@ -27,11 +29,13 @@ const overlayVariants = {
 
 /* ─── All editable fields definition ─── */
 const profileFields = [
+  { key: "username", labelKey: "profile.name", icon: UserIcon, type: "text", placeholder: "John Doe" },
   { key: "phoneNumber", labelKey: "profile.phone", icon: Phone, type: "tel", placeholder: "+977 98XXXXXXXX" },
   { key: "email", labelKey: "profile.email", icon: Mail, type: "email", placeholder: "you@example.com" },
   { key: "gender", labelKey: "profile.gender", icon: UserIcon, type: "select", options: ["Male", "Female", "Other"] },
-  { key: "citizenshipId", labelKey: "profile.citizenship", icon: IdCard, type: "text", placeholder: "XX-XX-XX-XXXXX" },
+  { key: "localGovName", labelKey: "profile.localGov", icon: MapPin, type: "text", placeholder: "e.g. Butwal" },
   { key: "address", labelKey: "profile.address", icon: MapPin, type: "text", placeholder: "Butwal-11, Rupandehi" },
+  { key: "citizenshipId", labelKey: "profile.citizenship", icon: IdCard, type: "text", placeholder: "XX-XX-XX-XXXXX" },
 ];
 
 /* ─── Push Notifications Toggle Row ─── */
@@ -111,15 +115,18 @@ const ProfileDrawer = ({ open, onClose }) => {
   }, [user?.avatar]);
 
   const [isEditing, setIsEditing] = useState(false);
+  const [saving, setSaving] = useState(false);
   const [editForm, setEditForm] = useState({});
 
   // Sync edit form when user changes or editing starts
   useEffect(() => {
     if (isEditing && user) {
       setEditForm({
+        username: user.username || "",
         phoneNumber: user.phoneNumber || "",
         email: user.email || "",
         gender: user.gender || "",
+        localGovName: user.localGovName || "",
         citizenshipId: user.citizenshipId || "",
         address: user.address || "",
       });
@@ -162,9 +169,18 @@ const ProfileDrawer = ({ open, onClose }) => {
     setEditForm((prev) => ({ ...prev, [key]: value }));
   };
 
-  const handleSave = () => {
-    updateUser(editForm);
-    setIsEditing(false);
+  const handleSave = async () => {
+    setSaving(true);
+    try {
+      const { data } = await API.put("/auth/profile", editForm);
+      updateUser(data.user);
+      toast.success(t("profile.saveSuccess"));
+      setIsEditing(false);
+    } catch (err) {
+      toast.error(err.response?.data?.message || t("profile.saveError"));
+    } finally {
+      setSaving(false);
+    }
   };
 
   const handleCancel = () => {
@@ -302,17 +318,19 @@ const ProfileDrawer = ({ open, onClose }) => {
                       <div className="flex gap-3 mt-4">
                         <button
                           onClick={handleCancel}
-                          className="flex-1 flex items-center justify-center gap-2 py-3 bg-gray-100 text-gray-600 font-bold rounded-2xl hover:bg-gray-200 transition-colors active:scale-[0.98]"
+                          disabled={saving}
+                          className="flex-1 flex items-center justify-center gap-2 py-3 bg-gray-100 text-gray-600 font-bold rounded-2xl hover:bg-gray-200 transition-colors active:scale-[0.98] disabled:opacity-50"
                         >
                           <XCircle size={18} />
                           {t("profile.cancel")}
                         </button>
                         <button
                           onClick={handleSave}
-                          className="flex-1 flex items-center justify-center gap-2 py-3 bg-blue-600 text-white font-bold rounded-2xl shadow-md hover:bg-blue-700 transition-colors active:scale-[0.98]"
+                          disabled={saving}
+                          className="flex-1 flex items-center justify-center gap-2 py-3 bg-blue-600 text-white font-bold rounded-2xl shadow-md hover:bg-blue-700 transition-colors active:scale-[0.98] disabled:opacity-70"
                         >
-                          <Save size={18} />
-                          {t("profile.save")}
+                          {saving ? <Loader2 size={18} className="animate-spin" /> : <Save size={18} />}
+                          {saving ? t("profile.saving") : t("profile.save")}
                         </button>
                       </div>
                     </motion.section>

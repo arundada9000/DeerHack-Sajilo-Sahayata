@@ -6,6 +6,7 @@ import {
   getAllUsersAroundLocation,
   uploadImage,
   verifyUser,
+  updateProfile,
   updateUserRole,
   deleteUser,
 } from "../controllers/authController";
@@ -21,6 +22,8 @@ router.post("/login", loginUser);
 router.get("/verify", authenticateToken, verifyUser);
 router.get("/users/:id", getUserById);
 router.get("/users/around", getAllUsersAroundLocation);
+
+router.put("/profile", authenticateToken, updateProfile);
 
 // ✅ Admin-only routes
 router.get("/users", authenticateToken, requireAdmin, async (req, res) => {

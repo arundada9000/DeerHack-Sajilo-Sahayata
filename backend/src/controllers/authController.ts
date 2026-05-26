@@ -212,6 +212,48 @@ export const getAllUsersAroundLocation = async (
   }
 };
 
+export const updateProfile = async (req: Request, res: Response) => {
+  try {
+    const userId = req.user?.id;
+    if (!userId) {
+      res.status(401).json({ message: "Unauthorized" });
+      return;
+    }
+
+    const allowedFields = [
+      "username", "phoneNumber", "email", "gender",
+      "citizenshipId", "address", "localGovName",
+    ];
+
+    const updates: Record<string, any> = {};
+    for (const field of allowedFields) {
+      if (req.body[field] !== undefined) {
+        updates[field] = req.body[field];
+      }
+    }
+
+    if (Object.keys(updates).length === 0) {
+      res.status(400).json({ message: "No valid fields to update" });
+      return;
+    }
+
+    const user = await User.findByIdAndUpdate(userId, updates, {
+      new: true,
+      select: "-password",
+    });
+
+    if (!user) {
+      res.status(404).json({ message: "User not found" });
+      return;
+    }
+
+    res.json({ message: "Profile updated", user });
+  } catch (error: any) {
+    console.error("Update profile error:", error?.message);
+    res.status(500).json({ message: "Server error", error: error?.message });
+  }
+};
+
 export const updateUserRole = async (req: Request, res: Response) => {
   const { id } = req.params;
   const { role } = req.body;
