@@ -205,13 +205,13 @@ const Dashboard = () => {
 
   const formatLocation = (incident) => {
     const location = incident.location;
-    if (!location) return t("Unknown Location");
+    if (!location) return t("dashboard.unknownLocation");
     if (locationNames[incident._id]) return locationNames[incident._id];
     if (typeof location === "string") return location;
     if (location.city && location.area)
       return `${location.area}, ${location.city}`;
     if (location.city) return location.city;
-    return t("Unknown Location");
+    return t("dashboard.unknownLocation");
   };
 
   return (
@@ -244,7 +244,7 @@ const Dashboard = () => {
             <div className="flex items-center gap-2 px-1">
               <BellRing size={18} className="text-red-500" />
               <h2 className="text-lg font-bold text-gray-800 tracking-tight">
-                {t("Active Alerts")}
+                {t("dashboard.activeAlerts")}
               </h2>
               <span className="ml-auto text-xs font-semibold bg-red-100 text-red-700 px-2.5 py-0.5 rounded-full">
                 {notifications.length}
@@ -354,7 +354,7 @@ const Dashboard = () => {
             </div>
           ) : filteredIncidents.length === 0 ? (
             <div className="text-center py-12 bg-white rounded-2xl shadow-sm text-gray-500 border border-gray-100">
-              {t("No incidents reported yet.")}
+              {t("dashboard.noIncidents")}
             </div>
           ) : (
             <>
@@ -497,7 +497,7 @@ const Dashboard = () => {
                               <ChevronUp size={24} />
                             </div>
                             <span className="font-semibold text-sm">
-                              {t("Show Less")}
+                              {t("dashboard.showLess")}
                             </span>
                           </>
                         ) : (
@@ -506,7 +506,7 @@ const Dashboard = () => {
                               <ChevronDown size={24} />
                             </div>
                             <span className="font-semibold text-sm">
-                              {t("Show More")}
+                              {t("dashboard.showMore")}
                             </span>
                             <span className="text-xs text-gray-400">
                               {t("dashboard.moreCount", { count: filteredIncidents.length - visibleCount })}
