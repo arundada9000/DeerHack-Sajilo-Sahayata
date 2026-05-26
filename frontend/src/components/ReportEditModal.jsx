@@ -197,7 +197,7 @@ export default function ReportEditModal({ report, onClose, onUpdate }) {
                 </div>
               </div>
             )}
-            <ImagePreview />
+            {ImagePreview}
           </div>
 
           {/* Footer Actions */}
