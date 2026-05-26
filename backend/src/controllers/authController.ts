@@ -222,7 +222,7 @@ export const updateProfile = async (req: Request, res: Response) => {
 
     const allowedFields = [
       "username", "phoneNumber", "email", "gender",
-      "citizenshipId", "address", "localGovName",
+      "citizenshipId", "address",
     ];
 
     const updates: Record<string, any> = {};

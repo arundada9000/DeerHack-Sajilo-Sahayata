@@ -33,7 +33,6 @@ const profileFields = [
   { key: "phoneNumber", labelKey: "profile.phone", icon: Phone, type: "tel", placeholder: "+977 98XXXXXXXX" },
   { key: "email", labelKey: "profile.email", icon: Mail, type: "email", placeholder: "you@example.com" },
   { key: "gender", labelKey: "profile.gender", icon: UserIcon, type: "select", options: ["Male", "Female", "Other"] },
-  { key: "localGovName", labelKey: "profile.localGov", icon: MapPin, type: "text", placeholder: "e.g. Butwal" },
   { key: "address", labelKey: "profile.address", icon: MapPin, type: "text", placeholder: "Butwal-11, Rupandehi" },
   { key: "citizenshipId", labelKey: "profile.citizenship", icon: IdCard, type: "text", placeholder: "XX-XX-XX-XXXXX" },
 ];
@@ -126,7 +125,6 @@ const ProfileDrawer = ({ open, onClose }) => {
         phoneNumber: user.phoneNumber || "",
         email: user.email || "",
         gender: user.gender || "",
-        localGovName: user.localGovName || "",
         citizenshipId: user.citizenshipId || "",
         address: user.address || "",
       });
