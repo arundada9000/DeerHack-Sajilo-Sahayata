@@ -61,17 +61,20 @@ export default function ManageAlerts() {
   const handleModalSubmit = async (data) => {
     setSubmitting(true);
     try {
-      if (selectedAlert) { 
-        await API.put(`/alerts/${selectedAlert._id}`, data); 
-        toast.success("Alert updated"); 
+      if (selectedAlert) {
+        await API.put(`/alerts/${selectedAlert._id}`, data);
+      } else {
+        await API.post("/alerts", data);
       }
-      else { 
-        await API.post("/alerts", data); 
-        toast.success("Alert created"); 
-      }
+      setSelectedAlert(null);
+      setShowModal(false);
+      toast.success(selectedAlert ? "Alert updated" : "Alert created");
       queryClient.invalidateQueries({ queryKey: ["alerts"] });
-    } catch { toast.error("Operation failed"); }
-    finally { setSubmitting(false); setSelectedAlert(null); setShowModal(false); }
+    } catch {
+      toast.error("Operation failed");
+    } finally {
+      setSubmitting(false);
+    }
   };
 
   const clearAll = () => { setSearch(""); setTypeFilter(""); setLocationFilter(""); };
