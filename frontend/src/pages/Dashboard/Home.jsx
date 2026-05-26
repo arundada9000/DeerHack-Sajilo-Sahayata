@@ -30,7 +30,7 @@ const fetchAlerts = async () => {
   const { data } = await API.get("/alerts");
   return data.map((alert) => ({
     type: alert.type,
-    location: alert.location || "Unknown area",
+    location: alert.location || "",
     description: alert.description,
     timeAgo: new Date(alert.timestamp).toLocaleTimeString(),
     timestamp: alert.timestamp,
@@ -97,15 +97,15 @@ const alertMeta = {
   },
 };
 
-const getRelativeTime = (timestamp) => {
+const getRelativeTime = (timestamp, t) => {
   const diff = Date.now() - new Date(timestamp).getTime();
   const mins = Math.floor(diff / 60000);
-  if (mins < 1) return "Just now";
-  if (mins < 60) return `${mins}m ago`;
+  if (mins < 1) return t("dashboard.justNow");
+  if (mins < 60) return t("dashboard.minutesAgo", { mins });
   const hrs = Math.floor(mins / 60);
-  if (hrs < 24) return `${hrs}h ago`;
+  if (hrs < 24) return t("dashboard.hoursAgo", { hrs });
   const days = Math.floor(hrs / 24);
-  return `${days}d ago`;
+  return t("dashboard.daysAgo", { days });
 };
 
 // Nominatim Reverse Geocoding fetcher (with rate limit awareness)
@@ -294,7 +294,7 @@ const Dashboard = () => {
                             <Clock size={11} />
                             <span>
                               {notification.timestamp
-                                ? getRelativeTime(notification.timestamp)
+                                ? getRelativeTime(notification.timestamp, t)
                                 : notification.timeAgo}
                             </span>
                           </div>
@@ -307,7 +307,7 @@ const Dashboard = () => {
                             className="text-gray-500 mt-0.5 flex-shrink-0"
                           />
                           <span className="text-sm font-semibold text-gray-800 leading-snug">
-                            {notification.location}
+                            {notification.location || t("dashboard.unknownArea")}
                           </span>
                         </div>
 
@@ -336,7 +336,7 @@ const Dashboard = () => {
               value={filterType}
               onChange={(e) => setFilterType(e.target.value)}
               className="text-sm bg-white border border-gray-200 rounded-lg px-3 py-1.5 shadow-sm outline-none focus:ring-2 focus:ring-blue-500 cursor-pointer hover:bg-gray-50 transition"
-              aria-label="Filter incidents by status"
+              aria-label={t("dashboard.statusFilter")}
             >
               <option value="all">{t("dashboard.All")}</option>
               <option value="verified">{t("dashboard.Verified")}</option>
@@ -456,7 +456,7 @@ const Dashboard = () => {
                               className={`absolute top-3 right-3 w-4 h-4 rounded-full border-2 border-white shadow-sm ${
                                 statusDotColor[status] || "bg-gray-400"
                               }`}
-                              title={`Status: ${status}`}
+                              title={t("dashboard.statusTooltip") + status}
                             ></div>
                           </div>
 
@@ -509,7 +509,7 @@ const Dashboard = () => {
                               {t("Show More")}
                             </span>
                             <span className="text-xs text-gray-400">
-                              ({filteredIncidents.length - visibleCount} more)
+                              {t("dashboard.moreCount", { count: filteredIncidents.length - visibleCount })}
                             </span>
                           </>
                         )}
@@ -540,7 +540,7 @@ const Dashboard = () => {
               onClick={() => navigate("/dashboard/emergency-type-selection")}
               whileHover={{ scale: 1.02 }}
               whileTap={{ scale: 0.95 }}
-              aria-label="Call for emergency assistance"
+              aria-label={t("dashboard.callEmergency")}
             >
               <Phone
                 size={30}
@@ -597,7 +597,7 @@ const Dashboard = () => {
                         </div>
                         <div>
                           <h3 className="font-bold text-gray-900 capitalize text-lg leading-tight">
-                            {selectedNotification.type} Alert
+                            {t("dashboard.alertType", { type: selectedNotification.type })}
                           </h3>
                           <span className="text-xs font-medium text-gray-500">
                             {selectedNotification.timestamp
@@ -621,7 +621,7 @@ const Dashboard = () => {
                         <div className="flex items-center gap-2 mb-1">
                           <MapPinIcon size={16} className="text-gray-400" />
                           <h4 className="font-semibold text-gray-500 text-sm uppercase tracking-wider">
-                            Location
+                            {t("dashboard.location")}
                           </h4>
                         </div>
                         <p className="font-bold text-gray-900 text-base pl-6 leading-snug">
@@ -633,12 +633,12 @@ const Dashboard = () => {
                         <div className="flex items-center gap-2 mb-1">
                           <CircleAlert size={16} className="text-gray-400" />
                           <h4 className="font-semibold text-gray-500 text-sm uppercase tracking-wider">
-                            Details
+                            {t("dashboard.details")}
                           </h4>
                         </div>
                         <p className="text-gray-700 text-[15px] leading-relaxed pl-6 whitespace-pre-wrap">
                           {selectedNotification.description ||
-                            "No additional details provided."}
+                            t("dashboard.noDetails")}
                         </p>
                       </div>
                     </div>
@@ -648,7 +648,7 @@ const Dashboard = () => {
                         onClick={() => setSelectedNotification(null)}
                         className={`px-6 py-2.5 ${meta.accent} text-white font-bold rounded-xl shadow-sm hover:shadow-md transition-all active:scale-95 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-${meta.accent.replace("bg-", "")}`}
                       >
-                        Close
+                        {t("dashboard.close")}
                       </button>
                     </div>
                   </>

@@ -1,9 +1,11 @@
 import { useEffect, useState } from "react";
+import { useTranslation } from "react-i18next";
 import { useNavigate } from "react-router-dom";
 import { ShieldAlert, Home, ArrowLeft } from "lucide-react";
 import { motion } from "framer-motion";
 
 export default function Unauthorized() {
+  const { t } = useTranslation();
   const navigate = useNavigate();
   const [countdown, setCountdown] = useState(5);
 
@@ -39,9 +41,9 @@ export default function Unauthorized() {
           <ShieldAlert size={40} />
         </motion.div>
         
-        <h1 className="text-3xl font-black text-slate-800 mb-2 tracking-tight">Access Denied</h1>
+        <h1 className="text-3xl font-black text-slate-800 mb-2 tracking-tight">{t("unauthorized.title")}</h1>
         <p className="text-slate-500 mb-8 leading-relaxed text-sm">
-          You don't have the required administrative privileges to view this page. Please contact your system administrator if you believe this is a mistake.
+          {t("unauthorized.message")}
         </p>
 
         <div className="flex flex-col gap-3">
@@ -50,19 +52,19 @@ export default function Unauthorized() {
             className="w-full flex items-center justify-center gap-2 py-3 px-4 bg-slate-50 hover:bg-slate-100 text-slate-600 font-bold rounded-xl transition-all cursor-pointer border border-slate-200 hover:border-slate-300"
           >
             <ArrowLeft size={18} />
-            Go Back
+            {t("unauthorized.goBack")}
           </button>
           <button 
             onClick={() => navigate("/dashboard/home")} 
             className="w-full flex items-center justify-center gap-2 py-3 px-4 bg-indigo-600 hover:bg-indigo-700 text-white font-bold rounded-xl transition-all shadow-lg shadow-indigo-200 cursor-pointer hover:-translate-y-0.5"
           >
             <Home size={18} />
-            Return to Dashboard
+            {t("unauthorized.returnToDashboard")}
           </button>
         </div>
 
         <p className="text-xs text-slate-400 mt-6 font-medium bg-slate-50 py-2 px-4 rounded-full inline-block">
-          Auto-redirecting in <span className="text-indigo-600 font-bold">{countdown}s</span>...
+          {t("unauthorized.autoRedirecting")} <span className="text-indigo-600 font-bold">{countdown}</span>...
         </p>
       </motion.div>
     </div>

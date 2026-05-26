@@ -1,4 +1,5 @@
 import React from "react";
+import { withTranslation } from "react-i18next";
 import { RefreshCw, WifiOff } from "lucide-react";
 
 /**
@@ -26,6 +27,8 @@ class ErrorBoundary extends React.Component {
   };
 
   render() {
+    const { t } = this.props;
+
     if (this.state.hasError) {
       const isChunkError =
         this.state.error?.name === "ChunkLoadError" ||
@@ -40,12 +43,12 @@ class ErrorBoundary extends React.Component {
             </div>
 
             <h2 className="text-xl font-bold text-slate-800 mb-2">
-              {isChunkError ? "Connection Lost" : "Something Went Wrong"}
+              {isChunkError ? t("errorBoundary.connectionLost") : t("errorBoundary.somethingWentWrong")}
             </h2>
             <p className="text-sm text-slate-500 mb-8 leading-relaxed">
               {isChunkError
-                ? "We couldn't load this page. This can happen when your network drops or a new version of the app is available."
-                : "An unexpected error occurred. Please try refreshing the page."}
+                ? t("errorBoundary.connectionLostMessage")
+                : t("errorBoundary.somethingWentWrongMessage")}
             </p>
 
             <button
@@ -53,7 +56,7 @@ class ErrorBoundary extends React.Component {
               className="inline-flex items-center gap-2 px-6 py-3 bg-indigo-600 hover:bg-indigo-700 text-white font-semibold rounded-xl transition-all shadow-lg shadow-indigo-200 cursor-pointer hover:-translate-y-0.5"
             >
               <RefreshCw className="w-4 h-4" />
-              Reload Page
+              {t("errorBoundary.reloadPage")}
             </button>
           </div>
         </div>
@@ -64,4 +67,4 @@ class ErrorBoundary extends React.Component {
   }
 }
 
-export default ErrorBoundary;
+export default withTranslation()(ErrorBoundary);

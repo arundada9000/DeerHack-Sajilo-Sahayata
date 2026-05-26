@@ -1,100 +1,289 @@
-# ⚙️ Sajilo Sahayata – Backend
+# Sajilo Sahayata — Backend
 
 **Disaster Reporting & Coordination API**
 
 [![Node.js](https://img.shields.io/badge/Node.js-18-green)](https://nodejs.org/)
-[![Express](https://img.shields.io/badge/Express-Framework-lightgrey)](https://expressjs.com/)
-[![MongoDB](https://img.shields.io/badge/MongoDB-Database-green)](https://www.mongodb.com/)
+[![Express](https://img.shields.io/badge/Express-5-lightgrey)](https://expressjs.com/)
 [![TypeScript](https://img.shields.io/badge/TypeScript-5-blue)](https://www.typescriptlang.org/)
-
----
-
-## 📖 Overview
-
-The backend of **Sajilo Sahayata** powers real-time disaster reporting and coordination.  
-It provides APIs for user authentication, incident reporting, and alert broadcasting, ensuring citizens and local governments can respond quickly to emergencies.
-
----
-
-## Features
-
-- **User Authentication** — Secure login and signup using JWT
-- **Incident Reporting** — Citizens can submit reports with geolocation & media
-- **Real-Time Alerts** — Broadcast alerts to frontend dashboards
-- **Role-Based Access Control** — Separate access for citizens and admins
-- **Data Management** — Store reports, users, and alerts in MongoDB
-- **Middleware Security** — Authentication and admin guards
-- Modular structure with controllers, models, and routes
+[![MongoDB](https://img.shields.io/badge/MongoDB-Database-green)](https://www.mongodb.com/)
 
 ---
 
 ## Tech Stack
 
-- **Runtime:** Node.js 18
-- **Framework:** Express.js
-- **Language:** TypeScript
-- **Database:** MongoDB (via Mongoose)
-- **Authentication:** JWT
-- **Realtime:** Socket.IO (planned)
+| Category | Choice |
+|---|---|
+| **Runtime** | Node.js 18 |
+| **Framework** | Express 5 |
+| **Language** | TypeScript |
+| **Database** | MongoDB (Mongoose ODM) |
+| **Auth** | JWT (jsonwebtoken) |
+| **Passwords** | bcrypt (10 salt rounds) |
+| **File Uploads** | Multer (memory storage) → Cloudinary |
+| **Image Hosting** | Cloudinary SDK |
+| **Push Notifications** | web-push (VAPID) |
+| **Geospatial** | Turf.js (point-in-polygon) |
+| **Date** | Day.js |
 
 ---
 
-## Quick Start
-
-### 1. Clone Repository
-
-````bash
-git clone https://github.com/arundada9000/DeerHack-Sajilo-Sahayata.git
-cd DeerHack-Sajilo-Sahayata
-cd backend
-npm install
-npm run dev
-
-## Repository Structure
-<pre lang="plaintext"> ```
-sajilo-sahayata-backend/
-📁 src
-  📄 env.ts
-  📄 express.d.ts
-  📄 main.ts
-  📁 routes
-    📄 alertRoutes.ts
-    📄 authRoutes.ts
-    📄 reportRoutes.ts
-  📁 models
-    📄 alertModel.ts
-    📄 reportModel.ts
-    📄 userModel.ts
-  📁 middlewares
-    📄 authenticateToken.ts
-    📄 requireAdmin.ts
-  📁 controllers
-    📄 alertController.ts
-    📄 authController.ts
-    📄 reportController.ts
-  📁 config
-    📄 db.ts
-
-``` </pre>
-````
-
-## Create a .env file in /backend with:
+## Folder Structure
 
 ```
-
-PORT=3000
-MONGO_URI=your-mongodb-connection-string
-JWT_SECRET=your-secret-key
-
+backend/
+├── data/
+│   └── geojson/              # GeoJSON boundary files for GaPa/NaPa detection
+├── src/
+│   ├── config/
+│   │   ├── db.ts             # MongoDB connection via Mongoose
+│   │   └── cloudinary.ts     # Cloudinary SDK config
+│   ├── controllers/
+│   │   ├── authController.ts      # Register, Login, Verify, Profile CRUD, Role management
+│   │   ├── alertController.ts     # Alert CRUD + push notification broadcast
+│   │   ├── contactController.ts   # Emergency contact CRUD by department/location
+│   │   ├── locationController.ts  # GPS → GaPa detection, available locations list
+│   │   ├── pushController.ts      # Subscribe, unsubscribe, send push to all
+│   │   ├── reportController.ts    # Report CRUD, verify, status change, Cloudinary upload
+│   │   └── safeZoneController.ts  # Safe zone CRUD (hospitals, shelters, etc.)
+│   ├── middlewares/
+│   │   ├── authenticateToken.ts   # JWT verification → req.user
+│   │   └── requireAdmin.ts        # Role check (admin-only)
+│   ├── models/
+│   │   ├── userModel.ts           # User schema (with timestamps)
+│   │   ├── reportModel.ts         # Report schema (with timestamps)
+│   │   ├── alertModel.ts          # Alert schema
+│   │   ├── contactModel.ts        # ContactInfo schema (nested contacts array)
+│   │   ├── safeZoneModel.ts       # SafeZone schema (with timestamps)
+│   │   └── pushSubscriptionModel.ts  # Web push subscription schema
+│   ├── routes/
+│   │   ├── authRoutes.ts          # Auth endpoints
+│   │   ├── reportRoutes.ts        # Report endpoints
+│   │   ├── alertRoutes.ts         # Alert endpoints
+│   │   ├── contactRoutes.ts       # Contact endpoints
+│   │   ├── locationRoutes.ts      # Location endpoints
+│   │   ├── pushRoutes.ts          # Push notification endpoints
+│   │   └── safeZoneRoutes.ts      # Safe zone endpoints
+│   ├── utils/
+│   │   └── resolveGaPa.ts         # GPS → GaPa/NaPa name resolver (shared)
+│   ├── env.ts                     # Typed environment config
+│   ├── express.d.ts               # Express Request augmentation
+│   ├── main.ts                    # App entry point + Vercel export
+│   ├── seed.ts                    # Database seed script
+│   └── seedSafeZones.ts           # Safe zone seed data
+├── .env.example
+├── package.json
+├── tsconfig.json
+└── vercel.json                    # Vercel serverless config
 ```
 
-## Run Server
+---
 
-```
-npm run dev
+## API Endpoints
 
-```
+All routes are prefixed with `/api`.
 
-**Need Help?**
+### Auth (`/api/auth`)
 
-- Contact me on WhatsApp: **+977 9811420975**
+| Method | Path | Auth | Description |
+|---|---|---|---|
+| POST | `/register` | — | Register a new user (auto-detects GaPa from GPS) |
+| POST | `/login` | — | Login with phone + password → JWT |
+| GET | `/verify` | JWT | Verify token, return full user |
+| GET | `/users` | Admin | List all users (without passwords) |
+| GET | `/users/:id` | — | Get user by ID |
+| GET | `/users/around` | — | Get users near coordinates (query: lat, lng, radius) |
+| PUT | `/profile` | JWT | Update own profile (limited fields) |
+| PUT | `/users/:id/role` | Admin | Change user role (user/admin) |
+| DELETE | `/users/:id` | Admin | Delete a user |
+
+### Reports (`/api/reports`)
+
+| Method | Path | Auth | Description |
+|---|---|---|---|
+| POST | `/reports` | — | Create report (multipart: image + JSON fields) |
+| GET | `/reports` | — | List all reports (sorted by newest) |
+| GET | `/reports/:id` | — | Get single report |
+| GET | `/reportsLocation` | — | Get report locations for map markers |
+| PUT | `/reports/:id/status` | — | Change report status |
+| PUT | `/reports/verify/:id` | Admin | Verify a report |
+| PUT | `/reports/:id` | JWT | Update report (type, description, status, image) |
+| DELETE | `/reports/:id` | JWT | Delete a report |
+
+### Alerts (`/api/alerts`)
+
+| Method | Path | Auth | Description |
+|---|---|---|---|
+| GET | `/` | — | List all alerts (sorted by newest) |
+| POST | `/` | JWT | Create alert + broadcast push notification |
+| PUT | `/:id` | JWT | Update alert |
+| DELETE | `/:id` | JWT | Delete alert |
+
+### Contacts (`/api/contacts`)
+
+| Method | Path | Auth | Description |
+|---|---|---|---|
+| GET | `/` | — | List all contact records |
+| GET | `/:localGov/:department` | — | Get contacts for specific location + department |
+| POST | `/` | — | Create a new contact record |
+| PUT | `/:id` | — | Update a contact record |
+| DELETE | `/:id` | — | Delete a contact record |
+
+### Location (`/api/location`)
+
+| Method | Path | Auth | Description |
+|---|---|---|---|
+| GET | `/detect?lat=&lng=` | — | Detect GaPa/NaPa name from GPS coordinates |
+| GET | `/available` | — | List all available location names |
+
+### Safe Zones (`/api/safe-zones`)
+
+| Method | Path | Auth | Description |
+|---|---|---|---|
+| GET | `/` | — | List all active safe zones |
+| POST | `/` | JWT | Create a safe zone |
+| PUT | `/:id` | JWT | Update a safe zone |
+| DELETE | `/:id` | JWT | Delete a safe zone |
+
+### Push Notifications (`/api/push`)
+
+| Method | Path | Auth | Description |
+|---|---|---|---|
+| GET | `/vapid-public-key` | — | Get VAPID public key for client subscription |
+| POST | `/subscribe` | — | Save a push subscription |
+| POST | `/unsubscribe` | — | Remove a push subscription |
+
+---
+
+## Data Models
+
+### User
+| Field | Type | Notes |
+|---|---|---|
+| `username` | String | Required |
+| `password` | String | bcrypt hashed |
+| `phoneNumber` | String | Unique, required |
+| `role` | `"user" \| "admin"` | Default: `"user"` |
+| `localGovName` | String | Auto-detected from GPS |
+| `location` | GeoJSON Point | `[lng, lat]` |
+| `email` | String | Optional, editable |
+| `gender` | String | Optional, editable |
+| `citizenshipId` | String | Optional, editable |
+| `address` | String | Optional, editable |
+| `image_url` | String | Profile photo |
+| `createdAt` / `updatedAt` | Date | Auto (timestamps: true) |
+
+Index: `2dsphere` on `location`
+
+### Report
+| Field | Type | Notes |
+|---|---|---|
+| `type` | String | `fire, police, flood, accident, landslide, other` |
+| `description` | String | Min 10 characters |
+| `imageUrl` | String | Cloudinary URL |
+| `imageId` | String | Cloudinary public ID |
+| `location` | GeoJSON Point | `[lng, lat]` |
+| `localGovName` | String | Auto-detected from GPS |
+| `status` | String | `pending, verified, working, solved` |
+| `userId` | String | Reporter |
+| `verifiedBy` | String | Admin who verified |
+| `createdAt` / `updatedAt` | Date | Auto (timestamps: true) |
+
+Index: `2dsphere` on `location`
+
+### Alert
+| Field | Type | Notes |
+|---|---|---|
+| `title` | String | Required |
+| `description` | String | Required |
+| `type` | String | `fire, flood, earthquake, landslide, storm, police, accident, other` |
+| `location` | String | Free text location name |
+| `timestamp` | Date | Default: now |
+| `createdBy` | String | Admin user ID |
+
+### ContactInfo
+| Field | Type | Notes |
+|---|---|---|
+| `localGovName` | String | Indexed, required |
+| `department` | String | Indexed, required |
+| `contacts` | [Contact] | Array of `{ name, phone, role, description }` |
+
+Unique compound index on `(localGovName, department)`
+
+### SafeZone
+| Field | Type | Notes |
+|---|---|---|
+| `name` | String | Required |
+| `type` | String | `hospital, shelter, police, fire_station, distribution` |
+| `location` | GeoJSON Point | `[lng, lat]` |
+| `address` | String | Optional |
+| `phone` | String | Optional |
+| `isActive` | Boolean | Default: true |
+| `createdAt` / `updatedAt` | Date | Auto |
+
+Index: `2dsphere` on `location`
+
+### PushSubscription
+| Field | Type | Notes |
+|---|---|---|
+| `endpoint` | String | Unique, required |
+| `keys` | `{ p256dh, auth }` | Required |
+| `userId` | String | Optional |
+| `createdAt` | Date | Default: now |
+
+---
+
+## Key Implementation Details
+
+### GPS → GaPa/NaPa Detection
+The `resolveGaPa.ts` utility loads GeoJSON boundary files from `data/geojson/` on first call. It uses Turf.js `booleanPointInPolygon` to determine which local government boundary contains the given GPS coordinates. This is used:
+- At user registration (sets `user.localGovName`)
+- At report creation (sets `report.localGovName`)
+- Via the `GET /api/location/detect` endpoint for on-demand lookup
+
+### Authentication Flow
+1. User registers with `POST /api/auth/register` (phone + password + GPS coords)
+2. Login at `POST /api/auth/login` returns JWT (1h expiry) in response body + httpOnly cookie
+3. Frontend stores token in `localStorage`, attaches via `Authorization: Bearer <token>` header
+4. `GET /api/auth/verify` validates the token and returns the full user object
+5. Admin routes additionally check `requireAdmin` middleware
+
+### Image Upload Flow
+1. Frontend sends `multipart/form-data` with the image file
+2. Multer parses into `req.file.buffer` (memory storage — required for Vercel serverless)
+3. Controller uploads buffer to Cloudinary via stream
+4. Cloudinary URL and public ID stored in the document
+
+### Push Notification Flow
+1. Frontend subscribes to push via `PushManager` with VAPID public key from `GET /api/push/vapid-public-key`
+2. Subscription saved via `POST /api/push/subscribe`
+3. When an admin creates an alert, `alertController.ts` calls `sendPushToAll()` internally
+4. `sendPushToAll()` iterates all subscriptions, sends via `web-push`, and removes expired (410) subscriptions
+
+---
+
+## Environment Variables
+
+| Variable | Required | Description |
+|---|---|---|
+| `PORT` | Yes | Server port (default: 3000) |
+| `MONGO_URI` | Yes | MongoDB connection string |
+| `JWT_SECRET` | Yes | JWT signing secret |
+| `CLIENT_URL` | Yes | Frontend URL (CORS) |
+| `CLOUDINARY_CLOUD_NAME` | Yes | Cloudinary cloud name |
+| `CLOUDINARY_API_KEY` | Yes | Cloudinary API key |
+| `CLOUDINARY_API_SECRET` | Yes | Cloudinary API secret |
+| `VAPID_PUBLIC_KEY` | No | Web push VAPID public key |
+| `VAPID_PRIVATE_KEY` | No | Web push VAPID private key |
+| `VAPID_EMAIL` | No | Email for VAPID configuration |
+| `NODE_ENV` | No | `production` for Vercel deployment |
+
+---
+
+## Available Scripts
+
+| Script | Description |
+|---|---|
+| `npm run dev` | Start dev server with `tsx --watch` (hot reload) |
+| `npm run build` | Compile TypeScript to `dist/` |
+| `npm run start` | Run compiled `dist/main.js` |
+| `npm run db:generate` | Initialize Prisma (legacy, not used) |

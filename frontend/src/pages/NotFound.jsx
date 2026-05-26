@@ -1,8 +1,10 @@
 import { useNavigate } from "react-router-dom";
+import { useTranslation } from "react-i18next";
 import { SearchX, Home, ArrowLeft } from "lucide-react";
 import { motion } from "framer-motion";
 
 export default function NotFound() {
+  const { t } = useTranslation();
   const navigate = useNavigate();
 
   return (
@@ -24,9 +26,9 @@ export default function NotFound() {
         </div>
         
         <div className="text-6xl font-black text-indigo-600 mb-2 tracking-tighter">404</div>
-        <h1 className="text-2xl font-bold text-slate-800 mb-3 tracking-tight">Page Not Found</h1>
+        <h1 className="text-2xl font-bold text-slate-800 mb-3 tracking-tight">{t("notFound.title")}</h1>
         <p className="text-slate-500 mb-8 leading-relaxed text-sm">
-          Oops! The page you are looking for doesn't exist, has been moved, or is temporarily unavailable.
+          {t("notFound.message")}
         </p>
 
         <div className="flex flex-col gap-3">
@@ -35,14 +37,14 @@ export default function NotFound() {
             className="w-full flex items-center justify-center gap-2 py-3 px-4 bg-slate-50 hover:bg-slate-100 text-slate-600 font-bold rounded-xl transition-all cursor-pointer border border-slate-200 hover:border-slate-300"
           >
             <ArrowLeft size={18} />
-            Go Back
+            {t("notFound.goBack")}
           </button>
           <button 
             onClick={() => navigate("/dashboard/home")} 
             className="w-full flex items-center justify-center gap-2 py-3 px-4 bg-indigo-600 hover:bg-indigo-700 text-white font-bold rounded-xl transition-all shadow-lg shadow-indigo-200 cursor-pointer hover:-translate-y-0.5"
           >
             <Home size={18} />
-            Return to Dashboard
+            {t("notFound.returnToDashboard")}
           </button>
         </div>
       </motion.div>

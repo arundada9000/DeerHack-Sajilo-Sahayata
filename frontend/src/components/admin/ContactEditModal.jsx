@@ -3,6 +3,7 @@ import { motion } from "framer-motion";
 import { X, Save, Plus, Trash2 } from "lucide-react";
 import API from "../../api/axios";
 import toast from "react-hot-toast";
+import { useTranslation } from "react-i18next";
 
 const departments = ["fire", "police", "flood", "accident", "landslide", "other"];
 
@@ -21,17 +22,18 @@ export default function ContactEditModal({
       : [{ name: "", phone: "", description: "" }],
   });
 
+  const { t } = useTranslation();
   const [saving, setSaving] = useState(false);
   const [error, setError] = useState("");
 
   const handleSave = async () => {
     if (!form.localGovName.trim() || !form.department) {
-      setError("Location and department are required.");
+      setError(t("contactEdit.locationRequired"));
       return;
     }
     const valid = form.contacts.filter((c) => c.name.trim() && c.phone.trim());
     if (valid.length === 0) {
-      setError("At least one contact with name and phone is required.");
+      setError(t("contactEdit.contactRequired"));
       return;
     }
     try {
@@ -40,15 +42,15 @@ export default function ContactEditModal({
       const payload = { localGovName: form.localGovName.trim(), department: form.department, contacts: valid };
       if (record) {
         await API.put(`/contacts/${record._id}`, payload);
-        toast.success("Contact updated");
+        toast.success(t("contactEdit.updated"));
       } else {
         await API.post("/contacts", payload);
-        toast.success("Contact created");
+        toast.success(t("contactEdit.created"));
       }
       onSuccess();
       onClose();
     } catch (err) {
-      setError(err.response?.data?.message || "Failed to save.");
+      setError(err.response?.data?.message || t("contactEdit.failedToSave"));
     } finally {
       setSaving(false);
     }
@@ -78,7 +80,7 @@ export default function ContactEditModal({
       >
         <div className="flex items-center justify-between p-5 border-b border-gray-100">
           <h2 className="text-xl font-bold text-gray-800">
-            {record ? "Edit Contact Record" : "New Contact Record"}
+            {record ? t("contactEdit.editRecord") : t("contactEdit.newRecord")}
           </h2>
           <button onClick={onClose} className="p-1.5 hover:bg-gray-100 rounded-lg text-gray-500 transition">
             <X size={20} />
@@ -88,24 +90,24 @@ export default function ContactEditModal({
           {error && <div className="bg-red-50 text-red-700 px-4 py-2 rounded-lg text-sm">{error}</div>}
           <div className="grid grid-cols-1 sm:grid-cols-2 gap-5">
             <div>
-              <label className="block text-sm font-semibold text-gray-700 mb-1.5">Location / Municipality</label>
+              <label className="block text-sm font-semibold text-gray-700 mb-1.5">{t("contactEdit.locationDepartment")}</label>
               <select
                 value={form.localGovName}
                 onChange={(e) => setForm((p) => ({ ...p, localGovName: e.target.value }))}
                 className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-indigo-500 outline-none"
               >
-                <option value="">-- Select --</option>
+                <option value="">{t("contactEdit.select")}</option>
                 {availableLocations.map((loc) => (
                   <option key={loc} value={loc}>
-                    {loc} {loc === adminLocation ? "(Your Location)" : ""}
+                    {loc} {loc === adminLocation ? t("contactEdit.yourLocation") : ""}
                   </option>
                 ))}
               </select>
               <div className="mt-2 flex items-center gap-2">
-                <span className="text-xs text-gray-500">Not in list?</span>
+                <span className="text-xs text-gray-500">{t("contactEdit.notInList")}</span>
                 <input
                   type="text"
-                  placeholder="Type custom location"
+                  placeholder={t("contactEdit.typeCustom")}
                   className="flex-1 px-2 py-1 text-xs border rounded focus:ring-1 focus:ring-indigo-500 outline-none"
                   onChange={(e) => {
                     if (e.target.value) setForm((p) => ({ ...p, localGovName: e.target.value }));
@@ -114,7 +116,7 @@ export default function ContactEditModal({
               </div>
             </div>
             <div>
-              <label className="block text-sm font-semibold text-gray-700 mb-1.5">Department</label>
+              <label className="block text-sm font-semibold text-gray-700 mb-1.5">{t("contactEdit.department")}</label>
               <select
                 value={form.department}
                 onChange={(e) => setForm((p) => ({ ...p, department: e.target.value }))}
@@ -130,13 +132,13 @@ export default function ContactEditModal({
           </div>
           <div>
             <div className="flex items-center justify-between mb-2">
-              <label className="text-sm font-semibold text-gray-700">Phone Numbers</label>
+              <label className="text-sm font-semibold text-gray-700">{t("contactEdit.phoneNumbers")}</label>
               <button
                 type="button"
                 onClick={addRow}
                 className="text-xs text-indigo-600 hover:text-indigo-800 flex items-center gap-1 font-medium bg-indigo-50 px-2 py-1 rounded transition"
               >
-                <Plus size={14} /> Add Row
+                <Plus size={14} /> {t("contactEdit.addRow")}
               </button>
             </div>
             <div className="space-y-3">
@@ -145,21 +147,21 @@ export default function ContactEditModal({
                   <div className="flex-1 grid grid-cols-1 sm:grid-cols-3 gap-3">
                     <input
                       type="text"
-                      placeholder="Name"
+                      placeholder={t("contactEdit.name")}
                       value={c.name}
                       onChange={(e) => updateRow(i, "name", e.target.value)}
                       className="w-full px-3 py-1.5 border rounded text-sm focus:ring-2 focus:ring-indigo-500 outline-none"
                     />
                     <input
                       type="text"
-                      placeholder="Phone"
+                      placeholder={t("contactEdit.phone")}
                       value={c.phone}
                       onChange={(e) => updateRow(i, "phone", e.target.value)}
                       className="w-full px-3 py-1.5 border rounded text-sm focus:ring-2 focus:ring-indigo-500 outline-none"
                     />
                     <input
                       type="text"
-                      placeholder="Details (Optional)"
+                      placeholder={t("contactEdit.detailsOptional")}
                       value={c.description}
                       onChange={(e) => updateRow(i, "description", e.target.value)}
                       className="w-full px-3 py-1.5 border rounded text-sm focus:ring-2 focus:ring-indigo-500 outline-none"
@@ -184,7 +186,7 @@ export default function ContactEditModal({
             onClick={onClose}
             className="px-4 py-2 text-gray-700 bg-white border hover:bg-gray-50 rounded-lg text-sm font-medium transition"
           >
-            Cancel
+            {t("contactEdit.cancel")}
           </button>
           <button
             onClick={handleSave}
@@ -192,7 +194,7 @@ export default function ContactEditModal({
             className="flex items-center gap-2 bg-indigo-600 hover:bg-indigo-700 disabled:opacity-50 text-white px-4 py-2 rounded-lg text-sm font-medium transition shadow-sm"
           >
             <Save size={16} />
-            {saving ? "Saving..." : "Save"}
+            {saving ? t("contactEdit.saving") : t("contactEdit.save")}
           </button>
         </div>
       </motion.div>

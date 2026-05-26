@@ -1,5 +1,6 @@
 import { useState } from "react";
 import { Link, useLocation, useNavigate } from "react-router-dom";
+import { useTranslation } from "react-i18next";
 import {
   Home,
   Menu,
@@ -14,21 +15,22 @@ import {
   Shield,
 } from "lucide-react";
 
-const navItems = [
-  { label: "Home", to: "/", icon: Home },
-  { label: "Dashboard", to: "/admin", icon: LayoutDashboard, exact: true },
-  { label: "Manage Users", to: "/admin/manage-users", icon: Users },
-  { label: "Manage Reports", to: "/admin/manage-reports", icon: FileText },
-  { label: "Manage Contacts", to: "/admin/manage-contacts", icon: Phone },
-  { label: "Manage Alerts", to: "/admin/send-alerts", icon: Bell },
-  { label: "Safe Zones", to: "/admin/manage-safe-zones", icon: Shield },
-];
-
 export default function AdminSidebar() {
+  const { t } = useTranslation();
   const [collapsed, setCollapsed] = useState(false);
   const [mobileOpen, setMobileOpen] = useState(false);
   const location = useLocation();
   const navigate = useNavigate();
+
+  const navItems = [
+    { label: t("sidebar.home"), to: "/", icon: Home },
+    { label: t("sidebar.dashboard"), to: "/admin", icon: LayoutDashboard, exact: true },
+    { label: t("sidebar.manageUsers"), to: "/admin/manage-users", icon: Users },
+    { label: t("sidebar.manageReports"), to: "/admin/manage-reports", icon: FileText },
+    { label: t("sidebar.manageContacts"), to: "/admin/manage-contacts", icon: Phone },
+    { label: t("sidebar.manageAlerts"), to: "/admin/send-alerts", icon: Bell },
+    { label: t("sidebar.safeZones"), to: "/admin/manage-safe-zones", icon: Shield },
+  ];
 
   const isActive = (item) => {
     if (item.exact) return location.pathname === item.to;
@@ -45,7 +47,7 @@ export default function AdminSidebar() {
       <button
         onClick={() => setMobileOpen(!mobileOpen)}
         className="md:hidden fixed top-4 left-4 z-[80] p-2 bg-gray-900 text-white rounded-lg shadow-lg"
-        aria-label="Toggle sidebar"
+        aria-label={t("sidebar.toggleSidebar")}
       >
         {mobileOpen ? <X size={20} /> : <Menu size={20} />}
       </button>
@@ -70,12 +72,12 @@ export default function AdminSidebar() {
         {/* Header */}
         <div className="flex items-center justify-between p-4 border-b border-gray-800">
           {!collapsed && (
-            <span className="text-lg font-bold tracking-tight">Admin</span>
+            <span className="text-lg font-bold tracking-tight">{t("sidebar.admin")}</span>
           )}
           <button
             onClick={() => setCollapsed(!collapsed)}
             className="hidden md:flex p-1.5 rounded-lg text-gray-400 hover:text-white hover:bg-gray-800 transition"
-            aria-label={collapsed ? "Expand sidebar" : "Collapse sidebar"}
+            aria-label={collapsed ? t("sidebar.expandSidebar") : t("sidebar.collapseSidebar")}
           >
             {collapsed ? <Menu size={18} /> : <ChevronLeft size={18} />}
           </button>
@@ -115,11 +117,11 @@ export default function AdminSidebar() {
             className="flex items-center gap-3 px-3 py-2.5 rounded-lg text-sm font-medium text-red-400 hover:text-red-300 hover:bg-gray-800 transition-colors duration-200 w-full"
           >
             <LogOut size={18} className="shrink-0" />
-            {!collapsed && <span>Logout</span>}
+            {!collapsed && <span>{t("sidebar.logout")}</span>}
           </button>
           {!collapsed && (
             <p className="text-[11px] text-gray-600 mt-3 px-3">
-              © 2025 Sajilo Sahayata
+              {t("sidebar.footer")}
             </p>
           )}
         </div>

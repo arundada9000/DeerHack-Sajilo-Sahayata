@@ -1,8 +1,10 @@
 import { motion, AnimatePresence } from "framer-motion";
+import { useTranslation } from "react-i18next";
 import { X, Maximize2 } from "lucide-react";
 import useImagePreview from "../hooks/useImagePreview.jsx";
 
 export default function DetailModal({ open, onClose, title, icon, fields, imageUrl }) {
+  const { t } = useTranslation();
   const { openPreview, ImagePreview } = useImagePreview();
 
   if (!open) return null;
@@ -51,7 +53,7 @@ export default function DetailModal({ open, onClose, title, icon, fields, imageU
               >
                 <img
                   src={imageUrl}
-                  alt="Evidence"
+                  alt={t("detailModal.evidence")}
                   className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-300"
                 />
                 <div className="absolute inset-0 bg-black/0 group-hover:bg-black/30 transition-colors flex items-center justify-center">
@@ -78,7 +80,7 @@ export default function DetailModal({ open, onClose, title, icon, fields, imageU
               onClick={onClose}
               className="px-6 py-2.5 bg-indigo-600 hover:bg-indigo-700 text-white rounded-xl font-semibold text-sm transition shadow-md"
             >
-              Close
+              {t("detailModal.close")}
             </button>
           </div>
           {ImagePreview}

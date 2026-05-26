@@ -12,11 +12,13 @@ import TableSkeleton from "../components/admin/TableSkeleton";
 import Pagination from "../components/admin/Pagination";
 import { exportToCSV } from "../utils/exportCsv";
 import DetailModal from "../components/DetailModal";
+import { useTranslation } from "react-i18next";
 
 const ALERT_TYPES = ["fire", "flood", "earthquake", "landslide", "storm", "police", "accident", "other"];
 const PAGE_SIZE = 10;
 
 export default function ManageAlerts() {
+  const { t } = useTranslation();
   const queryClient = useQueryClient();
   const [search, setSearch] = useState("");
   const [typeFilter, setTypeFilter] = useState("");
@@ -52,13 +54,13 @@ export default function ManageAlerts() {
   const paginated = filtered.slice((currentPage - 1) * PAGE_SIZE, currentPage * PAGE_SIZE);
 
   const handleDelete = async (id) => {
-    if (!confirm("Delete this alert?")) return;
+    if (!confirm(t("admin.sendAlerts.deleteConfirm"))) return;
     try { 
       await API.delete(`/alerts/${id}`); 
-      toast.success("Alert deleted"); 
+      toast.success(t("admin.sendAlerts.deleted")); 
       queryClient.invalidateQueries({ queryKey: ["alerts"] });
     }
-    catch { toast.error("Failed to delete alert"); }
+    catch { toast.error(t("admin.sendAlerts.deleteFailed")); }
   };
 
   const handleModalSubmit = async (data) => {
@@ -71,10 +73,10 @@ export default function ManageAlerts() {
       }
       setSelectedAlert(null);
       setShowModal(false);
-      toast.success(selectedAlert ? "Alert updated" : "Alert created");
+      toast.success(selectedAlert ? t("admin.sendAlerts.updated") : t("admin.sendAlerts.created"));
       queryClient.invalidateQueries({ queryKey: ["alerts"] });
     } catch {
-      toast.error("Operation failed");
+      toast.error(t("admin.sendAlerts.failed"));
     } finally {
       setSubmitting(false);
     }
@@ -87,9 +89,9 @@ export default function ManageAlerts() {
       <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between mb-6 gap-4">
         <div className="flex items-center gap-3">
           <h1 className="text-3xl font-bold text-gray-800 tracking-tight flex items-center gap-3 hover:text-indigo-600 transition-colors cursor-pointer">
-            <Bell className="text-indigo-500" size={32} /> Manage Alerts
+            <Bell className="text-indigo-500" size={32} /> {t("admin.sendAlerts.title")}
           </h1>
-          <span className="text-sm text-gray-500 bg-gray-100 px-3 py-1 rounded-full font-medium">{filtered.length} alert{filtered.length !== 1 ? "s" : ""}</span>
+          <span className="text-sm text-gray-500 bg-gray-100 px-3 py-1 rounded-full font-medium">{filtered.length} {t("admin.sendAlerts.alertCount")}</span>
         </div>
         <div className="flex items-center gap-2">
           <button 
@@ -97,25 +99,25 @@ export default function ManageAlerts() {
             disabled={filtered.length === 0}
             className="flex items-center gap-2 bg-white border border-gray-200 text-gray-700 hover:bg-gray-50 hover:-translate-y-0.5 hover:shadow-md px-4 py-2 rounded-lg shadow-sm font-medium text-sm transition-all focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:ring-offset-1 active:scale-95 disabled:opacity-50 disabled:hover:translate-y-0 disabled:hover:shadow-sm"
           >
-            <Download size={16} /> Export CSV
+            <Download size={16} /> {t("admin.sendAlerts.exportCsv")}
           </button>
           <button onClick={() => { setSelectedAlert(null); setShowModal(true); }} className="flex items-center gap-2 bg-indigo-600 hover:bg-indigo-700 hover:-translate-y-0.5 hover:shadow-md text-white px-4 py-2 rounded-lg shadow-sm text-sm font-medium transition-all focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:ring-offset-1 active:scale-95">
-            <Plus size={16} /> Create Alert
+            <Plus size={16} /> {t("admin.sendAlerts.createAlert")}
           </button>
         </div>
       </div>
 
-      <AdminFilterBar search={search} onSearchChange={setSearch} searchPlaceholder="Search by title or description..." locationFilter={locationFilter} onLocationChange={setLocationFilter}
-        filters={[{ label: "Type", value: typeFilter, onChange: setTypeFilter, options: ALERT_TYPES.map((t) => ({ value: t, label: t.charAt(0).toUpperCase() + t.slice(1) })) }]}
+      <AdminFilterBar search={search} onSearchChange={setSearch} searchPlaceholder={t("admin.sendAlerts.searchPlaceholder")} locationFilter={locationFilter} onLocationChange={setLocationFilter}
+        filters={[{ label: t("admin.sendAlerts.type"), value: typeFilter, onChange: setTypeFilter, options: ALERT_TYPES.map((t) => ({ value: t, label: t.charAt(0).toUpperCase() + t.slice(1) })) }]}
         onClearAll={clearAll}
       />
 
       <div className="overflow-x-auto bg-white rounded-2xl shadow-lg ring-1 ring-gray-200">
         <table className="min-w-full divide-y divide-gray-200">
-          <thead className="bg-gray-50"><tr>{["Title", "Type", "Location", "Time", "Actions"].map((h) => (<th key={h} className="px-6 py-4 text-left text-xs font-bold text-gray-500 uppercase tracking-wider">{h}</th>))}</tr></thead>
+          <thead className="bg-gray-50"><tr>{[t("admin.sendAlerts.tableTitle"), t("admin.sendAlerts.tableType"), t("admin.sendAlerts.tableLocation"), t("admin.sendAlerts.tableTime"), t("admin.sendAlerts.tableActions")].map((h) => (<th key={h} className="px-6 py-4 text-left text-xs font-bold text-gray-500 uppercase tracking-wider">{h}</th>))}</tr></thead>
           <tbody className="divide-y divide-gray-100">
             {loading ? <TableSkeleton rows={PAGE_SIZE} cols={5} /> : paginated.length === 0 ? (
-              <tr><td colSpan="5" className="text-center py-12 text-gray-400">No alerts found.</td></tr>
+              <tr><td colSpan="5" className="text-center py-12 text-gray-400">{t("admin.sendAlerts.noAlerts")}</td></tr>
             ) : paginated.map((alert, i) => (
               <motion.tr key={alert._id} initial={{ opacity: 0 }} animate={{ opacity: 1 }} transition={{ delay: i * 0.03 }} className="hover:bg-indigo-50/30 transition">
                 <td className="px-6 py-4 text-sm text-gray-800 font-medium">{alert.title}</td>
@@ -123,9 +125,9 @@ export default function ManageAlerts() {
                 <td className="px-6 py-4 text-sm text-gray-600">{alert.location}</td>
                 <td className="px-6 py-4 text-sm text-gray-500 tabular-nums">{new Date(alert.timestamp).toLocaleString()}</td>
                 <td className="px-6 py-4 flex gap-2">
-                  <button onClick={() => { setViewItem(alert); setViewOpen(true); }} className="flex items-center gap-1 px-3 py-1.5 text-xs bg-gray-100 text-gray-700 rounded-lg hover:bg-gray-200 hover:-translate-y-0.5 hover:shadow-sm font-medium transition-all active:scale-95"><Eye size={13} /> View</button>
-                  <button onClick={() => { setSelectedAlert(alert); setShowModal(true); }} className="flex items-center gap-1 px-3 py-1.5 text-xs bg-indigo-600 hover:bg-indigo-700 hover:-translate-y-0.5 hover:shadow-sm text-white rounded-lg font-medium transition-all active:scale-95"><Pencil size={13} /> Edit</button>
-                  <button onClick={() => handleDelete(alert._id)} className="flex items-center gap-1 px-3 py-1.5 text-xs bg-red-50 text-red-600 rounded-lg hover:bg-red-100 hover:-translate-y-0.5 hover:shadow-sm font-medium transition-all active:scale-95"><Trash2 size={13} /> Delete</button>
+                  <button onClick={() => { setViewItem(alert); setViewOpen(true); }} className="flex items-center gap-1 px-3 py-1.5 text-xs bg-gray-100 text-gray-700 rounded-lg hover:bg-gray-200 hover:-translate-y-0.5 hover:shadow-sm font-medium transition-all active:scale-95"><Eye size={13} /> {t("admin.sendAlerts.view")}</button>
+                  <button onClick={() => { setSelectedAlert(alert); setShowModal(true); }} className="flex items-center gap-1 px-3 py-1.5 text-xs bg-indigo-600 hover:bg-indigo-700 hover:-translate-y-0.5 hover:shadow-sm text-white rounded-lg font-medium transition-all active:scale-95"><Pencil size={13} /> {t("admin.sendAlerts.edit")}</button>
+                  <button onClick={() => handleDelete(alert._id)} className="flex items-center gap-1 px-3 py-1.5 text-xs bg-red-50 text-red-600 rounded-lg hover:bg-red-100 hover:-translate-y-0.5 hover:shadow-sm font-medium transition-all active:scale-95"><Trash2 size={13} /> {t("admin.sendAlerts.delete")}</button>
                 </td>
               </motion.tr>
             ))}
@@ -137,14 +139,14 @@ export default function ManageAlerts() {
       <DetailModal
         open={viewOpen}
         onClose={() => { setViewOpen(false); setViewItem(null); }}
-        title="Alert Details"
+        title={t("admin.sendAlerts.alertDetails")}
         icon={<Bell size={20} />}
         fields={[
-          { label: "Title", value: viewItem?.title },
-          { label: "Type", value: viewItem?.type, render: (v) => <span className="capitalize bg-gray-100 px-2.5 py-1 rounded-full text-xs font-semibold">{v}</span> },
-          { label: "Location", value: viewItem?.location },
-          { label: "Description", value: viewItem?.description },
-          { label: "Timestamp", value: viewItem?.timestamp ? new Date(viewItem.timestamp).toLocaleString() : "—" },
+          { label: t("admin.sendAlerts.tableTitle"), value: viewItem?.title },
+          { label: t("admin.sendAlerts.typeLabel"), value: viewItem?.type, render: (v) => <span className="capitalize bg-gray-100 px-2.5 py-1 rounded-full text-xs font-semibold">{v}</span> },
+          { label: t("admin.sendAlerts.location"), value: viewItem?.location },
+          { label: t("admin.sendAlerts.description"), value: viewItem?.description },
+          { label: t("admin.sendAlerts.timestamp"), value: viewItem?.timestamp ? new Date(viewItem.timestamp).toLocaleString() : "—" },
         ]}
       />
       <AlertModal open={showModal} onClose={() => { setSelectedAlert(null); setShowModal(false); }} onSubmit={handleModalSubmit} initialData={selectedAlert} submitting={submitting} />

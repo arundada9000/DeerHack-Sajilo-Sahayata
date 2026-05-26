@@ -1,3 +1,5 @@
+import { useTranslation } from "react-i18next";
+
 const statusColors = {
   status: "bg-blue-500",
   "in progress": "bg-yellow-500",
@@ -6,6 +8,7 @@ const statusColors = {
 };
 
 const ReportCard = ({ title, location, id, time, status, icon, onView }) => {
+  const { t } = useTranslation();
   const latitude = location?.coordinates?.[1];
   const longitude = location?.coordinates?.[0];
 
@@ -18,7 +21,7 @@ const ReportCard = ({ title, location, id, time, status, icon, onView }) => {
           <p className="text-xs text-gray-600">
             {latitude && longitude
               ? `Lat: ${latitude.toFixed(4)}, Lng: ${longitude.toFixed(4)}`
-              : "Location not available"}
+              : t("reportCard.locationNotAvailable")}
           </p>
           <div className="flex items-center space-x-2 mt-1">
             <span className="text-[10px] text-gray-400">#{id}</span>
@@ -38,7 +41,7 @@ const ReportCard = ({ title, location, id, time, status, icon, onView }) => {
           onClick={onView}
           className="text-xs bg-gray-200 hover:bg-gray-300 px-3 py-1 rounded"
         >
-          View Reports
+          {t("reportCard.viewReports")}
         </button>
       </div>
     </div>

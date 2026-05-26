@@ -10,10 +10,12 @@ import AdminFilterBar from "../components/admin/AdminFilterBar";
 import TableSkeleton from "../components/admin/TableSkeleton";
 import Pagination from "../components/admin/Pagination";
 import { exportToCSV } from "../utils/exportCsv";
+import { useTranslation } from "react-i18next";
 
 const PAGE_SIZE = 10;
 
 export default function ManageUsers() {
+  const { t } = useTranslation();
   const queryClient = useQueryClient();
   const [search, setSearch] = useState("");
   const [roleFilter, setRoleFilter] = useState("");
@@ -91,29 +93,29 @@ export default function ManageUsers() {
 
   const handleRoleChange = (userId, newRole) => {
     confirmAction(
-      `Are you sure you want to make this user ${newRole}?`,
+      t("admin.manageUsers.roleChangeConfirm", { role: newRole }),
       async () => {
         try {
           await API.put(`/auth/users/${userId}/role`, { role: newRole });
-          toast.success("Role updated successfully");
+          toast.success(t("admin.manageUsers.roleUpdated"));
           queryClient.invalidateQueries({ queryKey: ["users"] });
         } catch (err) {
           console.error("Failed to update role", err);
-          toast.error("Failed to update role");
+          toast.error(t("admin.manageUsers.roleUpdateFailed"));
         }
       }
     );
   };
 
   const handleDeleteUser = (id) => {
-    confirmAction("Are you sure you want to delete this user?", async () => {
+    confirmAction(t("admin.manageUsers.deleteConfirm"), async () => {
       try {
         await API.delete(`/auth/users/${id}`);
-        toast.success("User deleted successfully");
+        toast.success(t("admin.manageUsers.deleted"));
         queryClient.invalidateQueries({ queryKey: ["users"] });
       } catch (err) {
         console.error("Failed to delete user", err);
-        toast.error("Failed to delete user");
+        toast.error(t("admin.manageUsers.deleteFailed"));
       }
     });
   };
@@ -131,10 +133,10 @@ export default function ManageUsers() {
         <div className="flex items-center gap-3">
           <h1 className="text-3xl font-bold text-gray-800 tracking-tight flex items-center gap-3 hover:text-indigo-600 transition-colors cursor-pointer">
             <Users className="text-indigo-500" size={32} />
-            Manage Users
+            {t("admin.manageUsers.title")}
           </h1>
           <span className="text-sm text-gray-500 bg-gray-100 px-3 py-1 rounded-full font-medium">
-            {filteredUsers.length} user{filteredUsers.length !== 1 ? "s" : ""}
+            {filteredUsers.length} {t("admin.manageUsers.userCount")}
           </span>
         </div>
         <button 
@@ -142,7 +144,7 @@ export default function ManageUsers() {
           disabled={filteredUsers.length === 0}
           className="flex items-center gap-2 bg-white border border-gray-200 text-gray-700 hover:bg-gray-50 hover:-translate-y-0.5 hover:shadow-md px-4 py-2 rounded-lg shadow-sm font-medium text-sm transition-all focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:ring-offset-1 active:scale-95 disabled:opacity-50 disabled:hover:translate-y-0 disabled:hover:shadow-sm"
         >
-          <Download size={16} /> Export CSV
+          <Download size={16} /> {t("admin.manageUsers.exportCsv")}
         </button>
       </div>
 
@@ -150,17 +152,17 @@ export default function ManageUsers() {
       <AdminFilterBar
         search={search}
         onSearchChange={setSearch}
-        searchPlaceholder="Search by name, email or phone..."
+        searchPlaceholder={t("admin.manageUsers.searchPlaceholder")}
         locationFilter={locationFilter}
         onLocationChange={setLocationFilter}
         filters={[
           {
-            label: "Role",
+            label: t("admin.manageUsers.role"),
             value: roleFilter,
             onChange: setRoleFilter,
             options: [
-              { value: "user", label: "User" },
-              { value: "admin", label: "Admin" },
+              { value: "user", label: t("admin.manageUsers.user") },
+              { value: "admin", label: t("admin.manageUsers.admin") },
             ],
           },
         ]}
@@ -172,7 +174,7 @@ export default function ManageUsers() {
         <table className="min-w-full divide-y divide-gray-200">
           <thead className="bg-gray-50">
             <tr>
-              {["Name", "Email", "Phone", "Role", "Actions"].map((head) => (
+              {[t("admin.manageUsers.tableName"), t("admin.manageUsers.tableEmail"), t("admin.manageUsers.tablePhone"), t("admin.manageUsers.tableRole"), t("admin.manageUsers.tableActions")].map((head) => (
                 <th
                   key={head}
                   className="px-6 py-4 text-left text-xs font-bold text-gray-500 uppercase tracking-wider"
@@ -188,7 +190,7 @@ export default function ManageUsers() {
             ) : paginatedUsers.length === 0 ? (
               <tr>
                 <td colSpan="5" className="text-center py-12 text-gray-400">
-                  No users found matching your filters.
+                  {t("admin.manageUsers.noUsers")}
                 </td>
               </tr>
             ) : (
@@ -226,7 +228,7 @@ export default function ManageUsers() {
                         onClick={() => setSelectedUser(user)}
                         className="flex items-center gap-1 px-3 py-1.5 bg-blue-50 text-blue-600 rounded-lg hover:bg-blue-100 hover:-translate-y-0.5 hover:shadow-sm transition-all text-xs font-medium active:scale-95"
                       >
-                        <Eye size={13} /> View
+                        <Eye size={13} /> {t("admin.manageUsers.view")}
                       </button>
                       <button
                         onClick={() =>
@@ -238,13 +240,13 @@ export default function ManageUsers() {
                         className="flex items-center gap-1 px-3 py-1.5 bg-indigo-600 text-white rounded-lg hover:bg-indigo-700 hover:-translate-y-0.5 hover:shadow-sm transition-all text-xs font-medium active:scale-95"
                       >
                         <Shield size={13} />
-                        {user.role === "admin" ? "Make User" : "Make Admin"}
+                        {user.role === "admin" ? t("admin.manageUsers.makeUser") : t("admin.manageUsers.makeAdmin")}
                       </button>
                       <button
                         onClick={() => handleDeleteUser(user._id)}
                         className="flex items-center gap-1 px-3 py-1.5 bg-red-50 text-red-600 rounded-lg hover:bg-red-100 hover:-translate-y-0.5 hover:shadow-sm transition-all text-xs font-medium active:scale-95"
                       >
-                        <Trash2 size={13} /> Delete
+                        <Trash2 size={13} /> {t("admin.manageUsers.delete")}
                       </button>
                     </div>
                   </td>
@@ -304,16 +306,16 @@ export default function ManageUsers() {
                 <div className="flex items-center gap-3 text-sm text-gray-700 bg-gray-50 p-3 rounded-xl">
                   <Mail size={16} className="text-gray-400" />
                   <div className="flex flex-col">
-                    <span className="text-xs text-gray-400 font-semibold uppercase">Email</span>
-                    <span className="font-medium">{selectedUser.email || "Not provided"}</span>
+                    <span className="text-xs text-gray-400 font-semibold uppercase">{t("admin.manageUsers.email")}</span>
+                    <span className="font-medium">{selectedUser.email || t("admin.manageUsers.notProvided")}</span>
                   </div>
                 </div>
 
                 <div className="flex items-center gap-3 text-sm text-gray-700 bg-gray-50 p-3 rounded-xl">
                   <Phone size={16} className="text-gray-400" />
                   <div className="flex flex-col">
-                    <span className="text-xs text-gray-400 font-semibold uppercase">Phone Number</span>
-                    <span className="font-medium">{selectedUser.phoneNumber || "Not provided"}</span>
+                    <span className="text-xs text-gray-400 font-semibold uppercase">{t("admin.manageUsers.phone")}</span>
+                    <span className="font-medium">{selectedUser.phoneNumber || t("admin.manageUsers.notProvided")}</span>
                   </div>
                 </div>
 
@@ -321,18 +323,18 @@ export default function ManageUsers() {
                   <div className="flex items-center gap-3 text-sm text-gray-700 bg-gray-50 p-3 rounded-xl">
                     <MapPin size={16} className="text-gray-400" />
                     <div className="flex flex-col">
-                      <span className="text-xs text-gray-400 font-semibold uppercase">VDC / Municipality</span>
-                      <span className="font-medium">{selectedUser.localGovName || "Not provided"}</span>
+                      <span className="text-xs text-gray-400 font-semibold uppercase">{t("admin.manageUsers.vdcMunicipality")}</span>
+                      <span className="font-medium">{selectedUser.localGovName || t("admin.manageUsers.notProvided")}</span>
                     </div>
                   </div>
                   <div className="flex items-center gap-3 text-sm text-gray-700 bg-gray-50 p-3 rounded-xl">
                     <MapPin size={16} className="text-gray-400" />
                     <div className="flex flex-col">
-                      <span className="text-xs text-gray-400 font-semibold uppercase">Coordinates</span>
+                      <span className="text-xs text-gray-400 font-semibold uppercase">{t("admin.manageUsers.coordinates")}</span>
                       <span className="font-medium">
                         {selectedUser.location?.coordinates
                           ? `[${selectedUser.location.coordinates[0]?.toFixed(4)}, ${selectedUser.location.coordinates[1]?.toFixed(4)}]`
-                          : "Not provided"}
+                          : t("admin.manageUsers.notProvided")}
                       </span>
                     </div>
                   </div>
@@ -341,16 +343,16 @@ export default function ManageUsers() {
                 <div className="flex items-center gap-3 text-sm text-gray-700 bg-gray-50 p-3 rounded-xl">
                   <User size={16} className="text-gray-400" />
                   <div className="flex flex-col">
-                    <span className="text-xs text-gray-400 font-semibold uppercase">Gender</span>
-                    <span className="font-medium capitalize">{selectedUser.gender || "Not provided"}</span>
+                    <span className="text-xs text-gray-400 font-semibold uppercase">{t("admin.manageUsers.gender")}</span>
+                    <span className="font-medium capitalize">{selectedUser.gender || t("admin.manageUsers.notProvided")}</span>
                   </div>
                 </div>
 
                 <div className="flex items-center gap-3 text-sm text-gray-700 bg-gray-50 p-3 rounded-xl">
                   <IdCard size={16} className="text-gray-400" />
                   <div className="flex flex-col">
-                    <span className="text-xs text-gray-400 font-semibold uppercase">Citizenship ID</span>
-                    <span className="font-medium">{selectedUser.citizenshipId || "Not provided"}</span>
+                    <span className="text-xs text-gray-400 font-semibold uppercase">{t("admin.manageUsers.citizenshipId")}</span>
+                    <span className="font-medium">{selectedUser.citizenshipId || t("admin.manageUsers.notProvided")}</span>
                   </div>
                 </div>
 
@@ -358,9 +360,9 @@ export default function ManageUsers() {
                   <div className="flex items-center gap-3 text-sm text-gray-700 bg-gray-50 p-3 rounded-xl">
                     <Calendar size={16} className="text-gray-400" />
                     <div className="flex flex-col">
-                      <span className="text-xs text-gray-400 font-semibold uppercase">Joined On</span>
+                      <span className="text-xs text-gray-400 font-semibold uppercase">{t("admin.manageUsers.joinedOn")}</span>
                       <span className="font-medium">
-                        {selectedUser.createdAt ? new Date(selectedUser.createdAt).toLocaleDateString() : "Unknown"}
+                        {selectedUser.createdAt ? new Date(selectedUser.createdAt).toLocaleDateString() : t("admin.manageUsers.unknown")}
                       </span>
                     </div>
                   </div>
@@ -388,7 +390,7 @@ export default function ManageUsers() {
               className="bg-white p-6 rounded-2xl shadow-xl max-w-sm w-full mx-4"
             >
               <h2 className="text-lg font-bold text-gray-800 mb-3">
-                Confirm Action
+                {t("admin.manageUsers.confirmTitle")}
               </h2>
               <p className="text-sm text-gray-600 mb-6">{modal.message}</p>
               <div className="flex justify-end gap-3">
@@ -396,13 +398,13 @@ export default function ManageUsers() {
                   onClick={() => setModal({ visible: false, action: null })}
                   className="px-4 py-2 rounded-lg bg-gray-100 hover:bg-gray-200 text-sm font-medium hover:-translate-y-0.5 active:scale-95 transition-all"
                 >
-                  Cancel
+                  {t("admin.manageUsers.cancel")}
                 </button>
                 <button
                   onClick={handleConfirm}
                   className="px-4 py-2 rounded-lg bg-indigo-600 hover:bg-indigo-700 text-white hover:shadow-md hover:-translate-y-0.5 text-sm font-medium active:scale-95 transition-all"
                 >
-                  Confirm
+                  {t("admin.manageUsers.confirm")}
                 </button>
               </div>
             </motion.div>

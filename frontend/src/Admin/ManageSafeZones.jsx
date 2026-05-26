@@ -10,6 +10,7 @@ import Pagination from "../components/admin/Pagination";
 import { useQuery, useQueryClient } from "@tanstack/react-query";
 import { exportToCSV } from "../utils/exportCsv";
 import DetailModal from "../components/DetailModal";
+import { useTranslation } from "react-i18next";
 
 const ZONE_TYPES = ["hospital", "shelter", "police", "fire_station", "distribution"];
 const PAGE_SIZE = 10;
@@ -24,6 +25,7 @@ const typeColors = {
 
 // ═══ Safe Zone Modal ═══
 function SafeZoneModal({ open, onClose, onSubmit, initialData }) {
+  const { t } = useTranslation();
   const [name, setName] = useState("");
   const [type, setType] = useState("hospital");
   const [lng, setLng] = useState("");
@@ -57,25 +59,25 @@ function SafeZoneModal({ open, onClose, onSubmit, initialData }) {
   }, [initialData, open]);
 
   const handleUseMyLocation = () => {
-    if (!navigator.geolocation) return toast.error("Geolocation not supported");
+    if (!navigator.geolocation) return toast.error(t("admin.manageSafeZones.geolocationNotSupported"));
     navigator.geolocation.getCurrentPosition(
       (pos) => {
         setLng(String(pos.coords.longitude));
         setLat(String(pos.coords.latitude));
-        toast.success("Location captured!");
+        toast.success(t("admin.manageSafeZones.locationCaptured"));
       },
-      () => toast.error("Failed to get location")
+      () => toast.error(t("admin.manageSafeZones.locationFailed"))
     );
   };
 
   const handleSubmit = (e) => {
     e.preventDefault();
-    if (!name.trim()) return toast.error("Name is required");
-    if (!lng || !lat) return toast.error("Coordinates are required");
+    if (!name.trim()) return toast.error(t("admin.manageSafeZones.nameRequiredError"));
+    if (!lng || !lat) return toast.error(t("admin.manageSafeZones.coordinatesRequired"));
 
     const lngNum = parseFloat(lng);
     const latNum = parseFloat(lat);
-    if (isNaN(lngNum) || isNaN(latNum)) return toast.error("Invalid coordinates");
+    if (isNaN(lngNum) || isNaN(latNum)) return toast.error(t("admin.manageSafeZones.invalidCoordinates"));
 
     onSubmit({
       name: name.trim(),
@@ -108,24 +110,24 @@ function SafeZoneModal({ open, onClose, onSubmit, initialData }) {
           <div className="p-6 border-b border-gray-100">
             <h2 className="text-xl font-bold text-gray-900 flex items-center gap-2">
               <Shield size={20} className="text-emerald-600" />
-              {initialData ? "Edit Safe Zone" : "Add Safe Zone"}
+              {initialData ? t("admin.manageSafeZones.editZone") : t("admin.manageSafeZones.addZoneTitle")}
             </h2>
           </div>
 
           <form onSubmit={handleSubmit} className="p-6 space-y-4">
             <div>
-              <label className="block text-sm font-semibold text-gray-700 mb-1">Name *</label>
+              <label className="block text-sm font-semibold text-gray-700 mb-1">{t("admin.manageSafeZones.nameRequired")}</label>
               <input
                 type="text"
                 value={name}
                 onChange={(e) => setName(e.target.value)}
-                placeholder="e.g. Lumbini Provincial Hospital"
+                placeholder={t("admin.manageSafeZones.namePlaceholder")}
                 className="w-full border border-gray-200 rounded-xl px-4 py-2.5 text-sm focus:ring-2 focus:ring-emerald-500 focus:border-transparent outline-none"
               />
             </div>
 
             <div>
-              <label className="block text-sm font-semibold text-gray-700 mb-1">Type *</label>
+              <label className="block text-sm font-semibold text-gray-700 mb-1">{t("admin.manageSafeZones.typeRequired")}</label>
               <select
                 value={type}
                 onChange={(e) => setType(e.target.value)}
@@ -141,7 +143,7 @@ function SafeZoneModal({ open, onClose, onSubmit, initialData }) {
 
             <div className="grid grid-cols-2 gap-3">
               <div>
-                <label className="block text-sm font-semibold text-gray-700 mb-1">Longitude *</label>
+                <label className="block text-sm font-semibold text-gray-700 mb-1">{t("admin.manageSafeZones.longitude")}</label>
                 <input
                   type="number"
                   step="any"
@@ -152,7 +154,7 @@ function SafeZoneModal({ open, onClose, onSubmit, initialData }) {
                 />
               </div>
               <div>
-                <label className="block text-sm font-semibold text-gray-700 mb-1">Latitude *</label>
+                <label className="block text-sm font-semibold text-gray-700 mb-1">{t("admin.manageSafeZones.latitude")}</label>
                 <input
                   type="number"
                   step="any"
@@ -169,34 +171,34 @@ function SafeZoneModal({ open, onClose, onSubmit, initialData }) {
               onClick={handleUseMyLocation}
               className="flex items-center gap-2 text-sm text-emerald-600 font-semibold hover:text-emerald-700 transition focus:outline-none focus:ring-2 focus:ring-emerald-500 rounded p-1"
             >
-              <MapPin size={14} /> Use my current location
+              <MapPin size={14} /> {t("admin.manageSafeZones.useCurrentLocation")}
             </button>
 
             <div>
-              <label className="block text-sm font-semibold text-gray-700 mb-1">Address</label>
+              <label className="block text-sm font-semibold text-gray-700 mb-1">{t("admin.manageSafeZones.addressLabel")}</label>
               <input
                 type="text"
                 value={address}
                 onChange={(e) => setAddress(e.target.value)}
-                placeholder="Butwal-11, Rupandehi"
+                placeholder={t("admin.manageSafeZones.addressPlaceholder")}
                 className="w-full border border-gray-200 rounded-xl px-4 py-2.5 text-sm focus:ring-2 focus:ring-emerald-500 focus:border-transparent outline-none"
               />
             </div>
 
             <div>
-              <label className="block text-sm font-semibold text-gray-700 mb-1">Phone</label>
+              <label className="block text-sm font-semibold text-gray-700 mb-1">{t("admin.manageSafeZones.phoneLabel")}</label>
               <input
                 type="tel"
                 value={phone}
                 onChange={(e) => setPhone(e.target.value)}
-                placeholder="071-XXXXXX"
+                placeholder={t("admin.manageSafeZones.phonePlaceholder")}
                 className="w-full border border-gray-200 rounded-xl px-4 py-2.5 text-sm focus:ring-2 focus:ring-emerald-500 focus:border-transparent outline-none"
               />
             </div>
 
             {initialData && (
               <div className="flex items-center justify-between">
-                <span className="text-sm font-semibold text-gray-700">Active</span>
+                <span className="text-sm font-semibold text-gray-700">{t("admin.manageSafeZones.activeToggle")}</span>
                 <button
                   type="button"
                   onClick={() => setIsActive(!isActive)}
@@ -216,13 +218,13 @@ function SafeZoneModal({ open, onClose, onSubmit, initialData }) {
                 onClick={onClose}
                 className="flex-1 bg-gray-100 text-gray-700 font-bold py-2.5 rounded-xl hover:bg-gray-200 transition text-sm focus:outline-none focus:ring-2 focus:ring-gray-400 active:scale-95"
               >
-                Cancel
+                {t("admin.manageSafeZones.cancel")}
               </button>
               <button
                 type="submit"
                 className="flex-1 bg-emerald-600 text-white font-bold py-2.5 rounded-xl hover:bg-emerald-700 transition text-sm focus:outline-none focus:ring-2 focus:ring-emerald-500 active:scale-95"
               >
-                {initialData ? "Update" : "Create"}
+                {initialData ? t("admin.manageSafeZones.update") : t("admin.manageSafeZones.create")}
               </button>
             </div>
           </form>
@@ -234,6 +236,7 @@ function SafeZoneModal({ open, onClose, onSubmit, initialData }) {
 
 // ═══ Main Admin Page ═══
 export default function ManageSafeZones() {
+  const { t } = useTranslation();
   const queryClient = useQueryClient();
   const [search, setSearch] = useState("");
   const [typeFilter, setTypeFilter] = useState("");
@@ -275,13 +278,13 @@ export default function ManageSafeZones() {
   );
 
   const handleDelete = async (id) => {
-    if (!confirm("Delete this safe zone?")) return;
+    if (!confirm(t("admin.manageSafeZones.deleteConfirm"))) return;
     try {
       await API.delete(`/safe-zones/${id}`);
-      toast.success("Safe zone deleted");
+      toast.success(t("admin.manageSafeZones.deleted"));
       queryClient.invalidateQueries({ queryKey: ["safe-zones"] });
     } catch {
-      toast.error("Failed to delete");
+      toast.error(t("admin.manageSafeZones.deleteFailed"));
     }
   };
 
@@ -289,14 +292,14 @@ export default function ManageSafeZones() {
     try {
       if (selectedZone) {
         await API.put(`/safe-zones/${selectedZone._id}`, data);
-        toast.success("Safe zone updated");
+        toast.success(t("admin.manageSafeZones.updated"));
       } else {
         await API.post("/safe-zones", data);
-        toast.success("Safe zone created");
+        toast.success(t("admin.manageSafeZones.created"));
       }
       queryClient.invalidateQueries({ queryKey: ["safe-zones"] });
     } catch {
-      toast.error("Operation failed");
+      toast.error(t("admin.manageSafeZones.failed"));
     } finally {
       setSelectedZone(null);
       setShowModal(false);
@@ -314,9 +317,9 @@ export default function ManageSafeZones() {
         <div className="flex items-center gap-3">
           <h1 className="text-3xl font-bold text-gray-800 tracking-tight flex items-center gap-3 hover:text-emerald-600 transition-colors cursor-pointer">
             <Shield className="text-emerald-600" size={28} />
-            Safe Zones
+            {t("admin.manageSafeZones.title")}
           </h1>
-          <span className="text-sm text-gray-500 bg-gray-100 px-3 py-1 rounded-full font-medium">{filtered.length} zone{filtered.length !== 1 ? "s" : ""}</span>
+          <span className="text-sm text-gray-500 bg-gray-100 px-3 py-1 rounded-full font-medium">{filtered.length} {t("admin.manageSafeZones.zoneCount")}</span>
         </div>
         <div className="flex items-center gap-2">
           <button 
@@ -324,7 +327,7 @@ export default function ManageSafeZones() {
             disabled={filtered.length === 0}
             className="flex items-center gap-2 bg-white border border-gray-200 text-gray-700 hover:bg-gray-50 hover:-translate-y-0.5 hover:shadow-md px-4 py-2 rounded-lg shadow-sm font-medium text-sm transition-all focus:outline-none focus:ring-2 focus:ring-emerald-500 focus:ring-offset-1 active:scale-95 disabled:opacity-50 disabled:hover:translate-y-0 disabled:hover:shadow-sm"
           >
-            <Download size={16} /> Export CSV
+            <Download size={16} /> {t("admin.manageSafeZones.exportCsv")}
           </button>
           <button
             onClick={() => {
@@ -333,7 +336,7 @@ export default function ManageSafeZones() {
             }}
             className="flex items-center gap-2 bg-emerald-600 hover:bg-emerald-700 hover:-translate-y-0.5 hover:shadow-md text-white px-4 py-2 rounded-lg shadow-sm text-sm font-medium transition-all focus:outline-none focus:ring-2 focus:ring-emerald-500 focus:ring-offset-1 active:scale-95"
           >
-            <Plus size={16} /> Add Zone
+            <Plus size={16} /> {t("admin.manageSafeZones.addZone")}
           </button>
         </div>
       </div>
@@ -341,10 +344,10 @@ export default function ManageSafeZones() {
       <AdminFilterBar
         search={search}
         onSearchChange={setSearch}
-        searchPlaceholder="Search by name or address..."
+        searchPlaceholder={t("admin.manageSafeZones.searchPlaceholder")}
         filters={[
           {
-            label: "Type",
+            label: t("admin.manageSafeZones.type"),
             value: typeFilter,
             onChange: setTypeFilter,
             options: ZONE_TYPES.map((t) => ({
@@ -360,7 +363,7 @@ export default function ManageSafeZones() {
         <table className="min-w-full divide-y divide-gray-200">
           <thead className="bg-gray-50">
             <tr>
-              {["Name", "Type", "Address", "Phone", "Status", "Actions"].map((h) => (
+              {[t("admin.manageSafeZones.tableName"), t("admin.manageSafeZones.tableType"), t("admin.manageSafeZones.tableAddress"), t("admin.manageSafeZones.tablePhone"), t("admin.manageSafeZones.tableStatus"), t("admin.manageSafeZones.tableActions")].map((h) => (
                 <th
                   key={h}
                   className="px-6 py-4 text-left text-xs font-bold text-gray-500 uppercase tracking-wider"
@@ -376,7 +379,7 @@ export default function ManageSafeZones() {
             ) : paginated.length === 0 ? (
               <tr>
                 <td colSpan="6" className="text-center py-12 text-gray-400">
-                  No safe zones found. Add your first one!
+                  {t("admin.manageSafeZones.noZones")}
                 </td>
               </tr>
             ) : (
@@ -398,7 +401,7 @@ export default function ManageSafeZones() {
                   <td className="px-6 py-4 text-sm text-gray-600 tabular-nums">{zone.phone || "—"}</td>
                   <td className="px-6 py-4 text-sm">
                     <span className={`px-2 py-1 rounded-full text-xs font-bold ${zone.isActive ? "bg-green-100 text-green-700" : "bg-gray-100 text-gray-500"}`}>
-                      {zone.isActive ? "Active" : "Inactive"}
+                      {zone.isActive ? t("admin.manageSafeZones.active") : t("admin.manageSafeZones.inactive")}
                     </span>
                   </td>
                   <td className="px-6 py-4 flex gap-2">
@@ -406,7 +409,7 @@ export default function ManageSafeZones() {
                       onClick={() => { setViewItem(zone); setViewOpen(true); }}
                       className="flex items-center gap-1 px-3 py-1.5 text-xs bg-gray-100 text-gray-700 rounded-lg hover:bg-gray-200 hover:-translate-y-0.5 hover:shadow-sm font-medium transition-all active:scale-95"
                     >
-                      <Eye size={13} /> View
+                      <Eye size={13} /> {t("admin.manageSafeZones.view")}
                     </button>
                     <button
                       onClick={() => {
@@ -415,13 +418,13 @@ export default function ManageSafeZones() {
                       }}
                       className="flex items-center gap-1 px-3 py-1.5 text-xs bg-emerald-600 hover:bg-emerald-700 hover:-translate-y-0.5 hover:shadow-sm text-white rounded-lg font-medium transition-all active:scale-95"
                     >
-                      <Pencil size={13} /> Edit
+                      <Pencil size={13} /> {t("admin.manageSafeZones.edit")}
                     </button>
                     <button
                       onClick={() => handleDelete(zone._id)}
                       className="flex items-center gap-1 px-3 py-1.5 text-xs bg-red-50 text-red-600 rounded-lg hover:bg-red-100 hover:-translate-y-0.5 hover:shadow-sm font-medium transition-all active:scale-95"
                     >
-                      <Trash2 size={13} /> Delete
+                      <Trash2 size={13} /> {t("admin.manageSafeZones.delete")}
                     </button>
                   </td>
                 </motion.tr>
@@ -441,17 +444,17 @@ export default function ManageSafeZones() {
       <DetailModal
         open={viewOpen}
         onClose={() => { setViewOpen(false); setViewItem(null); }}
-        title="Safe Zone Details"
+        title={t("admin.manageSafeZones.zoneDetails")}
         icon={<Shield size={20} />}
         fields={[
-          { label: "Name", value: viewItem?.name },
-          { label: "Type", value: viewItem?.type, render: (v) => <span className={`px-2.5 py-1 rounded-full text-xs font-semibold capitalize ${typeColors[v] || "bg-gray-100 text-gray-700"}`}>{v?.replace("_", " ")}</span> },
-          { label: "Address", value: viewItem?.address },
-          { label: "Phone", value: viewItem?.phone },
-          { label: "Coordinates", value: viewItem?.location?.coordinates ? `[${viewItem.location.coordinates[0]?.toFixed(5)}, ${viewItem.location.coordinates[1]?.toFixed(5)}]` : "—" },
-          { label: "Status", value: viewItem?.isActive, render: (v) => <span className={`px-2 py-1 rounded-full text-xs font-bold ${v ? "bg-green-100 text-green-700" : "bg-gray-100 text-gray-500"}`}>{v ? "Active" : "Inactive"}</span> },
-          { label: "Created At", value: viewItem?.createdAt ? new Date(viewItem.createdAt).toLocaleString() : "—" },
-          { label: "Updated At", value: viewItem?.updatedAt ? new Date(viewItem.updatedAt).toLocaleString() : "—" },
+          { label: t("admin.manageSafeZones.name"), value: viewItem?.name },
+          { label: t("admin.manageSafeZones.typeLabel"), value: viewItem?.type, render: (v) => <span className={`px-2.5 py-1 rounded-full text-xs font-semibold capitalize ${typeColors[v] || "bg-gray-100 text-gray-700"}`}>{v?.replace("_", " ")}</span> },
+          { label: t("admin.manageSafeZones.address"), value: viewItem?.address },
+          { label: t("admin.manageSafeZones.phone"), value: viewItem?.phone },
+          { label: t("admin.manageSafeZones.coordinates"), value: viewItem?.location?.coordinates ? `[${viewItem.location.coordinates[0]?.toFixed(5)}, ${viewItem.location.coordinates[1]?.toFixed(5)}]` : "—" },
+          { label: t("admin.manageSafeZones.status"), value: viewItem?.isActive, render: (v) => <span className={`px-2 py-1 rounded-full text-xs font-bold ${v ? "bg-green-100 text-green-700" : "bg-gray-100 text-gray-500"}`}>{v ? t("admin.manageSafeZones.active") : t("admin.manageSafeZones.inactive")}</span> },
+          { label: t("admin.manageSafeZones.createdAt"), value: viewItem?.createdAt ? new Date(viewItem.createdAt).toLocaleString() : "—" },
+          { label: t("admin.manageSafeZones.updatedAt"), value: viewItem?.updatedAt ? new Date(viewItem.updatedAt).toLocaleString() : "—" },
         ]}
       />
       <SafeZoneModal

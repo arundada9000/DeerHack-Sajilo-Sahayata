@@ -1,10 +1,12 @@
 import { useState, useEffect } from "react";
 import { motion, AnimatePresence } from "framer-motion";
+import { useTranslation } from "react-i18next";
 import { BellRing, FileText, MapPin, Tag, X, Loader2 } from "lucide-react";
 
 const ALERT_TYPES = ["fire", "flood", "earthquake", "landslide", "storm", "police", "accident", "other"];
 
 export default function AlertModal({ open, onClose, onSubmit, initialData, submitting }) {
+  const { t } = useTranslation();
   const [form, setForm] = useState({
     title: "",
     description: "",
@@ -65,7 +67,7 @@ export default function AlertModal({ open, onClose, onSubmit, initialData, submi
               <BellRing size={20} />
             </div>
             <h2 className="text-xl font-bold text-gray-800">
-              {initialData ? "Edit Alert" : "Broadcast Alert"}
+              {initialData ? t("alertModal.editAlert") : t("alertModal.broadcastAlert")}
             </h2>
           </div>
 
@@ -78,7 +80,7 @@ export default function AlertModal({ open, onClose, onSubmit, initialData, submi
                 name="title"
                 value={form.title}
                 onChange={handleChange}
-                placeholder="Alert Title"
+                placeholder={t("alertModal.alertTitle")}
                 required
                 className="w-full border border-gray-200 pl-10 pr-4 py-2.5 rounded-xl text-sm focus:ring-2 focus:ring-indigo-500 focus:border-transparent outline-none transition"
               />
@@ -95,7 +97,7 @@ export default function AlertModal({ open, onClose, onSubmit, initialData, submi
                 required
                 className="w-full border border-gray-200 pl-10 pr-4 py-2.5 rounded-xl text-sm focus:ring-2 focus:ring-indigo-500 focus:border-transparent outline-none transition appearance-none bg-white"
               >
-                <option value="" disabled>Select Emergency Type</option>
+                <option value="" disabled>{t("alertModal.selectEmergencyType")}</option>
                 {ALERT_TYPES.map((t) => (
                   <option key={t} value={t}>{t.charAt(0).toUpperCase() + t.slice(1)}</option>
                 ))}
@@ -110,7 +112,7 @@ export default function AlertModal({ open, onClose, onSubmit, initialData, submi
                 name="location"
                 value={form.location}
                 onChange={handleChange}
-                placeholder="Affected Location"
+                placeholder={t("alertModal.affectedLocation")}
                 required
                 className="w-full border border-gray-200 pl-10 pr-4 py-2.5 rounded-xl text-sm focus:ring-2 focus:ring-indigo-500 focus:border-transparent outline-none transition"
               />
@@ -121,7 +123,7 @@ export default function AlertModal({ open, onClose, onSubmit, initialData, submi
                 name="description"
                 value={form.description}
                 onChange={handleChange}
-                placeholder="Detailed Description..."
+                placeholder={t("alertModal.detailedDescription")}
                 rows={4}
                 required
                 className="w-full border border-gray-200 p-3 rounded-xl text-sm focus:ring-2 focus:ring-indigo-500 focus:border-transparent outline-none transition resize-none"
@@ -134,7 +136,7 @@ export default function AlertModal({ open, onClose, onSubmit, initialData, submi
                 onClick={onClose}
                 className="px-5 py-2.5 rounded-xl bg-gray-100 hover:bg-gray-200 text-gray-700 font-semibold text-sm transition"
               >
-                Cancel
+                {t("alertModal.cancel")}
               </button>
               <button
                 type="submit"
@@ -142,7 +144,7 @@ export default function AlertModal({ open, onClose, onSubmit, initialData, submi
                 className="px-5 py-2.5 rounded-xl bg-indigo-600 hover:bg-indigo-700 disabled:bg-indigo-400 disabled:cursor-not-allowed text-white font-semibold text-sm transition shadow-md shadow-indigo-200 flex items-center gap-2"
               >
                 {submitting && <Loader2 size={16} className="animate-spin" />}
-                {submitting ? "Submitting..." : initialData ? "Save Changes" : "Broadcast"}
+                {submitting ? t("alertModal.submitting") : initialData ? t("alertModal.saveChanges") : t("alertModal.broadcast")}
               </button>
             </div>
           </form>

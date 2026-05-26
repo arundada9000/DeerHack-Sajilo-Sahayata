@@ -11,12 +11,14 @@ import TableSkeleton from "../components/admin/TableSkeleton";
 import Pagination from "../components/admin/Pagination";
 import { exportToCSV } from "../utils/exportCsv";
 import DetailModal from "../components/DetailModal";
+import { useTranslation } from "react-i18next";
 
 const REPORT_TYPES = ["fire", "police", "flood", "accident", "landslide", "other"];
 const STATUS_TYPES = ["pending", "verified", "solved", "working"];
 const PAGE_SIZE = 10;
 
 export default function Reports() {
+  const { t } = useTranslation();
   const queryClient = useQueryClient();
   const [search, setSearch] = useState("");
   const [statusFilter, setStatusFilter] = useState("");
@@ -71,11 +73,11 @@ export default function Reports() {
   }, [reports]);
 
   const cards = [
-    { label: "Total", color: "bg-gray-100 text-gray-800", count: reports.length, icon: <ListChecks size={22} /> },
-    { label: "Pending", color: "bg-yellow-100 text-yellow-800", count: counts.pending, icon: <Clock size={22} /> },
-    { label: "Verified", color: "bg-blue-100 text-blue-800", count: counts.verified, icon: <ShieldCheck size={22} /> },
-    { label: "Working", color: "bg-purple-100 text-purple-800", count: counts.working, icon: <Hammer size={22} /> },
-    { label: "Solved", color: "bg-green-100 text-green-800", count: counts.solved, icon: <CheckCircle size={22} /> },
+    { label: t("admin.manageReports.total"), color: "bg-gray-100 text-gray-800", count: reports.length, icon: <ListChecks size={22} /> },
+    { label: t("admin.manageReports.pending"), color: "bg-yellow-100 text-yellow-800", count: counts.pending, icon: <Clock size={22} /> },
+    { label: t("admin.manageReports.verified"), color: "bg-blue-100 text-blue-800", count: counts.verified, icon: <ShieldCheck size={22} /> },
+    { label: t("admin.manageReports.working"), color: "bg-purple-100 text-purple-800", count: counts.working, icon: <Hammer size={22} /> },
+    { label: t("admin.manageReports.solved"), color: "bg-green-100 text-green-800", count: counts.solved, icon: <CheckCircle size={22} /> },
   ];
 
   const statusColor = (s) => s === "pending" ? "bg-yellow-100 text-yellow-700" : s === "verified" ? "bg-blue-100 text-blue-700" : s === "working" ? "bg-purple-100 text-purple-700" : "bg-green-100 text-green-700";
@@ -85,14 +87,14 @@ export default function Reports() {
       <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between mb-6 gap-4">
         <h1 className="text-3xl font-bold text-gray-800 tracking-tight flex items-center gap-3 hover:text-indigo-600 transition-colors cursor-pointer">
           <FileText className="text-indigo-500" size={32} />
-          Manage Reports
+          {t("admin.manageReports.title")}
         </h1>
         <button 
           onClick={() => exportToCSV(filtered, "reports")}
           disabled={filtered.length === 0}
           className="flex items-center gap-2 bg-white border border-gray-200 text-gray-700 hover:bg-gray-50 hover:-translate-y-0.5 hover:shadow-md px-4 py-2 rounded-lg shadow-sm font-medium text-sm transition-all focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:ring-offset-1 active:scale-95 disabled:opacity-50 disabled:hover:translate-y-0 disabled:hover:shadow-sm"
         >
-          <Download size={16} /> Export CSV
+          <Download size={16} /> {t("admin.manageReports.exportCsv")}
         </button>
       </div>
 
@@ -113,10 +115,10 @@ export default function Reports() {
         ))}
       </div>
 
-      <AdminFilterBar search={search} onSearchChange={setSearch} searchPlaceholder="Search by description or ID..." locationFilter={locationFilter} onLocationChange={setLocationFilter}
+      <AdminFilterBar search={search} onSearchChange={setSearch} searchPlaceholder={t("admin.manageReports.searchPlaceholder")} locationFilter={locationFilter} onLocationChange={setLocationFilter}
         filters={[
-          { label: "Status", value: statusFilter, onChange: setStatusFilter, options: STATUS_TYPES.map((s) => ({ value: s, label: s.charAt(0).toUpperCase() + s.slice(1) })) },
-          { label: "Type", value: typeFilter, onChange: setTypeFilter, options: REPORT_TYPES.map((t) => ({ value: t, label: t.charAt(0).toUpperCase() + t.slice(1) })) },
+          { label: t("admin.manageReports.status"), value: statusFilter, onChange: setStatusFilter, options: STATUS_TYPES.map((s) => ({ value: s, label: s.charAt(0).toUpperCase() + s.slice(1) })) },
+          { label: t("admin.manageReports.type"), value: typeFilter, onChange: setTypeFilter, options: REPORT_TYPES.map((t) => ({ value: t, label: t.charAt(0).toUpperCase() + t.slice(1) })) },
         ]}
         onClearAll={clearAll}
       />
@@ -124,11 +126,11 @@ export default function Reports() {
       <div className="overflow-x-auto bg-white rounded-2xl shadow-lg ring-1 ring-gray-200">
         <table className="min-w-full divide-y divide-gray-200">
           <thead className="bg-gray-50">
-            <tr>{["Type", "Status", "Description", "Location", "Actions"].map((h) => (<th key={h} className="px-6 py-4 text-left text-xs font-bold text-gray-500 uppercase tracking-wider">{h}</th>))}</tr>
+            <tr>{[t("admin.manageReports.tableType"), t("admin.manageReports.tableStatus"), t("admin.manageReports.tableDescription"), t("admin.manageReports.tableLocation"), t("admin.manageReports.tableActions")].map((h) => (<th key={h} className="px-6 py-4 text-left text-xs font-bold text-gray-500 uppercase tracking-wider">{h}</th>))}</tr>
           </thead>
           <tbody className="divide-y divide-gray-100">
             {loading ? <TableSkeleton rows={PAGE_SIZE} cols={5} /> : paginated.length === 0 ? (
-              <tr><td colSpan="5" className="text-center py-12 text-gray-400">No reports found.</td></tr>
+              <tr><td colSpan="5" className="text-center py-12 text-gray-400">{t("admin.manageReports.noReports")}</td></tr>
             ) : paginated.map((r, i) => (
               <motion.tr key={r._id} initial={{ opacity: 0 }} animate={{ opacity: 1 }} transition={{ delay: i * 0.03 }} className="hover:bg-indigo-50/30 transition">
                 <td className="px-6 py-4 text-sm font-medium text-gray-800 flex items-center gap-2">
@@ -138,8 +140,8 @@ export default function Reports() {
                 <td className="px-6 py-4 text-sm text-gray-600 max-w-[200px] truncate">{r.description?.slice(0, 50)}{r.description?.length > 50 ? "…" : ""}</td>
                 <td className="px-6 py-4 text-sm text-gray-500">{r.localGovName || "—"}</td>
                 <td className="px-6 py-4"><div className="flex gap-2">
-                  <button onClick={() => { setViewItem(r); setViewOpen(true); }} className="flex items-center gap-1 px-3 py-1.5 text-xs bg-gray-100 text-gray-700 rounded-lg hover:bg-gray-200 hover:-translate-y-0.5 hover:shadow-sm transition-all font-medium active:scale-95"><Eye size={13} /> View</button>
-                  <button onClick={() => handleEdit(r)} className="flex items-center gap-1 px-3 py-1.5 text-xs bg-indigo-600 text-white rounded-lg hover:bg-indigo-700 transition-all hover:-translate-y-0.5 hover:shadow-md active:scale-95">Edit</button>
+                  <button onClick={() => { setViewItem(r); setViewOpen(true); }} className="flex items-center gap-1 px-3 py-1.5 text-xs bg-gray-100 text-gray-700 rounded-lg hover:bg-gray-200 hover:-translate-y-0.5 hover:shadow-sm transition-all font-medium active:scale-95"><Eye size={13} /> {t("admin.manageReports.view")}</button>
+                  <button onClick={() => handleEdit(r)} className="flex items-center gap-1 px-3 py-1.5 text-xs bg-indigo-600 text-white rounded-lg hover:bg-indigo-700 transition-all hover:-translate-y-0.5 hover:shadow-md active:scale-95">{t("admin.manageReports.edit")}</button>
                 </div></td>
               </motion.tr>
             ))}
@@ -151,17 +153,17 @@ export default function Reports() {
       <DetailModal
         open={viewOpen}
         onClose={() => { setViewOpen(false); setViewItem(null); }}
-        title="Report Details"
+        title={t("admin.manageReports.reportDetails")}
         icon={<FileText size={20} />}
         imageUrl={viewItem?.imageUrl ? (viewItem.imageUrl.startsWith("http") ? viewItem.imageUrl : `${import.meta.env.VITE_API_URL.replace("/api", "")}${viewItem.imageUrl}`) : null}
         fields={[
-          { label: "Type", value: viewItem?.type, render: (v) => <span className="capitalize">{v}</span> },
-          { label: "Status", value: viewItem?.status, render: (v) => <span className={`inline-block px-2.5 py-1 rounded-full text-xs font-semibold capitalize ${v === "pending" ? "bg-yellow-100 text-yellow-700" : v === "verified" ? "bg-blue-100 text-blue-700" : v === "working" ? "bg-purple-100 text-purple-700" : "bg-green-100 text-green-700"}`}>{v}</span> },
-          { label: "Description", value: viewItem?.description },
-          { label: "Location", value: viewItem?.localGovName || "—" },
-          { label: "Coordinates", value: viewItem?.location?.coordinates ? `[${viewItem.location.coordinates[0]?.toFixed(5)}, ${viewItem.location.coordinates[1]?.toFixed(5)}]` : "—" },
-          { label: "Reported At", value: viewItem?.createdAt ? new Date(viewItem.createdAt).toLocaleString() : "—" },
-          { label: "Updated At", value: viewItem?.updatedAt ? new Date(viewItem.updatedAt).toLocaleString() : "—" },
+          { label: t("admin.manageReports.typeLabel"), value: viewItem?.type, render: (v) => <span className="capitalize">{v}</span> },
+          { label: t("admin.manageReports.statusLabel"), value: viewItem?.status, render: (v) => <span className={`inline-block px-2.5 py-1 rounded-full text-xs font-semibold capitalize ${v === "pending" ? "bg-yellow-100 text-yellow-700" : v === "verified" ? "bg-blue-100 text-blue-700" : v === "working" ? "bg-purple-100 text-purple-700" : "bg-green-100 text-green-700"}`}>{v}</span> },
+          { label: t("admin.manageReports.description"), value: viewItem?.description },
+          { label: t("admin.manageReports.location"), value: viewItem?.localGovName || "—" },
+          { label: t("admin.manageReports.coordinates"), value: viewItem?.location?.coordinates ? `[${viewItem.location.coordinates[0]?.toFixed(5)}, ${viewItem.location.coordinates[1]?.toFixed(5)}]` : "—" },
+          { label: t("admin.manageReports.reportedAt"), value: viewItem?.createdAt ? new Date(viewItem.createdAt).toLocaleString() : "—" },
+          { label: t("admin.manageReports.updatedAt"), value: viewItem?.updatedAt ? new Date(viewItem.updatedAt).toLocaleString() : "—" },
         ]}
       />
       <AnimatePresence>

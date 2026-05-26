@@ -1,4 +1,5 @@
 import React from "react";
+import { useTranslation } from "react-i18next";
 import { ChevronLeft, ChevronRight } from "lucide-react";
 
 /**
@@ -17,6 +18,7 @@ export default function Pagination({
   totalItems = 0,
   pageSize = 10,
 }) {
+  const { t } = useTranslation();
   if (totalPages <= 1) return null;
 
   const start = (currentPage - 1) * pageSize + 1;
@@ -46,7 +48,7 @@ export default function Pagination({
   return (
     <div className="flex items-center justify-between px-6 py-4 border-t border-gray-100 bg-gray-50/50 rounded-b-2xl">
       <span className="text-sm text-gray-500">
-        Showing <span className="font-semibold text-gray-700">{start}–{end}</span> of{" "}
+        {t("pagination.showing")} <span className="font-semibold text-gray-700">{start}–{end}</span> {t("pagination.of")}{" "}
         <span className="font-semibold text-gray-700">{totalItems}</span>
       </span>
 
@@ -55,7 +57,7 @@ export default function Pagination({
           onClick={() => onPageChange(currentPage - 1)}
           disabled={currentPage === 1}
           className="p-1.5 rounded-lg hover:bg-gray-200 disabled:opacity-30 disabled:cursor-not-allowed transition"
-          aria-label="Previous page"
+          aria-label={t("pagination.previousPage")}
         >
           <ChevronLeft size={18} />
         </button>
@@ -84,7 +86,7 @@ export default function Pagination({
           onClick={() => onPageChange(currentPage + 1)}
           disabled={currentPage === totalPages}
           className="p-1.5 rounded-lg hover:bg-gray-200 disabled:opacity-30 disabled:cursor-not-allowed transition"
-          aria-label="Next page"
+          aria-label={t("pagination.nextPage")}
         >
           <ChevronRight size={18} />
         </button>

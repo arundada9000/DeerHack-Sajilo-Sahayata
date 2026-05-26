@@ -3,11 +3,13 @@ import { motion, AnimatePresence } from "framer-motion";
 import { X, FileEdit, Trash2, MapPin, Tag, Activity, FileText, Maximize2 } from "lucide-react";
 import API from "../api/axios";
 import useImagePreview from "../hooks/useImagePreview.jsx";
+import { useTranslation } from "react-i18next";
 
 const REPORT_TYPES = ["fire", "police", "flood", "accident", "landslide", "other"];
 const STATUS_TYPES = ["pending", "verified", "solved", "working"];
 
 export default function ReportEditModal({ report, onClose, onUpdate }) {
+  const { t } = useTranslation();
   const [formData, setFormData] = useState({
     type: report.type,
     description: report.description,
@@ -29,7 +31,7 @@ export default function ReportEditModal({ report, onClose, onUpdate }) {
   };
 
   const handleDelete = async () => {
-    if (!window.confirm("Are you sure you want to delete this report?")) return;
+    if (!window.confirm(t("reportEdit.deleteConfirm"))) return;
     try {
       await API.delete(`/reports/${report._id}`);
       onClose();
@@ -86,7 +88,7 @@ export default function ReportEditModal({ report, onClose, onUpdate }) {
               <div className="w-10 h-10 rounded-full bg-indigo-100 flex items-center justify-center text-indigo-600">
                 <FileEdit size={20} />
               </div>
-              <h2 className="text-xl font-bold text-gray-800">Edit Report</h2>
+              <h2 className="text-xl font-bold text-gray-800">{t("reportEdit.title")}</h2>
             </div>
             <button
               onClick={onClose}
@@ -102,7 +104,7 @@ export default function ReportEditModal({ report, onClose, onUpdate }) {
               {/* Type */}
               <div>
                 <label className="flex items-center gap-1.5 text-sm font-semibold text-gray-700 mb-1.5">
-                  <Tag size={14} className="text-gray-400" /> Incident Type
+                  <Tag size={14} className="text-gray-400" /> {t("reportEdit.incidentType")}
                 </label>
                 <select
                   name="type"
@@ -119,7 +121,7 @@ export default function ReportEditModal({ report, onClose, onUpdate }) {
               {/* Status */}
               <div>
                 <label className="flex items-center gap-1.5 text-sm font-semibold text-gray-700 mb-1.5">
-                  <Activity size={14} className="text-gray-400" /> Status
+                  <Activity size={14} className="text-gray-400" /> {t("reportEdit.status")}
                 </label>
                 <select
                   name="status"
@@ -138,7 +140,7 @@ export default function ReportEditModal({ report, onClose, onUpdate }) {
             <div className="grid grid-cols-1 md:grid-cols-2 gap-5">
               <div>
                 <label className="flex items-center gap-1.5 text-sm font-semibold text-gray-700 mb-1.5">
-                  <MapPin size={14} className="text-gray-400" /> Latitude
+                  <MapPin size={14} className="text-gray-400" /> {t("reportEdit.latitude")}
                 </label>
                 <input
                   type="number"
@@ -151,7 +153,7 @@ export default function ReportEditModal({ report, onClose, onUpdate }) {
               </div>
               <div>
                 <label className="flex items-center gap-1.5 text-sm font-semibold text-gray-700 mb-1.5">
-                  <MapPin size={14} className="text-gray-400" /> Longitude
+                  <MapPin size={14} className="text-gray-400" /> {t("reportEdit.longitude")}
                 </label>
                 <input
                   type="number"
@@ -167,7 +169,7 @@ export default function ReportEditModal({ report, onClose, onUpdate }) {
             {/* Description */}
             <div>
               <label className="flex items-center gap-1.5 text-sm font-semibold text-gray-700 mb-1.5">
-                <FileText size={14} className="text-gray-400" /> Description
+                <FileText size={14} className="text-gray-400" /> {t("reportEdit.description")}
               </label>
               <textarea
                 name="description"
@@ -181,14 +183,14 @@ export default function ReportEditModal({ report, onClose, onUpdate }) {
             {/* Image Preview */}
             {report.imageUrl && (
               <div>
-                <label className="block text-sm font-semibold text-gray-700 mb-1.5">Evidence Photo</label>
+                <label className="block text-sm font-semibold text-gray-700 mb-1.5">{t("reportEdit.evidencePhoto")}</label>
                 <div
                   className="relative w-full h-48 bg-gray-50 rounded-xl border border-gray-200 overflow-hidden group cursor-pointer"
                   onClick={() => openPreview(report.imageUrl.startsWith("http") ? report.imageUrl : `${import.meta.env.VITE_API_URL.replace("/api", "")}${report.imageUrl}`)}
                 >
                   <img
                     src={report.imageUrl.startsWith("http") ? report.imageUrl : `${import.meta.env.VITE_API_URL.replace("/api", "")}${report.imageUrl}`}
-                    alt="Incident Evidence"
+                    alt={t("reportEdit.altEvidence")}
                     className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-300"
                   />
                   <div className="absolute inset-0 bg-black/0 group-hover:bg-black/30 transition-colors flex items-center justify-center">
@@ -206,21 +208,21 @@ export default function ReportEditModal({ report, onClose, onUpdate }) {
               onClick={handleDelete}
               className="w-full sm:w-auto flex items-center justify-center gap-2 px-5 py-2.5 bg-red-100 text-red-600 hover:bg-red-200 rounded-xl font-semibold text-sm transition"
             >
-              <Trash2 size={16} /> Delete Report
+              <Trash2 size={16} /> {t("reportEdit.deleteReport")}
             </button>
             <div className="flex gap-3 w-full sm:w-auto">
               <button
                 onClick={onClose}
                 className="flex-1 sm:flex-none px-6 py-2.5 bg-white border border-gray-200 text-gray-700 hover:bg-gray-50 rounded-xl font-semibold text-sm transition"
               >
-                Cancel
+                {t("reportEdit.cancel")}
               </button>
               <button
                 onClick={handleSubmit}
                 disabled={loading}
                 className="flex-1 sm:flex-none px-6 py-2.5 bg-indigo-600 hover:bg-indigo-700 text-white rounded-xl font-semibold text-sm transition shadow-md shadow-indigo-200"
               >
-                {loading ? "Saving..." : "Save Changes"}
+                {loading ? t("reportEdit.saving") : t("reportEdit.saveChanges")}
               </button>
             </div>
           </div>

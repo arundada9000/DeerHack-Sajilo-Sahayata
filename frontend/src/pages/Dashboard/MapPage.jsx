@@ -57,11 +57,11 @@ const incidentTypesConfig = [
 ];
 
 const safeZoneTypesConfig = [
-  { key: "hospital", label: "Hospital", color: "#10b981" },
-  { key: "shelter", label: "Shelter", color: "#3b82f6" },
-  { key: "police", label: "Police", color: "#6366f1" },
-  { key: "fire_station", label: "Fire Station", color: "#ef4444" },
-  { key: "distribution", label: "Distribution", color: "#f59e0b" },
+  { key: "hospital", label: "map.hospital", color: "#10b981" },
+  { key: "shelter", label: "map.shelter", color: "#3b82f6" },
+  { key: "police", label: "map.police", color: "#6366f1" },
+  { key: "fire_station", label: "map.fireStation", color: "#ef4444" },
+  { key: "distribution", label: "map.distribution", color: "#f59e0b" },
 ];
 
 const incidentThemes = {
@@ -119,6 +119,7 @@ const getSafeZoneIcon = (type) => {
 };
 
 function LocateButton({ onLocate }) {
+  const { t } = useTranslation();
   const map = useMap();
 
   const locate = () => {
@@ -135,7 +136,7 @@ function LocateButton({ onLocate }) {
     <button
       onClick={locate}
       className="absolute bottom-32 right-4 bg-white border border-gray-300 shadow-md rounded-full p-2 z-50 hover:scale-110 transition-transform duration-200 cursor-pointer"
-      title="Locate Me"
+      title={t("map.locateMe")}
     >
       <LocateFixed size={40} className="text-blue-600" />
     </button>
@@ -278,13 +279,13 @@ const MapPage = () => {
                         onClick={() => setAll(true)}
                         className="flex-1 flex justify-center items-center gap-1.5 bg-blue-50 hover:bg-blue-100 text-blue-700 text-xs font-bold px-3 py-2.5 rounded-xl transition-colors"
                       >
-                        <CheckCircle size={14} /> All
+                        <CheckCircle size={14} /> {t("map.selectAllBtn")}
                       </button>
                       <button
                         onClick={() => setAll(false)}
                         className="flex-1 flex justify-center items-center gap-1.5 bg-red-50 hover:bg-red-100 text-red-600 text-xs font-bold px-3 py-2.5 rounded-xl transition-colors"
                       >
-                        <XCircle size={14} /> None
+                        <XCircle size={14} /> {t("map.clearAllBtn")}
                       </button>
                     </div>
                   </motion.div>

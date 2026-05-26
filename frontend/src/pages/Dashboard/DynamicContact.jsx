@@ -139,7 +139,7 @@ const DynamicContact = () => {
           ) : fromCache ? (
             <div className="mb-4 flex items-center gap-2 bg-amber-50 border border-amber-200 rounded-2xl px-4 py-3 text-sm text-amber-800 font-medium">
               <WifiOff size={16} />
-              Showing previously saved contacts (offline)
+              {t("emergency.offlineBanner")}
             </div>
           ) : contacts.length === 0 ? (
             <div className="text-center py-12 text-gray-500 bg-white rounded-2xl p-6 shadow-sm border border-gray-100">

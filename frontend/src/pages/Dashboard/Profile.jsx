@@ -29,12 +29,12 @@ const overlayVariants = {
 
 /* ─── All editable fields definition ─── */
 const profileFields = [
-  { key: "username", labelKey: "profile.name", icon: UserIcon, type: "text", placeholder: "John Doe" },
-  { key: "phoneNumber", labelKey: "profile.phone", icon: Phone, type: "tel", placeholder: "+977 98XXXXXXXX" },
-  { key: "email", labelKey: "profile.email", icon: Mail, type: "email", placeholder: "you@example.com" },
+  { key: "username", labelKey: "profile.name", icon: UserIcon, type: "text", placeholder: "profile.namePlaceholder" },
+  { key: "phoneNumber", labelKey: "profile.phone", icon: Phone, type: "tel", placeholder: "profile.phonePlaceholder" },
+  { key: "email", labelKey: "profile.email", icon: Mail, type: "email", placeholder: "profile.emailPlaceholder" },
   { key: "gender", labelKey: "profile.gender", icon: UserIcon, type: "select", options: ["Male", "Female", "Other"] },
-  { key: "address", labelKey: "profile.address", icon: MapPin, type: "text", placeholder: "Butwal-11, Rupandehi" },
-  { key: "citizenshipId", labelKey: "profile.citizenship", icon: IdCard, type: "text", placeholder: "XX-XX-XX-XXXXX" },
+  { key: "address", labelKey: "profile.address", icon: MapPin, type: "text", placeholder: "profile.addressPlaceholder" },
+  { key: "citizenshipId", labelKey: "profile.citizenship", icon: IdCard, type: "text", placeholder: "profile.citizenshipPlaceholder" },
 ];
 
 /* ─── Push Notifications Toggle Row ─── */
@@ -63,14 +63,14 @@ const PushToggleRow = () => {
             {t("profile.pushNotifications", "Push Notifications")}
           </span>
           {Notification.permission === "denied" && (
-            <p className="text-xs text-red-500 mt-0.5">Blocked by browser</p>
+            <p className="text-xs text-red-500 mt-0.5">{t("profile.blockedByBrowser")}</p>
           )}
         </div>
       </div>
       <button
         onClick={handleToggle}
         disabled={loading || Notification.permission === "denied"}
-        aria-label="Toggle push notifications"
+        aria-label={t("profile.toggleNotifications")}
         className={`w-12 h-6 rounded-full transition-colors relative disabled:opacity-50 ${
           isSubscribed ? "bg-blue-500" : "bg-gray-300"
         }`}
@@ -239,7 +239,7 @@ const ProfileDrawer = ({ open, onClose }) => {
                   />
                   <button
                     onClick={handleAvatarClick}
-                    aria-label="Change profile picture"
+                    aria-label={t("profile.changePhoto")}
                     className="absolute bottom-0 right-0 bg-primary-red p-2 rounded-full shadow-md text-white hover:bg-red-700 hover:scale-105 transition-all duration-200 active:scale-95"
                   >
                     <Camera size={16} strokeWidth={2.5} />
@@ -411,10 +411,10 @@ const ProfileDrawer = ({ open, onClose }) => {
                       value={fontSize}
                       onChange={setFontSize}
                       options={[
-                        { value: "sm", label: "Small" },
-                        { value: "base", label: "Default" },
-                        { value: "lg", label: "Large" },
-                        { value: "xl", label: "Extra Large" },
+                        { value: "sm", label: t("profile.fontSizeSmall") },
+                        { value: "base", label: t("profile.fontSizeDefault") },
+                        { value: "lg", label: t("profile.fontSizeLarge") },
+                        { value: "xl", label: t("profile.fontSizeExtraLarge") },
                       ]}
                     />
                     <div className="h-[1px] bg-gray-50 ml-14" />
@@ -424,16 +424,16 @@ const ProfileDrawer = ({ open, onClose }) => {
                       value={fontFamily}
                       onChange={setFontFamily}
                       options={[
-                        { value: "inter", label: "Inter (Modern)" },
-                        { value: "poppins", label: "Poppins" },
-                        { value: "montserrat", label: "Montserrat" },
-                        { value: "roboto", label: "Roboto" },
-                        { value: "outfit", label: "Outfit" },
-                        { value: "mukta", label: "Mukta (Nepali)" },
-                        { value: "yantramanav", label: "Yantramanav (Nepali)" },
-                        { value: "khand", label: "Khand (Nepali)" },
-                        { value: "kalam", label: "Kalam (Nepali / Handwriting)" },
-                        { value: "laila", label: "Laila (Nepali / Serif)" },
+                        { value: "inter", label: t("profile.fontInter") },
+                        { value: "poppins", label: t("profile.fontPoppins") },
+                        { value: "montserrat", label: t("profile.fontMontserrat") },
+                        { value: "roboto", label: t("profile.fontRoboto") },
+                        { value: "outfit", label: t("profile.fontOutfit") },
+                        { value: "mukta", label: t("profile.fontMukta") },
+                        { value: "yantramanav", label: t("profile.fontYantramanav") },
+                        { value: "khand", label: t("profile.fontKhand") },
+                        { value: "kalam", label: t("profile.fontKalam") },
+                        { value: "laila", label: t("profile.fontLaila") },
                         { value: "arial", label: "Arial" },
                         { value: "sans", label: "System Sans" },
                         { value: "serif", label: "System Serif" },
@@ -451,7 +451,7 @@ const ProfileDrawer = ({ open, onClose }) => {
                       </div>
                       <button
                         onClick={() => setTheme(theme === "light" ? "dark" : "light")}
-                        aria-label="Toggle theme"
+                        aria-label={t("profile.toggleTheme")}
                         className={`w-12 h-6 rounded-full transition-colors relative ${theme === "dark" ? "bg-purple-500" : "bg-gray-300"}`}
                       >
                         <motion.div
@@ -523,38 +523,43 @@ const InfoRow = ({ icon: Icon, label, value }) => (
 );
 
 /** Edit-mode field: icon + label + input/select */
-const EditField = ({ icon: Icon, label, type, value, placeholder, options, onChange }) => (
-  <div className="flex items-start gap-3">
-    <div className="w-9 h-9 mt-1 rounded-full bg-blue-50 flex items-center justify-center text-blue-600 shrink-0">
-      <Icon size={18} />
+const EditField = ({ icon: Icon, label, type, value, placeholder, options, onChange }) => {
+  const { t } = useTranslation();
+  const genderLabelMap = { Male: "profile.male", Female: "profile.female", Other: "profile.other" };
+
+  return (
+    <div className="flex items-start gap-3">
+      <div className="w-9 h-9 mt-1 rounded-full bg-blue-50 flex items-center justify-center text-blue-600 shrink-0">
+        <Icon size={18} />
+      </div>
+      <div className="flex flex-col flex-1 min-w-0">
+        <label className="text-[11px] font-bold text-gray-400 uppercase tracking-wider mb-1">
+          {label}
+        </label>
+        {type === "select" ? (
+          <select
+            value={value}
+            onChange={(e) => onChange(e.target.value)}
+            className="w-full bg-gray-50 border border-gray-200 rounded-xl px-3 py-2.5 text-sm font-medium text-gray-800 focus:outline-none focus:ring-2 focus:ring-blue-300 focus:border-transparent transition"
+          >
+            <option value="">{t("profile.selectOption")}</option>
+            {options.map((opt) => (
+              <option key={opt} value={opt}>{t(genderLabelMap[opt] || opt)}</option>
+            ))}
+          </select>
+        ) : (
+          <input
+            type={type}
+            value={value}
+            placeholder={t(placeholder)}
+            onChange={(e) => onChange(e.target.value)}
+            className="w-full bg-gray-50 border border-gray-200 rounded-xl px-3 py-2.5 text-sm font-medium text-gray-800 placeholder:text-gray-300 focus:outline-none focus:ring-2 focus:ring-blue-300 focus:border-transparent transition"
+          />
+        )}
+      </div>
     </div>
-    <div className="flex flex-col flex-1 min-w-0">
-      <label className="text-[11px] font-bold text-gray-400 uppercase tracking-wider mb-1">
-        {label}
-      </label>
-      {type === "select" ? (
-        <select
-          value={value}
-          onChange={(e) => onChange(e.target.value)}
-          className="w-full bg-gray-50 border border-gray-200 rounded-xl px-3 py-2.5 text-sm font-medium text-gray-800 focus:outline-none focus:ring-2 focus:ring-blue-300 focus:border-transparent transition"
-        >
-          <option value="">— Select —</option>
-          {options.map((opt) => (
-            <option key={opt} value={opt}>{opt}</option>
-          ))}
-        </select>
-      ) : (
-        <input
-          type={type}
-          value={value}
-          placeholder={placeholder}
-          onChange={(e) => onChange(e.target.value)}
-          className="w-full bg-gray-50 border border-gray-200 rounded-xl px-3 py-2.5 text-sm font-medium text-gray-800 placeholder:text-gray-300 focus:outline-none focus:ring-2 focus:ring-blue-300 focus:border-transparent transition"
-        />
-      )}
-    </div>
-  </div>
-);
+  );
+};
 
 /** Preferences row: icon + label + select dropdown */
 const SelectRow = ({ icon: Icon, label, value, onChange, options }) => (

@@ -68,7 +68,7 @@ const NavigationLayout = () => {
           >
             <img
               src="/assets/logo.png"
-              alt="Sajilo Sahayata Logo"
+              alt={t("navigation.logoAlt")}
               className="w-12 h-12 rounded-full shadow-sm border border-gray-100"
               onClick={() => navigate("/dashboard/home")}
             />

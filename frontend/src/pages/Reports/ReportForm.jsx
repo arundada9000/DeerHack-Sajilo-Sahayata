@@ -121,12 +121,12 @@ export default function ReportForm() {
     const file = e.target.files[0];
     if (!file) return;
     if (!file.type.startsWith("image/")) {
-      toast.error("Please select an image file.");
+      toast.error(t("report.selectImage"));
       return;
     }
     const timeDiff = Date.now() - file.lastModified;
     if (!file.lastModified || timeDiff > 5000) {
-      toast.error("Only live photos are allowed. Please use the camera.");
+      toast.error(t("report.livePhotoOnly"));
       e.target.value = "";
       return;
     }
@@ -181,7 +181,7 @@ export default function ReportForm() {
     }
 
     if (!photoFile) {
-      return toast.error("A live photo is required. Please take a photo.");
+      return toast.error(t("report.livePhotoRequired"));
     }
 
     if (description.length < 10) {
@@ -217,7 +217,7 @@ export default function ReportForm() {
         setStatus("queued");
       } catch (queueErr) {
         console.error("Failed to queue offline:", queueErr);
-        setErrorMessage("Failed to save report offline. Please try again.");
+        setErrorMessage(t("report.offlineSaveFailed"));
         setStatus("failed");
       }
     }
@@ -374,7 +374,7 @@ export default function ReportForm() {
                         onClick={() => { stopCamera(); setShowCamera(false); }}
                         className="px-5 py-2.5 rounded-full bg-white/20 backdrop-blur-md text-white font-semibold text-sm hover:bg-white/30 transition"
                       >
-                        Cancel
+                        {t("report.cameraCancel")}
                       </button>
                       <button
                         type="button"
@@ -397,7 +397,7 @@ export default function ReportForm() {
                       onClick={openCamera}
                       className="absolute bottom-3 left-3 bg-white/90 backdrop-blur-md text-gray-800 px-3 py-1.5 rounded-lg text-xs font-semibold hover:bg-white transition shadow"
                     >
-                      Retake
+                      {t("report.retake")}
                     </button>
                   </motion.div>
                 ) : (

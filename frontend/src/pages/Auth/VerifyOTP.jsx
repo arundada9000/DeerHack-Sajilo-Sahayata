@@ -57,7 +57,7 @@ const VerifyOTP = () => {
 
   const handleResend = () => {
     // Simulate resend
-    alert("OTP resent to " + stepData.phone);
+    alert(t("otp.resentTo", { phone: stepData.phone }));
   };
 
   return (
@@ -70,7 +70,7 @@ const VerifyOTP = () => {
       >
         <img
           src="/icons/back.png"
-          alt="Back"
+          alt={t("otp.backAlt")}
           className="w-8 h-8 object-contain cursor-pointer hover:scale-110 transition-transform duration-200"
         />
       </button>
@@ -82,7 +82,7 @@ const VerifyOTP = () => {
           <div className="flex justify-center mt-8 mb-2">
             <img
               src="/assets/logo.png"
-              alt="Logo"
+              alt={t("otp.logoAlt")}
               className="h-32 object-contain cursor-pointer transition-transform hover:scale-105 duration-200"
               onClick={() => navigate("/")}
             />
@@ -109,7 +109,7 @@ const VerifyOTP = () => {
                 onChange={(e) => handleChange(e.target.value, idx)}
                 onKeyDown={(e) => handleKeyDown(e, idx)}
                 className="w-12 h-14 border border-gray-300 rounded-xl text-center text-lg font-semibold shadow-sm focus:outline-none focus:ring-2 focus:ring-blue-500"
-                aria-label={`Digit ${idx + 1}`}
+                aria-label={t("otp.digitLabel", { digit: idx + 1 })}
               />
             ))}
           </div>

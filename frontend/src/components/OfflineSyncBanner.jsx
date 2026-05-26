@@ -4,12 +4,14 @@ import { WifiOff, RefreshCw, CheckCircle2 } from "lucide-react";
 import { getPendingReports, syncPendingReports } from "../utils/offlineQueue";
 import API from "../api/axios";
 import toast from "react-hot-toast";
+import { useTranslation } from "react-i18next";
 
 /**
  * Floating banner shown on the Dashboard when there are pending offline reports.
  * Auto-syncs when the browser regains connectivity.
  */
 const OfflineSyncBanner = () => {
+  const { t } = useTranslation();
   const [pendingCount, setPendingCount] = useState(0);
   const [syncing, setSyncing] = useState(false);
   const [justSynced, setJustSynced] = useState(false);
@@ -67,17 +69,17 @@ const OfflineSyncBanner = () => {
       const result = await syncPendingReports(API);
 
       if (result.synced > 0) {
-        toast.success(`${result.synced} report(s) synced successfully!`);
+        toast.success(t("offlineSync.synced", { count: result.synced }));
         setJustSynced(true);
         setTimeout(() => setJustSynced(false), 3000);
       }
       if (result.failed > 0) {
-        toast.error(`${result.failed} report(s) failed to sync. Will retry later.`);
+        toast.error(t("offlineSync.failed", { count: result.failed }));
       }
 
       await checkPending();
     } catch (err) {
-      toast.error("Sync failed. Please try again.");
+      toast.error(t("offlineSync.syncError"));
     } finally {
       setSyncing(false);
     }
@@ -99,7 +101,7 @@ const OfflineSyncBanner = () => {
               <CheckCircle2 size={20} className="text-green-600" />
             </div>
             <p className="text-sm font-medium text-green-800">
-              All offline reports have been synced!
+              {t("offlineSync.syncedAll")}
             </p>
           </div>
         ) : (
@@ -110,12 +112,12 @@ const OfflineSyncBanner = () => {
               </div>
               <div>
                 <p className="text-sm font-bold text-amber-900">
-                  {pendingCount} report{pendingCount !== 1 ? "s" : ""} pending sync
+                  {t("offlineSync.pendingSync", { count: pendingCount })}
                 </p>
                 <p className="text-xs text-amber-700 mt-0.5">
                   {navigator.onLine
-                    ? "You're online. Tap sync to upload."
-                    : "Will auto-sync when you're back online."}
+                    ? t("offlineSync.onlineTap")
+                    : t("offlineSync.autoSync")}
                 </p>
               </div>
             </div>
@@ -127,7 +129,7 @@ const OfflineSyncBanner = () => {
                 className="flex items-center gap-1.5 bg-amber-600 hover:bg-amber-700 disabled:opacity-60 text-white text-xs font-bold px-4 py-2 rounded-xl transition-colors shrink-0"
               >
                 <RefreshCw size={14} className={syncing ? "animate-spin" : ""} />
-                {syncing ? "Syncing..." : "Sync Now"}
+                {syncing ? t("offlineSync.syncing") : t("offlineSync.syncNow")}
               </button>
             )}
           </div>

@@ -1,4 +1,5 @@
 import React from "react";
+import { useTranslation } from "react-i18next";
 import { Search, MapPin, X } from "lucide-react";
 import useAdminLocationStore from "../../stores/useAdminLocationStore";
 
@@ -24,6 +25,7 @@ export default function AdminFilterBar({
   filters = [],
   onClearAll,
 }) {
+  const { t } = useTranslation();
   const { availableLocations } = useAdminLocationStore();
 
   const hasActiveFilters =
@@ -36,7 +38,7 @@ export default function AdminFilterBar({
       {/* Search */}
       <div className="flex-1 min-w-[200px]">
         <label className="block text-xs font-semibold text-gray-500 uppercase tracking-wider mb-1.5">
-          Search
+          {t("adminFilter.search")}
         </label>
         <div className="flex items-center bg-gray-50 border border-gray-200 rounded-lg px-3 py-2">
           <Search size={16} className="text-gray-400 mr-2 shrink-0" />
@@ -63,7 +65,7 @@ export default function AdminFilterBar({
             onChange={(e) => onLocationChange(e.target.value)}
             className="w-full px-3 py-2 bg-gray-50 border border-gray-200 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-indigo-300 focus:border-transparent transition"
           >
-            <option value="">All Locations</option>
+            <option value="">{t("adminFilter.allLocations")}</option>
             {availableLocations.map((loc) => (
               <option key={loc} value={loc}>
                 {loc}
@@ -84,7 +86,7 @@ export default function AdminFilterBar({
             onChange={(e) => filter.onChange(e.target.value)}
             className="w-full px-3 py-2 bg-gray-50 border border-gray-200 rounded-lg text-sm capitalize focus:outline-none focus:ring-2 focus:ring-indigo-300 focus:border-transparent transition"
           >
-            <option value="">All</option>
+            <option value="">{t("adminFilter.all")}</option>
             {filter.options.map((opt) => (
               <option key={opt.value} value={opt.value}>
                 {opt.label}
@@ -100,9 +102,9 @@ export default function AdminFilterBar({
           onClick={onClearAll}
           className="flex items-center gap-1.5 px-3 py-2 text-sm text-gray-600 bg-gray-100 hover:bg-gray-200 rounded-lg border border-gray-200 transition self-end"
         >
-          <X size={14} />
-          Clear
-        </button>
+<X size={14} />
+          {t("adminFilter.clear")}
+          </button>
       )}
     </div>
   );
