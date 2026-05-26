@@ -402,6 +402,9 @@ const ProfileDrawer = ({ open, onClose }) => {
                         { value: "newar", label: "नेपालभाषा" },
                         { value: "tamang", label: "तामाङ" },
                         { value: "tharu", label: "थारु" },
+                        { value: "chinese", label: "中文" },
+                        { value: "japanese", label: "日本語" },
+                        { value: "korean", label: "한국어" },
                       ]}
                     />
                     <div className="h-[1px] bg-gray-50 ml-14" />
