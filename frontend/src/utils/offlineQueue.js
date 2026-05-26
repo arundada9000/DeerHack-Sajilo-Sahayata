@@ -5,8 +5,24 @@
  */
 
 const DB_NAME = "sajilo-offline-db";
-const DB_VERSION = 1;
+const DB_VERSION = 2;
 const STORE_NAME = "offlineReports";
+const CONTACTS_STORE = "offlineContacts";
+
+/**
+ * Registers a background sync event with the service worker.
+ * This ensures pending reports sync even if the user closes the app.
+ */
+async function registerBackgroundSync() {
+  try {
+    if ("serviceWorker" in navigator && "SyncManager" in window) {
+      const reg = await navigator.serviceWorker.ready;
+      await reg.sync.register("sync-reports");
+    }
+  } catch {
+    // Background sync not supported — will rely on online event + polling
+  }
+}
 
 /**
  * Opens (or creates) the IndexedDB database.
@@ -20,6 +36,11 @@ function openDB() {
       const db = event.target.result;
       if (!db.objectStoreNames.contains(STORE_NAME)) {
         db.createObjectStore(STORE_NAME, { keyPath: "id", autoIncrement: true });
+      }
+      if (!db.objectStoreNames.contains(CONTACTS_STORE)) {
+        const contactStore = db.createObjectStore(CONTACTS_STORE, { keyPath: "cacheKey" });
+        contactStore.createIndex("localGov", "localGov", { unique: false });
+        contactStore.createIndex("department", "department", { unique: false });
       }
     };
 
@@ -68,7 +89,7 @@ function base64ToBlob(base64, mimeType = "image/jpeg") {
  */
 export async function saveReportOffline(reportData) {
   const db = await openDB();
-  return new Promise((resolve, reject) => {
+  await new Promise((resolve, reject) => {
     const tx = db.transaction(STORE_NAME, "readwrite");
     const store = tx.objectStore(STORE_NAME);
 
@@ -81,6 +102,9 @@ export async function saveReportOffline(reportData) {
     request.onsuccess = () => resolve(request.result);
     request.onerror = () => reject(request.error);
   });
+
+  // Register background sync so the SW can trigger sync even if tab is closed
+  registerBackgroundSync();
 }
 
 /**
@@ -172,4 +196,49 @@ export async function prepareOfflineReport({ type, description, location, photoF
     imageBase64,
     imageName,
   };
+}
+
+/* ══════════════════════════════════════════
+   Offline Contacts Cache
+   ══════════════════════════════════════════ */
+
+/**
+ * Stores emergency contacts in IndexedDB for offline access.
+ * @param {string} localGov - VDC/municipality name
+ * @param {string} department - fire, police, flood, etc.
+ * @param {Array} contacts - Array of contact objects
+ */
+export async function cacheContacts(localGov, department, contacts) {
+  const db = await openDB();
+  const cacheKey = `${localGov.toLowerCase()}/${department.toLowerCase()}`;
+  return new Promise((resolve, reject) => {
+    const tx = db.transaction(CONTACTS_STORE, "readwrite");
+    const store = tx.objectStore(CONTACTS_STORE);
+    const record = {
+      cacheKey,
+      localGov: localGov.toLowerCase(),
+      department: department.toLowerCase(),
+      contacts,
+      cachedAt: new Date().toISOString(),
+    };
+    store.put(record);
+    tx.oncomplete = () => resolve();
+    tx.onerror = () => reject(tx.error);
+  });
+}
+
+/**
+ * Retrieves cached contacts from IndexedDB.
+ * @returns {Promise<Array|null>} - Contacts array or null if not cached
+ */
+export async function getCachedContacts(localGov, department) {
+  const db = await openDB();
+  const cacheKey = `${localGov.toLowerCase()}/${department.toLowerCase()}`;
+  return new Promise((resolve, reject) => {
+    const tx = db.transaction(CONTACTS_STORE, "readonly");
+    const store = tx.objectStore(CONTACTS_STORE);
+    const request = store.get(cacheKey);
+    request.onsuccess = () => resolve(request.result?.contacts || null);
+    request.onerror = () => reject(request.error);
+  });
 }

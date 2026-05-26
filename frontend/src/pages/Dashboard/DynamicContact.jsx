@@ -3,8 +3,9 @@ import { useParams, useNavigate } from "react-router-dom";
 import { useTranslation } from "react-i18next";
 import { motion } from "framer-motion";
 import { Helmet } from "react-helmet-async";
-import { ChevronLeft, Phone } from "lucide-react";
+import { ChevronLeft, Phone, WifiOff } from "lucide-react";
 import API from "../../api/axios";
+import { cacheContacts, getCachedContacts } from "../../utils/offlineQueue";
 
 const departmentIcons = {
   fire: "/icons/fire-red.svg",
@@ -22,6 +23,7 @@ const DynamicContact = () => {
   const [contacts, setContacts] = useState([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
+  const [fromCache, setFromCache] = useState(false);
 
   const icon =
     departmentIcons[department?.toLowerCase()] || "/icons/others-red.svg";
@@ -31,11 +33,21 @@ const DynamicContact = () => {
       try {
         setLoading(true);
         setError(null);
+        setFromCache(false);
         const res = await API.get(`/contacts/${localGov}/${department}`);
         setContacts(res.data.contacts || []);
+        // Cache for offline use
+        cacheContacts(localGov, department, res.data.contacts || []);
       } catch (err) {
         console.error("Failed to fetch contacts:", err);
-        setError("Could not load contact information.");
+        // Try offline cache
+        const cached = await getCachedContacts(localGov, department);
+        if (cached && cached.length > 0) {
+          setContacts(cached);
+          setFromCache(true);
+        } else {
+          setError("Could not load contact information.");
+        }
       } finally {
         setLoading(false);
       }
@@ -123,6 +135,11 @@ const DynamicContact = () => {
                   ? t("emergency.errorLoading")
                   : t("emergency.errorLoading")}
               </p>
+            </div>
+          ) : fromCache ? (
+            <div className="mb-4 flex items-center gap-2 bg-amber-50 border border-amber-200 rounded-2xl px-4 py-3 text-sm text-amber-800 font-medium">
+              <WifiOff size={16} />
+              Showing previously saved contacts (offline)
             </div>
           ) : contacts.length === 0 ? (
             <div className="text-center py-12 text-gray-500 bg-white rounded-2xl p-6 shadow-sm border border-gray-100">

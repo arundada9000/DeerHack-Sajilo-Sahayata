@@ -25,7 +25,12 @@ const OfflineSyncBanner = () => {
   };
 
   useEffect(() => {
-    checkPending();
+    checkPending().then(() => {
+      // Auto-sync immediately if online with pending items
+      if (navigator.onLine && pendingCount > 0) {
+        handleSync();
+      }
+    });
     // Re-check every 30 seconds
     const interval = setInterval(checkPending, 30000);
     return () => clearInterval(interval);
@@ -41,6 +46,17 @@ const OfflineSyncBanner = () => {
 
     window.addEventListener("online", handleOnline);
     return () => window.removeEventListener("online", handleOnline);
+  }, [pendingCount]);
+
+  // Listen for background sync trigger from service worker
+  useEffect(() => {
+    const handler = (event) => {
+      if (event.data?.type === "SYNC_REPORTS" && pendingCount > 0) {
+        handleSync();
+      }
+    };
+    navigator.serviceWorker?.addEventListener("message", handler);
+    return () => navigator.serviceWorker?.removeEventListener("message", handler);
   }, [pendingCount]);
 
   const handleSync = async () => {

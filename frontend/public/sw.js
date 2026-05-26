@@ -33,7 +33,7 @@ self.addEventListener("activate", (event) => {
   );
 });
 
-// Fetch: Network-first for API, Cache-first for static assets
+// Fetch: Network-first for API, Cache-first for static assets & map tiles
 self.addEventListener("fetch", (event) => {
   const { request } = event;
   const url = new URL(request.url);
@@ -43,6 +43,22 @@ self.addEventListener("fetch", (event) => {
 
   // Skip chrome-extension and other non-http(s)
   if (!url.protocol.startsWith("http")) return;
+
+  // ── Map tiles (CARTO): Cache-first, fallback to network ──
+  if (url.hostname.includes("basemaps.cartocdn.com")) {
+    event.respondWith(
+      caches.match(request).then((cached) => {
+        if (cached) return cached;
+        return fetch(request).then((response) => {
+          if (!response || response.status !== 200) return response;
+          const clone = response.clone();
+          caches.open(CACHE_NAME).then((cache) => cache.put(request, clone));
+          return response;
+        });
+      })
+    );
+    return;
+  }
 
   // API calls: Network first, fallback to cache
   if (url.pathname.startsWith("/api/")) {
