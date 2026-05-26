@@ -192,8 +192,8 @@ const Dashboard = () => {
     })
     .sort((a, b) =>
       sortOrder === "latest"
-        ? new Date(b.timestamp) - new Date(a.timestamp)
-        : new Date(a.timestamp) - new Date(b.timestamp),
+        ? new Date(b.createdAt) - new Date(a.createdAt)
+        : new Date(a.createdAt) - new Date(b.createdAt),
     );
 
   const statusDotColor = {

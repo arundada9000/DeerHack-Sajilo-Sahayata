@@ -125,7 +125,7 @@ export const verifyReport = async (req: Request, res: Response) => {
 
 export const getAllReports = async (req: Request, res: Response) => {
   try {
-    const reports = await Report.find();
+    const reports = await Report.find().sort({ createdAt: -1 });
     res.json(reports);
   } catch (error) {
     res.status(400).json({ message: "Error fetching reports", error });

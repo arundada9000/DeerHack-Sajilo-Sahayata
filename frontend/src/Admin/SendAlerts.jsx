@@ -22,6 +22,7 @@ export default function ManageAlerts() {
   const [locationFilter, setLocationFilter] = useState("");
   const [currentPage, setCurrentPage] = useState(1);
   const [showModal, setShowModal] = useState(false);
+  const [submitting, setSubmitting] = useState(false);
   const [selectedAlert, setSelectedAlert] = useState(null);
 
   const { adminLocation } = useAdminLocationStore();
@@ -58,6 +59,7 @@ export default function ManageAlerts() {
   };
 
   const handleModalSubmit = async (data) => {
+    setSubmitting(true);
     try {
       if (selectedAlert) { 
         await API.put(`/alerts/${selectedAlert._id}`, data); 
@@ -69,7 +71,7 @@ export default function ManageAlerts() {
       }
       queryClient.invalidateQueries({ queryKey: ["alerts"] });
     } catch { toast.error("Operation failed"); }
-    finally { setSelectedAlert(null); setShowModal(false); }
+    finally { setSubmitting(false); setSelectedAlert(null); setShowModal(false); }
   };
 
   const clearAll = () => { setSearch(""); setTypeFilter(""); setLocationFilter(""); };
@@ -125,7 +127,7 @@ export default function ManageAlerts() {
         <Pagination currentPage={currentPage} totalPages={totalPages} onPageChange={setCurrentPage} totalItems={filtered.length} pageSize={PAGE_SIZE} />
       </div>
 
-      <AlertModal open={showModal} onClose={() => { setSelectedAlert(null); setShowModal(false); }} onSubmit={handleModalSubmit} initialData={selectedAlert} />
+      <AlertModal open={showModal} onClose={() => { setSelectedAlert(null); setShowModal(false); }} onSubmit={handleModalSubmit} initialData={selectedAlert} submitting={submitting} />
     </>
   );
 }

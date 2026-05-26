@@ -1,10 +1,10 @@
 import { useState, useEffect } from "react";
 import { motion, AnimatePresence } from "framer-motion";
-import { BellRing, FileText, MapPin, Tag, X } from "lucide-react";
+import { BellRing, FileText, MapPin, Tag, X, Loader2 } from "lucide-react";
 
 const ALERT_TYPES = ["fire", "flood", "earthquake", "landslide", "storm", "police", "accident", "other"];
 
-export default function AlertModal({ open, onClose, onSubmit, initialData }) {
+export default function AlertModal({ open, onClose, onSubmit, initialData, submitting }) {
   const [form, setForm] = useState({
     title: "",
     description: "",
@@ -138,9 +138,11 @@ export default function AlertModal({ open, onClose, onSubmit, initialData }) {
               </button>
               <button
                 type="submit"
-                className="px-5 py-2.5 rounded-xl bg-indigo-600 hover:bg-indigo-700 text-white font-semibold text-sm transition shadow-md shadow-indigo-200"
+                disabled={submitting}
+                className="px-5 py-2.5 rounded-xl bg-indigo-600 hover:bg-indigo-700 disabled:bg-indigo-400 disabled:cursor-not-allowed text-white font-semibold text-sm transition shadow-md shadow-indigo-200 flex items-center gap-2"
               >
-                {initialData ? "Save Changes" : "Broadcast"}
+                {submitting && <Loader2 size={16} className="animate-spin" />}
+                {submitting ? "Submitting..." : initialData ? "Save Changes" : "Broadcast"}
               </button>
             </div>
           </form>
