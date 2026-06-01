@@ -1,4 +1,4 @@
-# Sajilo Sahayata — Disaster Reporting & Coordination System
+﻿# Sajilo Sahayata - Disaster Reporting & Coordination System
 
 **From Alert to Action Instantly**
 
@@ -21,39 +21,39 @@ When a citizen reports an incident (fire, flood, landslide, accident, etc.) with
 
 ### How It Works
 
-1. **Detect** — The platform automatically detects the user's location and identifies the corresponding local government body.
-2. **Report** — Citizens submit incident reports with geolocation and photo evidence, even when offline.
-3. **Coordinate** — Admins receive real-time alerts, manage reports, and coordinate response efforts.
-4. **Resolve** — Report statuses (pending → verified → working → solved) keep everyone informed.
+1. **Detect** - The platform automatically detects the user's location and identifies the corresponding local government body.
+2. **Report** - Citizens submit incident reports with geolocation and photo evidence, even when offline.
+3. **Coordinate** - Admins receive real-time alerts, manage reports, and coordinate response efforts.
+4. **Resolve** - Report statuses (pending → verified → working → solved) keep everyone informed.
 
 ---
 
 ## Features
 
 ### Citizen Features
-- **Incident Reporting** — Submit reports with live GPS location and photo capture (camera/gallery)
-- **Offline Queue** — Reports submitted offline are queued in IndexedDB and auto-synced when connectivity returns
-- **Interactive Map** — View all incidents clustered on a Leaflet map with color-coded markers by type
-- **Emergency Contacts** — Department-specific contacts (Fire, Police, Flood, etc.) cached for offline access
-- **Real-Time Alerts** — Push notifications for urgent incidents broadcast by admins
-- **Multi-Language** — Interface available in English, Nepali, Hindi, Bhojpuri, and 5 other local languages
-- **Profile Management** — Edit personal details (username, phone, email, address, citizenship ID)
+- **Incident Reporting** - Submit reports with live GPS location and photo capture (camera/gallery)
+- **Offline Queue** - Reports submitted offline are queued in IndexedDB and auto-synced when connectivity returns
+- **Interactive Map** - View all incidents clustered on a Leaflet map with color-coded markers by type
+- **Emergency Contacts** - Department-specific contacts (Fire, Police, Flood, etc.) cached for offline access
+- **Real-Time Alerts** - Push notifications for urgent incidents broadcast by admins
+- **Multi-Language** - Interface available in English, Nepali, Hindi, Bhojpuri, and 5 other local languages
+- **Profile Management** - Edit personal details (username, phone, email, address, citizenship ID)
 
 ### Admin Features
-- **Dashboard** — Data visualizations (charts) for incident analytics
-- **Report Management** — View, filter (by type/status/location), verify, edit, and resolve reports
-- **User Management** — View users filtered by location, change roles, delete users
-- **Alert Broadcasting** — Create and send alerts with automatic push notifications to all subscribers
-- **Contact Management** — CRUD for emergency contact numbers by department and location
-- **Safe Zone Management** — Manage safe zones (hospitals, shelters, police stations, fire stations) displayed on the map
+- **Dashboard** - Data visualizations (charts) for incident analytics
+- **Report Management** - View, filter (by type/status/location), verify, edit, and resolve reports
+- **User Management** - View users filtered by location, change roles, delete users
+- **Alert Broadcasting** - Create and send alerts with automatic push notifications to all subscribers
+- **Contact Management** - CRUD for emergency contact numbers by department and location
+- **Safe Zone Management** - Manage safe zones (hospitals, shelters, police stations, fire stations) displayed on the map
 
 ### Technical Features
-- **PWA** — Installable progressive web app with service worker caching
-- **Background Sync** — Pending reports auto-sync via `SyncManager` API even when the tab is closed
-- **Map Tile Caching** — CARTO basemap tiles cached for offline map viewing
-- **TypeScript Backend** — Full type safety with Express + Mongoose
-- **Vite Code Splitting** — Automatic chunk splitting for optimal loading
-- **React Lazy Loading** — Route-based code splitting with Suspense
+- **PWA** - Installable progressive web app with service worker caching
+- **Background Sync** - Pending reports auto-sync via `SyncManager` API even when the tab is closed
+- **Map Tile Caching** - CARTO basemap tiles cached for offline map viewing
+- **TypeScript Backend** - Full type safety with Express + Mongoose
+- **Vite Code Splitting** - Automatic chunk splitting for optimal loading
+- **React Lazy Loading** - Route-based code splitting with Suspense
 
 ---
 
@@ -99,7 +99,7 @@ When a citizen reports an incident (fire, flood, landslide, accident, etc.) with
 | **dotenv** | Environment configuration |
 
 ### Database
-- **MongoDB** — Primary database with `2dsphere` geospatial indexes on User, Report, and SafeZone collections
+- **MongoDB** - Primary database with `2dsphere` geospatial indexes on User, Report, and SafeZone collections
 
 ---
 
@@ -277,7 +277,7 @@ Full API reference: [docs/API.md](docs/API.md)
 
 ### Team Contributions
 
-#### Initial Prototype — *Team Emergex*
+#### Initial Prototype - *Team Emergex*
 - **Aayush Chapagain** – UI/UX Design & Project Manager
 - **Arun Neupane** – Frontend Development
 - **Barsha Panthi** – UI/UX Design & Research
@@ -285,7 +285,7 @@ Full API reference: [docs/API.md](docs/API.md)
 
 <img src="./assets/images/team-emergex.jpg" alt="Team Emergex" width="350"/>
 
-#### Further Development — *Team BigAh*
+#### Further Development - *Team BigAh*
 - **Arun Neupane** – Full-Stack Development
 - **Bijay Chaudhary** – Documentation & Reports
 - **Sunil Paudyal** – Logistics & Coordination
@@ -297,9 +297,9 @@ Full API reference: [docs/API.md](docs/API.md)
 
 ## Changelog
 
-- **v1.2.0 (Latest)** — Offline queue with Background Sync, contacts cache, map tile caching, profile editing with backend persistence, fixed signup GaPa detection, Manage Users location filter fix
-- **v1.1.0** — UI/UX Overhaul, Admin Polish, Custom SVG Map/Notification Themes, Vercel Serverless Ready
-- **v1.0.0** — Initial release (August 2, 2025)
+- **v1.2.0 (Latest)** - Offline queue with Background Sync, contacts cache, map tile caching, profile editing with backend persistence, fixed signup GaPa detection, Manage Users location filter fix
+- **v1.1.0** - UI/UX Overhaul, Admin Polish, Custom SVG Map/Notification Themes, Vercel Serverless Ready
+- **v1.0.0** - Initial release (August 2, 2025)
 
 ---
 
