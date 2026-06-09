@@ -31,15 +31,15 @@ const ManageReports = React.lazy(() => import("../Admin/Manage-Reports"));
 const ManageContacts = React.lazy(() => import("../Admin/ManageContacts"));
 const SendAlerts = React.lazy(() => import("../Admin/SendAlerts"));
 const ManageSafeZones = React.lazy(() => import("../Admin/ManageSafeZones"));
+const Profile = React.lazy(() => import("../pages/Dashboard/Profile"));
+const Unauthorized = React.lazy(() => import("../pages/Unauthorized"));
 const NotFound = React.lazy(() => import("../pages/NotFound"));
 
 // ─── Eagerly loaded (small, critical-path components) ───
 import Navigation from "../layouts/Navigation";
 import RequireAdmin from "../Auth/RequireAdmin";
-import Unauthorized from "../pages/Unauthorized";
 import Logout from "../Auth/Logout";
 import AdminLayout from "../layouts/AdminLayout";
-import Profile from "../pages/Dashboard/Profile";
 
 const AnimatedRoutes = () => {
   const location = useLocation();

@@ -1,11 +1,12 @@
-import { useState, useEffect } from "react";
+import { useState, useEffect, lazy, Suspense } from "react";
 import { useTranslation } from "react-i18next";
 import { useLocation, useNavigate, Outlet } from "react-router-dom";
 import { motion, AnimatePresence } from "framer-motion";
 import { Home, AlertTriangle, Map as MapIcon, User } from "lucide-react";
-import ProfileDrawer from "../pages/Dashboard/Profile";
 import useAuth from "../stores/useAuth";
 import { useLocalGovStore } from "../stores/localGovStore";
+
+const ProfileDrawer = lazy(() => import("../pages/Dashboard/Profile"));
 
 const NavigationLayout = () => {
   const { t } = useTranslation();
@@ -135,10 +136,12 @@ const NavigationLayout = () => {
       </AnimatePresence>
 
       {/* Sliding Profile Drawer */}
-      <ProfileDrawer
-        open={showProfileDrawer}
-        onClose={() => setShowProfileDrawer(false)}
-      />
+      <Suspense fallback={null}>
+        <ProfileDrawer
+          open={showProfileDrawer}
+          onClose={() => setShowProfileDrawer(false)}
+        />
+      </Suspense>
     </div>
   );
 };

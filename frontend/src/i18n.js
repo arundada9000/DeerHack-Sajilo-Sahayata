@@ -1,41 +1,40 @@
 import i18n from "i18next";
 import { initReactI18next } from "react-i18next";
-
 import translationEN from "./locales/en/translation.json";
-import translationNE from "./locales/ne/translation.json";
-import translationBhojpuri from "./locales/bhojpuri/translation.json";
-import translationHindi from "./locales/hindi/translation.json";
-import translationMagar from "./locales/magar/translation.json";
-import translationMaithili from "./locales/maithili/translation.json";
-import translationNewar from "./locales/newar/translation.json";
-import translationTamang from "./locales/tamang/translation.json";
-import translationTharu from "./locales/tharu/translation.json";
-import translationChinese from "./locales/chinese/translation.json";
-import translationJapanese from "./locales/japanese/translation.json";
-import translationKorean from "./locales/korean/translation.json";
 
-const resources = {
-  en: { translation: translationEN },
-  ne: { translation: translationNE },
-  bhojpuri: { translation: translationBhojpuri },
-  hindi: { translation: translationHindi },
-  magar: { translation: translationMagar },
-  maithili: { translation: translationMaithili },
-  newar: { translation: translationNewar },
-  tamang: { translation: translationTamang },
-  tharu: { translation: translationTharu },
-  chinese: { translation: translationChinese },
-  japanese: { translation: translationJapanese },
-  korean: { translation: translationKorean },
-};
+const localeModules = import.meta.glob("./locales/*/translation.json");
+
+const localeMap = {};
+for (const path in localeModules) {
+  const match = path.match(/\.\/locales\/([^/]+)\/translation\.json$/);
+  if (match) {
+    localeMap[match[1]] = localeModules[path];
+  }
+}
 
 i18n
-  .use(initReactI18next) // IMPORTANT: injects i18next into react-i18next
+  .use(initReactI18next)
   .init({
-    resources,
-    lng: "en", // default language
+    resources: {
+      en: { translation: translationEN },
+    },
+    lng: "en",
     fallbackLng: "en",
-    interpolation: { escapeValue: false }, // react already escapes
+    interpolation: { escapeValue: false },
   });
+
+export const loadLanguage = async (lang) => {
+  if (i18n.hasResourceBundle(lang, "translation")) return;
+  if (!localeMap[lang]) {
+    console.warn(`[i18n] No locale found for: ${lang}`);
+    return;
+  }
+  try {
+    const module = await localeMap[lang]();
+    i18n.addResourceBundle(lang, "translation", module.default || module);
+  } catch (err) {
+    console.warn(`[i18n] Failed to load language: ${lang}`, err);
+  }
+};
 
 export default i18n;

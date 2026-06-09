@@ -4,6 +4,7 @@ import App from "./App.jsx";
 import { BrowserRouter } from "react-router-dom";
 import "./index.css";
 import "./i18n";
+import { loadLanguage } from "./i18n";
 import usePreferences from "./stores/UsePreference.jsx";
 import { useTranslation } from "react-i18next";
 
@@ -50,8 +51,8 @@ const ApplyPreferences = ({ children }) => {
     body.classList.remove("text-sm", "text-base", "text-lg", "text-xl");
     body.classList.add(`text-${fontSize}`);
 
-    // Language
-    i18n.changeLanguage(language);
+    // Language (load bundle first, then activate to avoid fallback flash)
+    loadLanguage(language).then(() => i18n.changeLanguage(language));
   }, [theme, fontSize, fontFamily, language, ready]);
 
   // Optional loading state to avoid flicker
