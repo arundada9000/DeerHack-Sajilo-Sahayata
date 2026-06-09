@@ -10,11 +10,33 @@ ROOT LEVEL
   .env.deploy              — Deployment env vars (Vercel)
   .gitignore               — Git ignore rules
   data/
-    geojson/               — GeoJSON boundary files for GaPa/NaPa detection
-      butwal.json
-      omsatiya.json
-      siddharthanagar.json
-      tilottama.json
+    geojson/               — GeoJSON boundary files for GaPa/NaPa detection (26 files)
+      butwal.json           — Rupandehi
+      omsatiya.json         — Rupandehi
+      siddharthanagar.json  — Rupandehi
+      tilottama.json        — Rupandehi
+      shuklagandaki.json    — Tanahu (Gandaki)
+      kathmandu.json        — Kathmandu (Mahanagarpalika)
+      budhanilakantha.json  — Kathmandu
+      chandragiri.json      — Kathmandu
+      dakshinkali.json      — Kathmandu
+      gokarneshwor.json     — Kathmandu
+      kageshwori-manahora.json — Kathmandu
+      kirtipur.json         — Kathmandu
+      nagarjun.json         — Kathmandu
+      shankharapur.json     — Kathmandu
+      tarakeshwor.json      — Kathmandu
+      tokha.json            — Kathmandu
+      bhaktapur.json        — Bhaktapur
+      changunarayan.json    — Bhaktapur
+      madhyapur-thimi.json  — Bhaktapur
+      suryabinayak.json     — Bhaktapur
+      lalitpur.json         — Lalitpur (Mahanagarpalika)
+      godawari.json         — Lalitpur
+      mahalaxmi.json        — Lalitpur
+      bagmati.json          — Lalitpur (Gaunpalika)
+      konjyosom.json        — Lalitpur (Gaunpalika)
+      mahankal.json         — Lalitpur (Gaunpalika)
   node_modules/            — Dependencies (gitignored)
   package-lock.json        — Dependency lockfile
   package.json             — Project metadata & scripts
@@ -52,7 +74,7 @@ ROOT LEVEL
       pushRoutes.ts        — Push notification endpoint routes
       reportRoutes.ts      — Report endpoint routes
       safeZoneRoutes.ts    — Safe zone endpoint routes
-    seed.ts                — Database seed script (dummy data)
+    seed.ts                — Emergency contact seed script (150 records, 25 GaPa/NaPa)
     seedApi.js             — Alternative seed script (JS version)
     seedSafeZones.ts       — Safe zone seed data
     utils/

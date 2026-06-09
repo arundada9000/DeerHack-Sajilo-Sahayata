@@ -39,7 +39,7 @@
 - **Emergency Contacts** — Department-specific contacts cached offline
 - **Interactive Map** — Clustered Leaflet map with type-colored markers
 - **Push Notifications** — Web push for admin alerts
-- **9 Languages** — English, Nepali, Hindi, Bhojpuri, Magar, Maithili, Newar, Tamang, Tharu
+- **12 Languages** — English, Nepali, Hindi, Bhojpuri, Magar, Maithili, Newar, Tamang, Tharu, Chinese, Japanese, Korean
 - **Admin Panel** — Dashboard, user/report/alert/contact/safezone management
 - **Code Splitting** — Route-based lazy loading + Vite manual chunks
 

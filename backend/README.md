@@ -32,11 +32,17 @@
 ```
 backend/
 ├── data/
-│   └── geojson/                   # GeoJSON boundary files for GaPa/NaPa detection
-│       ├── butwal.json
-│       ├── omsatiya.json
-│       ├── siddharthanagar.json
-│       └── tilottama.json
+│   └── geojson/                   # GeoJSON boundary files for GaPa/NaPa detection (26 files)
+│       ├── butwal.json / omsatiya.json / siddharthanagar.json / tilottama.json  # Rupandehi
+│       ├── shuklagandaki.json                                                  # Tanahu
+│       ├── kathmandu.json / budhanilakantha.json / chandragiri.json /
+│       │   dakshinkali.json / gokarneshwor.json / kageshwori-manahora.json /
+│       │   kirtipur.json / nagarjun.json / shankharapur.json /
+│       │   tarakeshwor.json / tokha.json                                       # Kathmandu
+│       ├── bhaktapur.json / changunarayan.json / madhyapur-thimi.json /
+│       │   suryabinayak.json                                                   # Bhaktapur
+│       └── lalitpur.json / godawari.json / mahalaxmi.json /
+│           bagmati.json / konjyosom.json / mahankal.json                       # Lalitpur
 ├── src/
 │   ├── config/
 │   │   ├── db.ts                  # MongoDB connection via Mongoose
@@ -72,7 +78,7 @@ backend/
 │   ├── env.ts                     # Typed environment config
 │   ├── express.d.ts               # Express Request augmentation (req.user)
 │   ├── main.ts                    # App entry point + route mounting + Vercel export
-│   ├── seed.ts                    # Database seed script (dummy data)
+│   ├── seed.ts                    # Emergency contact seed script (150 records, 25 GaPa/NaPa)
 │   ├── seedApi.js                 # Alternative seed script (JS version)
 │   └── seedSafeZones.ts           # Safe zone seed data
 ├── uploads/                       # Local uploads (dev, gitignored)
@@ -292,4 +298,5 @@ The `resolveGaPa.ts` utility loads GeoJSON boundary files from `data/geojson/` o
 | `npm run dev` | Start dev server with `tsx --watch` (hot reload) |
 | `npm run build` | Compile TypeScript to `dist/` |
 | `npm run start` | Run compiled `dist/main.js` |
+| `npm run seed` | Seed emergency contact data to MongoDB (reads from `.env`) |
 | `npm run db:generate` | Initialize Prisma (legacy, not used) |
