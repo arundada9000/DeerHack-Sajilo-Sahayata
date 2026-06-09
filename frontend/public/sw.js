@@ -1,21 +1,31 @@
-const CACHE_NAME = "sajilo-sahayata-v2";
+const CACHE_NAME = "sajilo-sahayata-v3";
 
-// Assets to pre-cache on install
-const PRECACHE_ASSETS = [
-  "/",
-  "/index.html",
-  "/favicon.ico",
-  "/logos/icon-192x192.png",
-  "/logos/icon-512x512.png",
-  "/assets/logo.png",
-];
+// Injected at build time by vite-plugin-pwa (auto-generated hashed filenames)
+const BUILD_MANIFEST = self.__WB_MANIFEST;
 
-// Install: Pre-cache core shell
+// Assets to pre-cache on install (static + build manifest)
+function getPrecacheAssets() {
+  const staticAssets = [
+    "/",
+    "/favicon.ico",
+    "/logos/icon-192x192.png",
+    "/logos/icon-512x512.png",
+  ];
+  if (BUILD_MANIFEST && Array.isArray(BUILD_MANIFEST)) {
+    return [...staticAssets, ...BUILD_MANIFEST.map((e) => e.url)];
+  }
+  return staticAssets;
+}
+
+// Install: Pre-cache all known assets
 // New SW waits for user confirmation (SKIP_WAITING message) instead of auto-activating.
 // This lets the UpdateBanner prompt the user before refreshing.
 self.addEventListener("install", (event) => {
   event.waitUntil(
-    caches.open(CACHE_NAME).then((cache) => cache.addAll(PRECACHE_ASSETS))
+    caches.open(CACHE_NAME).then(async (cache) => {
+      const urls = getPrecacheAssets();
+      await Promise.allSettled(urls.map((url) => cache.add(url)));
+    })
   );
 });
 
