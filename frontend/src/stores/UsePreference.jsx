@@ -3,7 +3,7 @@ import { create } from "zustand";
 const defaultPrefs = {
   theme: "light",
   fontSize: "base",
-  fontFamily: "arial",
+  fontFamily: "sans",
   language: "en", // Default language
 };
 
