@@ -3,7 +3,8 @@
     "dev": "tsx --watch src/main.ts",
     "db:generate": "npx prisma migrate dev --name init",
     "build": "tsc || true",
-    "start": "node dist/main.js"
+    "start": "node dist/main.js",
+    "seed": "tsx src/seed.ts"
   },
   "dependencies": {
     "@prisma/client": "^6.9.0",
