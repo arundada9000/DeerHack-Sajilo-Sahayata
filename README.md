@@ -31,6 +31,7 @@ When a citizen reports an incident (fire, flood, landslide, accident, etc.) with
 ## Features
 
 ### Citizen Features
+
 - **Incident Reporting** - Submit reports with live GPS location and photo capture (camera/gallery)
 - **Offline Queue** - Reports submitted offline are queued in IndexedDB and auto-synced when connectivity returns
 - **Interactive Map** - View all incidents clustered on a Leaflet map with color-coded markers by type
@@ -40,6 +41,7 @@ When a citizen reports an incident (fire, flood, landslide, accident, etc.) with
 - **Profile Management** - Edit personal details (username, phone, email, address, citizenship ID)
 
 ### Admin Features
+
 - **Dashboard** - Data visualizations (charts) for incident analytics
 - **Report Management** - View, filter (by type/status/location), verify, edit, and resolve reports
 - **User Management** - View users filtered by location, change roles, delete users
@@ -48,6 +50,7 @@ When a citizen reports an incident (fire, flood, landslide, accident, etc.) with
 - **Safe Zone Management** - Manage safe zones (hospitals, shelters, police stations, fire stations) displayed on the map
 
 ### Technical Features
+
 - **PWA** - Installable progressive web app with service worker caching
 - **Background Sync** - Pending reports auto-sync via `SyncManager` API even when the tab is closed
 - **Map Tile Caching** - CARTO basemap tiles cached for offline map viewing
@@ -60,45 +63,48 @@ When a citizen reports an incident (fire, flood, landslide, accident, etc.) with
 ## Tech Stack
 
 ### Frontend
-| Library | Purpose |
-|---|---|
-| **React 18** | UI framework |
-| **Vite 6** | Build tool & dev server |
-| **Tailwind CSS v4** | Utility-first CSS |
-| **Framer Motion** | Animations & transitions |
-| **Zustand** | State management |
-| **TanStack React Query** | Server state & caching |
-| **React Router v7** | Client-side routing |
-| **i18next** | Internationalization (9 languages) |
-| **Leaflet / React-Leaflet** | Interactive maps |
-| **Chart.js / react-chartjs-2** | Data visualization |
-| **Axios** | HTTP client |
-| **Lucide React** | Icons |
-| **React Hot Toast** | Toast notifications |
-| **React Helmet Async** | SEO / meta tags |
-| **Day.js** | Date formatting |
-| **Canvas Confetti** | Celebration effects |
-| **Turf.js** | Geospatial analysis |
+
+| Library                        | Purpose                            |
+| ------------------------------ | ---------------------------------- |
+| **React 18**                   | UI framework                       |
+| **Vite 6**                     | Build tool & dev server            |
+| **Tailwind CSS v4**            | Utility-first CSS                  |
+| **Framer Motion**              | Animations & transitions           |
+| **Zustand**                    | State management                   |
+| **TanStack React Query**       | Server state & caching             |
+| **React Router v7**            | Client-side routing                |
+| **i18next**                    | Internationalization (9 languages) |
+| **Leaflet / React-Leaflet**    | Interactive maps                   |
+| **Chart.js / react-chartjs-2** | Data visualization                 |
+| **Axios**                      | HTTP client                        |
+| **Lucide React**               | Icons                              |
+| **React Hot Toast**            | Toast notifications                |
+| **React Helmet Async**         | SEO / meta tags                    |
+| **Day.js**                     | Date formatting                    |
+| **Canvas Confetti**            | Celebration effects                |
+| **Turf.js**                    | Geospatial analysis                |
 
 ### Backend
-| Library | Purpose |
-|---|---|
-| **Node.js 18** | Runtime |
-| **Express 5** | HTTP framework |
-| **TypeScript** | Type safety |
-| **Mongoose** | MongoDB ODM |
-| **JWT (jsonwebtoken)** | Authentication |
-| **bcrypt** | Password hashing |
-| **Cloudinary** | Image upload & hosting |
-| **Multer** | File upload parsing (memory storage) |
-| **Turf.js** | Point-in-polygon (GPS → GaPa/NaPa) |
-| **Cookie Parser** | Cookie handling |
-| **CORS** | Cross-origin support |
-| **Day.js** | Date formatting |
-| **Web Push** | Push notifications |
-| **dotenv** | Environment configuration |
+
+| Library                | Purpose                              |
+| ---------------------- | ------------------------------------ |
+| **Node.js 18**         | Runtime                              |
+| **Express 5**          | HTTP framework                       |
+| **TypeScript**         | Type safety                          |
+| **Mongoose**           | MongoDB ODM                          |
+| **JWT (jsonwebtoken)** | Authentication                       |
+| **bcrypt**             | Password hashing                     |
+| **Cloudinary**         | Image upload & hosting               |
+| **Multer**             | File upload parsing (memory storage) |
+| **Turf.js**            | Point-in-polygon (GPS → GaPa/NaPa)   |
+| **Cookie Parser**      | Cookie handling                      |
+| **CORS**               | Cross-origin support                 |
+| **Day.js**             | Date formatting                      |
+| **Web Push**           | Push notifications                   |
+| **dotenv**             | Environment configuration            |
 
 ### Database
+
 - **MongoDB** - Primary database with `2dsphere` geospatial indexes on User, Report, and SafeZone collections
 
 ---
@@ -147,6 +153,7 @@ sajilo-sahayata/
 ## Screenshots
 
 ### Logo
+
 <div style="display: flex; gap: 10px; align-items: center; margin-bottom: 20px;">
   <img src="./assets/images/logo.jpg" alt="Logo" width="150"/>
   <img src="./assets/images/logo-full.jpg" alt="Full Logo" width="150"/>
@@ -187,17 +194,20 @@ sajilo-sahayata/
 ## Quick Start
 
 ### Prerequisites
+
 - Node.js v18+
 - MongoDB Atlas URI (or local MongoDB)
 - npm v9+
 
 ### 1. Clone
+
 ```bash
 git clone https://github.com/arundada9000/sajilo-sahayata.git
 cd sajilo-sahayata
 ```
 
 ### 2. Backend Setup
+
 ```bash
 cd backend
 cp .env.example .env    # Fill in your values
@@ -206,6 +216,7 @@ npm run dev             # Starts on http://localhost:3000
 ```
 
 Required `.env` variables:
+
 ```env
 PORT=3000
 MONGO_URI=your-mongodb-connection-string
@@ -219,6 +230,7 @@ VAPID_PRIVATE_KEY=...
 ```
 
 ### 3. Frontend Setup
+
 ```bash
 cd frontend
 npm install
@@ -226,6 +238,7 @@ npm run dev             # Starts on http://localhost:5173
 ```
 
 Frontend `.env`:
+
 ```env
 VITE_API_URL=http://localhost:3000/api
 VITE_FIREBASE_CONFIG=...
@@ -236,6 +249,7 @@ VITE_FIREBASE_CONFIG=...
 ## Deployment (Vercel)
 
 ### Frontend
+
 1. Import the repo in Vercel
 2. Framework Preset: **Vite**
 3. Root Directory: `frontend`
@@ -243,6 +257,7 @@ VITE_FIREBASE_CONFIG=...
 5. `frontend/vercel.json` handles SPA routing
 
 ### Backend
+
 1. Import the repo again as a new project
 2. Framework Preset: **Other**
 3. Root Directory: `backend`
@@ -255,15 +270,15 @@ VITE_FIREBASE_CONFIG=...
 
 All API routes are prefixed with `/api`.
 
-| Resource | Base Path | Key Endpoints |
-|---|---|---|
-| **Auth** | `/api/auth` | Register, Login, Verify, Profile |
-| **Reports** | `/api/reports` | CRUD, Verify, Status change |
-| **Alerts** | `/api/alerts` | CRUD with push notifications |
-| **Contacts** | `/api/contacts` | CRUD by localGov/department |
-| **Location** | `/api/location` | GPS → GaPa detection, available list |
-| **Safe Zones** | `/api/safe-zones` | CRUD for safe locations |
-| **Push** | `/api/push` | Subscribe, unsubscribe, VAPID key |
+| Resource       | Base Path         | Key Endpoints                        |
+| -------------- | ----------------- | ------------------------------------ |
+| **Auth**       | `/api/auth`       | Register, Login, Verify, Profile     |
+| **Reports**    | `/api/reports`    | CRUD, Verify, Status change          |
+| **Alerts**     | `/api/alerts`     | CRUD with push notifications         |
+| **Contacts**   | `/api/contacts`   | CRUD by localGov/department          |
+| **Location**   | `/api/location`   | GPS → GaPa detection, available list |
+| **Safe Zones** | `/api/safe-zones` | CRUD for safe locations              |
+| **Push**       | `/api/push`       | Subscribe, unsubscribe, VAPID key    |
 
 Full API reference: [docs/API.md](docs/API.md)
 
@@ -271,27 +286,16 @@ Full API reference: [docs/API.md](docs/API.md)
 
 ## Project Background
 
-### Academic Project & Hackathon Winner
-
-**Sajilo Sahayata** began as a Final Year Project for the **BSc.CSIT** program and won the **BMC InnovateX** hackathon competition. It showcases the potential of technology to streamline emergency response and coordination.
-
 ### Team Contributions
 
-#### Initial Prototype - *Team Emergex*
-- **Aayush Chapagain** – UI/UX Design & Project Manager
-- **Arun Neupane** – Frontend Development
-- **Barsha Panthi** – UI/UX Design & Research
-- **Bibek Bhusal** – Backend Development
+#### Initial Prototype - _Team DevNet_
+
+- **Aayush Chapagain** – UI/UX Design
+- **Arun Neupane** – Frontend Development | Project Manager
+- **Sudhir Aryal** – Presentation | idea formulation | Research
+- **Shubham Gyawali** – Backend Development
 
 <img src="./assets/images/team-emergex.jpg" alt="Team Emergex" width="350"/>
-
-#### Further Development - *Team BigAh*
-- **Arun Neupane** – Full-Stack Development
-- **Bijay Chaudhary** – Documentation & Reports
-- **Sunil Paudyal** – Logistics & Coordination
-- **Supervised by:** Mr. Suraj Pandey
-
-<img src="./assets/images/team-bigah.jpg" alt="Team BigAh" width="350"/>
 
 ---
 
@@ -311,7 +315,7 @@ This project is developed and maintained by **Arun Neupane** for educational and
 
 ## Contact
 
-[![Facebook](https://img.shields.io/badge/Facebook-%231877F2.svg?&logo=facebook&logoColor=white)](https://facebook.com/arunneupane9000)
+[![Facebook](https://img.shields.io/badge/Facebook-%231877F2.svg?&logo=facebook&logoColor=white)](https://facebook.com/arundada9000)
 [![Instagram](https://img.shields.io/badge/Instagram-%23E4405F.svg?&logo=instagram&logoColor=white)](https://instagram.com/arundada9000)
 [![WhatsApp](https://img.shields.io/badge/WhatsApp-25D366.svg?&logo=whatsapp&logoColor=white)](https://wa.me/+9779811420975)
 [![Email](https://img.shields.io/badge/Email-%23D14836.svg?&logo=gmail&logoColor=white)](mailto:arunneupane0000@gmail.com)
