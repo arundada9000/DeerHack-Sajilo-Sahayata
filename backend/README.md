@@ -32,13 +32,17 @@
 ```
 backend/
 ├── data/
-│   └── geojson/              # GeoJSON boundary files for GaPa/NaPa detection
+│   └── geojson/                   # GeoJSON boundary files for GaPa/NaPa detection
+│       ├── butwal.json
+│       ├── omsatiya.json
+│       ├── siddharthanagar.json
+│       └── tilottama.json
 ├── src/
 │   ├── config/
-│   │   ├── db.ts             # MongoDB connection via Mongoose
-│   │   └── cloudinary.ts     # Cloudinary SDK config
+│   │   ├── db.ts                  # MongoDB connection via Mongoose
+│   │   └── cloudinary.ts          # Cloudinary SDK config
 │   ├── controllers/
-│   │   ├── authController.ts      # Register, Login, Verify, Profile CRUD, Role management
+│   │   ├── authController.ts      # Register, Login, Verify, Profile CRUD, Role mgmt
 │   │   ├── alertController.ts     # Alert CRUD + push notification broadcast
 │   │   ├── contactController.ts   # Emergency contact CRUD by department/location
 │   │   ├── locationController.ts  # GPS → GaPa detection, available locations list
@@ -49,12 +53,12 @@ backend/
 │   │   ├── authenticateToken.ts   # JWT verification → req.user
 │   │   └── requireAdmin.ts        # Role check (admin-only)
 │   ├── models/
-│   │   ├── userModel.ts           # User schema (with timestamps)
-│   │   ├── reportModel.ts         # Report schema (with timestamps)
-│   │   ├── alertModel.ts          # Alert schema
-│   │   ├── contactModel.ts        # ContactInfo schema (nested contacts array)
-│   │   ├── safeZoneModel.ts       # SafeZone schema (with timestamps)
-│   │   └── pushSubscriptionModel.ts  # Web push subscription schema
+│   │   ├── userModel.ts           # User (username, password, phone, role, location, etc.)
+│   │   ├── reportModel.ts         # Report (type, description, image, location, status)
+│   │   ├── alertModel.ts          # Alert (title, description, type, location, timestamp)
+│   │   ├── contactModel.ts        # ContactInfo (localGovName, department, contacts[])
+│   │   ├── safeZoneModel.ts       # SafeZone (name, type, location, address, phone, isActive)
+│   │   └── pushSubscriptionModel.ts  # Push subscription (endpoint, keys, userId)
 │   ├── routes/
 │   │   ├── authRoutes.ts          # Auth endpoints
 │   │   ├── reportRoutes.ts        # Report endpoints
@@ -64,16 +68,18 @@ backend/
 │   │   ├── pushRoutes.ts          # Push notification endpoints
 │   │   └── safeZoneRoutes.ts      # Safe zone endpoints
 │   ├── utils/
-│   │   └── resolveGaPa.ts         # GPS → GaPa/NaPa name resolver (shared)
+│   │   └── resolveGaPa.ts         # GPS → GaPa/NaPa name resolver using Turf.js
 │   ├── env.ts                     # Typed environment config
-│   ├── express.d.ts               # Express Request augmentation
-│   ├── main.ts                    # App entry point + Vercel export
-│   ├── seed.ts                    # Database seed script
+│   ├── express.d.ts               # Express Request augmentation (req.user)
+│   ├── main.ts                    # App entry point + route mounting + Vercel export
+│   ├── seed.ts                    # Database seed script (dummy data)
+│   ├── seedApi.js                 # Alternative seed script (JS version)
 │   └── seedSafeZones.ts           # Safe zone seed data
-├── .env.example
+├── uploads/                       # Local uploads (dev, gitignored)
+├── .env / .env.deploy             # Environment configs
 ├── package.json
 ├── tsconfig.json
-└── vercel.json                    # Vercel serverless config
+└── vercel.json                    # Vercel serverless deployment config
 ```
 
 ---

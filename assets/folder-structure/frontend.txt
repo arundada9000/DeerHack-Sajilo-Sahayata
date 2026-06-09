@@ -1,105 +1,180 @@
-📁 src
-  📄 App.jsx
-  📄 i18n.js
-  📄 index.css
-  📄 main.jsx
-  📄 Socket.jsx
-  📁 stores
-    📄 localGovStore.js
-    📄 useAuth.js
-    📄 useAuthStore.js
-    📄 UsePreference.jsx
-    📄 useRegistration.js
-  📁 services
-    📄 api.js
-    📄 firebase.js
-  📁 routes
-    📄 AppRoutes.jsx
-  📁 pages
-    📄 Unauthorized.jsx
-    📁 Reports
-      📄 ReportForm.jsx
-    📁 Dashboard
-      📄 Alerts.jsx
-      📄 EmergencyTypeSelection.jsx
-      📄 Home.jsx
-      📄 MapPage.jsx
-      📄 Profile.jsx
-      📄 Reports.jsx
-    📁 Auth
-      📄 ForgotPassword.jsx
-      📄 Login.jsx
-      📄 Signup.jsx
-      📄 VerifyOTP.jsx
-      📄 Welcome.jsx
-    📁 Alerts
-      📄 AlertsFeed.jsx
-    📁 Admin
-      📄 Dashboard.jsx
-  📁 locales
-    📁 ne
-      📄 translation.json
-    📁 en
-      📄 translation.json
-  📁 layouts
-    📄 AdminLayout.jsx
-    📄 Navigation.jsx
-  📁 hooks
-    📄 useLocalGovernment.js
-  📁 data
-    📄 dummyReports.js
-  📁 contactInfo
-    📁 Tillotama
-      📄 Accident.jsx
-      📄 Fire.jsx
-      📄 Flood.jsx
-      📄 Landslide.jsx
-      📄 Other.jsx
-      📄 Police.jsx
-    📁 Siddharthanagar
-      📄 Accident.jsx
-      📄 Fire.jsx
-      📄 Flood.jsx
-      📄 Landslide.jsx
-      📄 Other.jsx
-      📄 Police.jsx
-    📁 Omsatiya
-      📄 Accident.jsx
-      📄 Fire.jsx
-      📄 Flood.jsx
-      📄 Landslide.jsx
-      📄 Other.jsx
-      📄 Police.jsx
-    📁 Butwal
-      📄 Accident.jsx
-      📄 Fire.jsx
-      📄 Flood.jsx
-      📄 Landslide.jsx
-      📄 Other.jsx
-      📄 Police.jsx
-  📁 components
-    📄 AdminSidebar.jsx
-    📄 AlertModal.jsx
-    📄 ReportCard.jsx
-    📄 ReportDetailModal.jsx
-    📄 ReportEditModal.jsx
-    📄 SummaryCard.jsx
-    📁 charts
-      📄 ReportsByStatusChart.jsx
-  📁 Auth
-    📄 ForgotPassword.jsx
-    📄 Login.jsx
-    📄 Logout.jsx
-    📄 RequireAdmin.jsx
-    📄 Signup.jsx
-    📄 VerifyOTP.jsx
-    📄 Welcome.jsx
-  📁 assets
-    📄 react.svg
-  📁 api
-    📄 axios.js
-  📁 Admin
-    📄 Dashboard.jsx
-    📄 Manage-Reports.jsx
-    📄 Manage-Users.jsx
-    📄 SendAlerts.jsx
+Frontend — Sajilo Sahayata (React PWA)
+==========================================
+Build tool : Vite 6.3
+Framework  : React 18.3
+CSS        : Tailwind CSS v4
+Language   : JavaScript (JSX)
+
+ROOT LEVEL
+  .env.deploy              — Deployment env vars (Vercel)
+  .env.local               — Local env overrides (gitignored)
+  .gitignore               — Git ignore rules
+  .vscode/
+    settings.json          — VSCode workspace settings
+  ads.txt                  — Google AdSense verification (if used)
+  dist/                    — Production build output (gitignored)
+  eslint.config.js         — ESLint flat config
+  index.html               — SPA entry HTML
+  information/
+    Additional-information.txt  — Quick-start notes for contributors
+  node_modules/            — Dependencies (gitignored)
+  package-lock.json        — Dependency lockfile
+  package.json             — Project metadata & scripts
+  preview.png              — Social preview image
+  public/                  — Static assets (copied as-is to dist)
+    _redirects             — SPA redirect rules (Vercel/Netlify)
+    assets/
+      dummy/               — Dummy placeholder images
+      logo.png             — Main app logo
+      logo/                — Logo variants
+    favicon.ico            — Browser favicon
+    icons/                 — SVG icons used throughout the app
+      accident-red.svg
+      accident.svg
+      admin-profile.png
+      back-white.png
+      back.png
+      call.svg
+      camera.png
+      emergency-icon.svg
+      emergency.svg
+      fire-red.svg
+      fire.png
+      fire.svg
+      flood-red.svg
+      flood.svg
+      garbage.svg
+      home-icon.svg
+      home.svg
+      landslide-red.svg
+      landslide.svg
+      location-icon.svg
+      location.svg
+      map-icons-red/       — Red variant map marker icons
+      map.svg
+      notification-homepage.svg
+      notification.svg
+      other.png
+      other.svg
+      others-red.svg
+      police-red.svg
+      police.svg
+      profile-icon.svg
+      profile.png
+      rename-icon.svg
+      report.png
+      setting-icon.svg
+    manifest.json          — PWA manifest (name, icons, theme_color)
+    static.json            — Static asset config (for hosting)
+    sw.js                  — Service Worker (cache strategies, push, bg-sync)
+    vite.svg               — Vite default favicon
+  README.md                — Frontend project documentation
+  src/                     — Application source code
+    Admin/                 — Admin page components (directly used, not lazy)
+      Dashboard.jsx
+      Manage-Reports.jsx
+      Manage-Users.jsx
+      ManageContacts.jsx
+      ManageSafeZones.jsx
+      SendAlerts.jsx
+    App.jsx                — Root React component (providers, hooks init)
+    Auth/                  — Auth page components (directly used)
+      ForgotPassword.jsx
+      Login.jsx
+      Logout.jsx
+      RequireAdmin.jsx     — Admin route guard component
+      Signup.jsx
+      VerifyOTP.jsx
+      Welcome.jsx
+    api/
+      axios.js             — Axios instance with JWT interceptor, 30s timeout
+    assets/                — Static asset imports (Vite-bundled)
+    components/            — Shared/reusable UI components
+      AdminSidebar.jsx     — Admin layout sidebar navigation
+      AdminSkeletonLoader.jsx  — Skeleton loader for admin panels
+      AlertModal.jsx       — Alert details modal
+      DetailModal.jsx      — Generic detail view modal
+      ErrorBoundary.jsx    — React error boundary wrapper
+      MapSkeleton.jsx      — Skeleton loader for Leaflet map
+      OfflineSyncBanner.jsx    — "You're offline" / "Sync now" banner
+      PageLoader.jsx       — Full-page loading spinner
+      ReportCard.jsx       — Individual report card component
+      ReportDetailModal.jsx    — Report detail view modal
+      ReportEditModal.jsx  — Admin report edit modal
+      SummaryCard.jsx      — Dashboard summary statistics card
+      UpdateBanner.jsx     — SW update notification banner
+      admin/               — Admin-specific sub-components
+        AdminFilterBar.jsx     — Filter controls for admin tables
+        ContactEditModal.jsx   — Edit emergency contacts modal
+        Pagination.jsx         — Reusable pagination component
+        TableSkeleton.jsx      — Skeleton loader for data tables
+      charts/              — Chart.js wrapper components
+        ReportsByStatusChart.jsx   — Pie/doughnut chart for report statuses
+    data/
+      dummyReports.js      — Dummy/fixture report data for development
+    hooks/                 — Custom React hooks
+      useDebounce.js       — Debounce hook for search inputs
+      useImagePreview.jsx  — Image file preview hook
+      useLocalGovernment.js    — GPS → local government name hook
+      usePushNotifications.js  — Web push subscription hook
+      useSWUpdate.js       — Service Worker update detection hook
+    i18n.js                — i18next configuration & initialization
+    index.css              — Global Tailwind CSS styles
+    layouts/               — Layout wrapper components
+      AdminLayout.jsx      — Admin dashboard layout (sidebar + content)
+      Navigation.jsx       — Bottom navigation bar (user dashboard)
+    locales/               — i18n translation JSON files (12 languages)
+      bhojpuri/translation.json
+      chinese/translation.json
+      en/translation.json
+      hindi/translation.json
+      japanese/translation.json
+      korean/translation.json
+      magar/translation.json
+      maithili/translation.json
+      ne/translation.json
+      newar/translation.json
+      tamang/translation.json
+      tharu/translation.json
+    main.jsx               — App entry point (ReactDOM.createRoot)
+    pages/                 — Lazy-loaded page components
+      Admin/
+        Dashboard.jsx      — Admin dashboard page (stats, charts)
+      Alerts/
+        AlertsFeed.jsx     — Public alerts feed page
+      Auth/
+        ForgotPassword.jsx — Password reset page
+        Login.jsx          — Login page
+        Signup.jsx         — Registration page
+        VerifyOTP.jsx      — OTP verification page
+        Welcome.jsx        — Post-registration welcome screen
+      Dashboard/
+        Alerts.jsx         — User dashboard alerts view
+        DynamicContact.jsx — Dynamic contact lookup by location/department
+        EmergencyTypeSelection.jsx  — Emergency type picker
+        Home.jsx           — Main user dashboard home
+        MapPage.jsx        — Full-page interactive map
+        Profile.jsx        — User profile view/edit
+        Reports.jsx        — User's submitted reports
+      NotFound.jsx         — 404 page
+      Reports/
+        ReportForm.jsx     — New report submission form
+      Unauthorized.jsx     — 403 unauthorized page
+    routes/
+      AppRoutes.jsx        — Route definitions with lazy loading & guards
+    services/
+      api.js               — Legacy/deprecated API service
+      firebase.js          — Firebase config (future push fallback)
+    Socket.jsx             — Socket.IO client connection (real-time)
+    stores/                — Zustand state stores
+      UsePreference.jsx    — Theme/font/language preferences (localStorage)
+      localGovStore.js     — GPS → GaPa/NaPa cache (30 min expiry)
+      useAdminLocationStore.js  — Admin location filter store
+      useAuth.js           — Auth state (login, logout, autoLogin, profile update)
+      useAuthStore.js      — Legacy/demo auth store
+      useRegistration.js   — Registration form state store
+    utils/
+      exportCsv.js         — CSV export utility
+      offlineQueue.js      — IndexedDB offline queue + Background Sync
+  vercel.json              — Vercel deployment config (SPA rewrites)
+  vite.config.js           — Vite config (plugins, manual chunks, allowed hosts)

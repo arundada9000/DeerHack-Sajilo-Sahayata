@@ -49,80 +49,104 @@
 
 ```
 frontend/
-├── public/
-│   ├── sw.js                 # Service Worker (cache strategy, push, sync)
-│   └── logos/                # PWA icons
+├── public/                          # Static assets (copied as-is to dist)
+│   ├── assets/                      #   images & logos
+│   │   ├── dummy/                   #   placeholder images
+│   │   ├── logo.png
+│   │   └── logo/
+│   ├── icons/                       #   SVG/PNG icons (emergency types, nav, etc.)
+│   │   ├── map-icons-red/           #   red-variant map markers
+│   │   ├── accident-red.svg, accident.svg, call.svg, camera.png
+│   │   ├── fire-red.svg, fire.png, fire.svg
+│   │   ├── flood-red.svg, flood.svg
+│   │   ├── landslide-red.svg, landslide.svg
+│   │   ├── police-red.svg, police.svg
+│   │   ├── emergency-icon.svg, emergency.svg
+│   │   ├── home-icon.svg, home.svg, location-icon.svg, location.svg
+│   │   ├── map.svg, notification.svg, notification-homepage.svg
+│   │   ├── other.png, other.svg, others-red.svg, garbage.svg
+│   │   ├── profile-icon.svg, profile.png, setting-icon.svg, rename-icon.svg
+│   │   ├── admin-profile.png, back.png, back-white.png
+│   │   └── report.png
+│   ├── sw.js                        # Service Worker (cache, push, bg-sync)
+│   ├── manifest.json                # PWA manifest
+│   ├── favicon.ico / vite.svg
+│   ├── _redirects                   # SPA fallback redirects
+│   └── static.json                  # Static asset hosting config
 ├── src/
-│   ├── Admin/                # Admin pages
+│   ├── Admin/                       # Admin page components
 │   │   ├── Dashboard.jsx
 │   │   ├── Manage-Users.jsx
 │   │   ├── Manage-Reports.jsx
 │   │   ├── ManageContacts.jsx
 │   │   ├── ManageSafeZones.jsx
 │   │   └── SendAlerts.jsx
-│   ├── Auth/                 # Auth guard (RequireAdmin)
+│   ├── Auth/                        # Auth components (RequireAdmin, Login, etc.)
 │   ├── api/
-│   │   └── axios.js          # Axios instance with JWT interceptor
+│   │   └── axios.js                 # Axios instance with JWT interceptor (30s timeout)
 │   ├── components/
-│   │   ├── admin/            # Admin sub-components (FilterBar, Pagination, etc.)
-│   │   ├── charts/           # Chart.js wrappers
+│   │   ├── admin/                   # Admin sub-components
+│   │   │   ├── AdminFilterBar.jsx
+│   │   │   ├── ContactEditModal.jsx
+│   │   │   ├── Pagination.jsx
+│   │   │   └── TableSkeleton.jsx
+│   │   ├── charts/
+│   │   │   └── ReportsByStatusChart.jsx  # Chart.js wrapper
+│   │   ├── AdminSidebar.jsx
+│   │   ├── AdminSkeletonLoader.jsx
 │   │   ├── AlertModal.jsx
 │   │   ├── DetailModal.jsx
 │   │   ├── ErrorBoundary.jsx
-│   │   ├── OfflineSyncBanner.jsx
+│   │   ├── MapSkeleton.jsx
+│   │   ├── OfflineSyncBanner.jsx    # "Offline" / "Sync now" banner
 │   │   ├── PageLoader.jsx
 │   │   ├── ReportCard.jsx
 │   │   ├── ReportDetailModal.jsx
 │   │   ├── ReportEditModal.jsx
-│   │   └── SummaryCard.jsx
-│   ├── data/                 # Dummy/fixture reports
+│   │   ├── SummaryCard.jsx
+│   │   └── UpdateBanner.jsx         # SW update notification
+│   ├── data/
+│   │   └── dummyReports.js          # Fixture data for development
 │   ├── hooks/
 │   │   ├── useDebounce.js
 │   │   ├── useImagePreview.jsx
-│   │   ├── useLocalGovernment.js
-│   │   └── usePushNotifications.js
+│   │   ├── useLocalGovernment.js    # GPS → GaPa lookup
+│   │   ├── usePushNotifications.js  # Web push subscription
+│   │   └── useSWUpdate.js           # SW update detection
 │   ├── layouts/
-│   │   ├── AdminLayout.jsx   # Sidebar + admin wrapper
-│   │   └── Navigation.jsx    # Bottom nav for user dashboard
-│   ├── locales/              # i18n translation JSON
-│   │   ├── en/
-│   │   ├── ne/
-│   │   ├── bhojpuri/
-│   │   ├── hindi/
-│   │   ├── magar/
-│   │   ├── maithili/
-│   │   ├── newar/
-│   │   ├── tamang/
-│   │   └── tharu/
-│   ├── pages/
-│   │   ├── Admin/            # Lazy-loaded admin pages
-│   │   ├── Auth/             # Login, Signup, VerifyOTP, ForgotPassword, Welcome
-│   │   ├── Dashboard/        # Home, Alerts, Reports, Map, Profile, DynamicContact
-│   │   └── Reports/
-│   │       └── ReportForm.jsx
+│   │   ├── AdminLayout.jsx          # Sidebar + admin wrapper
+│   │   └── Navigation.jsx           # Bottom nav for user dashboard
+│   ├── locales/                     # i18n translation JSON (12 languages)
+│   │   ├── en/ / ne/ / bhojpuri/ / hindi/ / maithili/ / magar/
+│   │   ├── newar/ / tamang/ / tharu/ / chinese/ / japanese/ / korean/
+│   │   └── each has translation.json
+│   ├── pages/                       # Lazy-loaded route pages
+│   │   ├── Admin/Dashboard.jsx
+│   │   ├── Alerts/AlertsFeed.jsx
+│   │   ├── Auth/ (Login, Signup, VerifyOTP, ForgotPassword, Welcome)
+│   │   ├── Dashboard/ (Home, Alerts, MapPage, Reports, Profile, DynamicContact, EmergencyTypeSelection)
+│   │   ├── Reports/ReportForm.jsx
+│   │   ├── NotFound.jsx
+│   │   └── Unauthorized.jsx
 │   ├── routes/
-│   │   └── AppRoutes.jsx     # All routes with lazy loading
+│   │   └── AppRoutes.jsx            # All routes with lazy loading + guards
 │   ├── services/
-│   │   ├── api.js            # Deprecated API service
-│   │   └── firebase.js       # Firebase config
-│   ├── stores/               # Zustand stores
-│   │   ├── localGovStore.js  # GPS → GaPa cache (30 min expiry)
-│   │   ├── useAuth.js        # Auth state (login/logout/autoLogin)
-│   │   ├── useAuthStore.js   # Legacy demo store
-│   │   ├── useAdminLocationStore.js
-│   │   ├── useRegistration.js
-│   │   └── UsePreference.jsx # Theme, font, language preferences
+│   │   ├── api.js                   # Legacy/deprecated API service
+│   │   └── firebase.js              # Firebase config
+│   ├── stores/                      # Zustand state stores
+│   │   ├── localGovStore.js         # GPS → GaPa cache (30 min expiry)
+│   │   ├── useAuth.js               # Auth state login/logout/autoLogin
+│   │   ├── useAuthStore.js          # Legacy demo store
+│   │   ├── useAdminLocationStore.js # Admin location filter
+│   │   ├── useRegistration.js       # Registration form state
+│   │   └── UsePreference.jsx        # Theme, font, language preferences
 │   ├── utils/
-│   │   ├── exportCsv.js      # CSV export utility
-│   │   └── offlineQueue.js   # IndexedDB queue + Background Sync
-│   ├── App.jsx
-│   ├── i18n.js
-│   ├── index.css
-│   ├── main.jsx
-│   └── Socket.jsx
-├── index.html
-├── vercel.json               # SPA rewrites
-└── vite.config.js            # Vite config + chunk splitting
+│   │   ├── exportCsv.js             # CSV export utility
+│   │   └── offlineQueue.js          # IndexedDB queue + Background Sync
+│   ├── App.jsx / i18n.js / index.css / main.jsx / Socket.jsx
+├── index.html / vercel.json / vite.config.js
+├── eslint.config.js / package.json
+└── information/Additional-information.txt  # Quick-start notes
 ```
 
 ---

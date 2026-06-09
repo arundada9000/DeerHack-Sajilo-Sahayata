@@ -1,21 +1,63 @@
-📁 src
-  📄 env.ts
-  📄 express.d.ts
-  📄 main.ts
-  📁 routes
-    📄 alertRoutes.ts
-    📄 authRoutes.ts
-    📄 reportRoutes.ts
-  📁 models
-    📄 alertModel.ts
-    📄 reportModel.ts
-    📄 userModel.ts
-  📁 middlewares
-    📄 authenticateToken.ts
-    📄 requireAdmin.ts
-  📁 controllers
-    📄 alertController.ts
-    📄 authController.ts
-    📄 reportController.ts
-  📁 config
-    📄 db.ts
+Backend — Sajilo Sahayata (Node.js + Express API)
+==================================================
+Runtime   : Node.js 18
+Framework : Express 5
+Language  : TypeScript
+Database  : MongoDB (Mongoose ODM)
+
+ROOT LEVEL
+  .env                     — Environment variables (gitignored)
+  .env.deploy              — Deployment env vars (Vercel)
+  .gitignore               — Git ignore rules
+  data/
+    geojson/               — GeoJSON boundary files for GaPa/NaPa detection
+      butwal.json
+      omsatiya.json
+      siddharthanagar.json
+      tilottama.json
+  node_modules/            — Dependencies (gitignored)
+  package-lock.json        — Dependency lockfile
+  package.json             — Project metadata & scripts
+  README.md                — Backend project documentation
+  src/                     — Application source code
+    config/
+      cloudinary.ts        — Cloudinary SDK configuration (upload stream)
+      db.ts                — Mongoose connection setup
+    controllers/
+      alertController.ts       — Alert CRUD + push notification broadcast
+      authController.ts        — Register, Login, Verify, Profile CRUD, Role mgmt
+      contactController.ts     — Emergency contact CRUD by department/location
+      locationController.ts    — GPS → GaPa detection, available locations list
+      pushController.ts        — Subscribe, unsubscribe, send push to all
+      reportController.ts      — Report CRUD, verify, status change, Cloudinary upload
+      safeZoneController.ts    — Safe zone CRUD (hospitals, shelters, etc.)
+    env.ts                 — Typed environment variable loader
+    express.d.ts           — Express Request type augmentation (req.user)
+    main.ts                — App entry point, middleware, route mounting, Vercel export
+    middlewares/
+      authenticateToken.ts — JWT verification middleware → req.user
+      requireAdmin.ts      — Admin role check middleware
+    models/
+      alertModel.ts             — Alert schema (title, description, type, location, timestamp)
+      contactModel.ts           — ContactInfo schema (localGovName, department, contacts[])
+      pushSubscriptionModel.ts  — Web Push subscription schema (endpoint, keys, userId)
+      reportModel.ts            — Report schema (type, description, image, location, status)
+      safeZoneModel.ts          — SafeZone schema (name, type, location, address, phone, isActive)
+      userModel.ts              — User schema (username, password, phone, role, location, etc.)
+    routes/
+      alertRoutes.ts       — Alert endpoint routes
+      authRoutes.ts        — Auth endpoint routes
+      contactRoutes.ts     — Contact endpoint routes
+      locationRoutes.ts    — Location endpoint routes
+      pushRoutes.ts        — Push notification endpoint routes
+      reportRoutes.ts      — Report endpoint routes
+      safeZoneRoutes.ts    — Safe zone endpoint routes
+    seed.ts                — Database seed script (dummy data)
+    seedApi.js             — Alternative seed script (JS version)
+    seedSafeZones.ts       — Safe zone seed data
+    utils/
+      resolveGaPa.ts       — GPS → GaPa/NaPa name resolver using Turf.js point-in-polygon
+  tsconfig.json            — TypeScript compiler configuration
+  uploads/                 — Local file uploads directory (dev only, gitignored)
+    *.jpeg                 — Sample uploaded images
+  vercel.json              — Vercel serverless deployment config
