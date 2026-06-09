@@ -236,6 +236,62 @@ const seedData = [
     ],
   },
 
+  // ===== SHUKLAGANDAKI =====
+  {
+    localGovName: "Shuklagandaki",
+    department: "fire",
+    contacts: [
+      { name: "Shuklagandaki Fire Post", phone: "9846000112", description: "2.0 km away" },
+      { name: "Tanahu Fire HQ", phone: "9846111223", description: "8.0 km away" },
+      { name: "Damauli Fire Service", phone: "9846222334", description: "12.0 km away" },
+    ],
+  },
+  {
+    localGovName: "Shuklagandaki",
+    department: "police",
+    contacts: [
+      { name: "Shuklagandaki Police Station", phone: "9846333445", description: "1.5 km away" },
+      { name: "Traffic Police Shuklagandaki", phone: "9846444556", description: "3.0 km away" },
+      { name: "Area Police Office Damauli", phone: "9846555667", description: "10.0 km away" },
+    ],
+  },
+  {
+    localGovName: "Shuklagandaki",
+    department: "flood",
+    contacts: [
+      { name: "Shuklagandaki Flood Rescue", phone: "9846666778", description: "2.5 km away" },
+      { name: "Seti River Rescue Team", phone: "9846777889", description: "5.0 km away" },
+      { name: "Disaster Response Tanahu", phone: "9846888990", description: "9.0 km away" },
+    ],
+  },
+  {
+    localGovName: "Shuklagandaki",
+    department: "accident",
+    contacts: [
+      { name: "Traffic Emergency Shuklagandaki", phone: "9856000113", description: "2.0 km away" },
+      { name: "Road Safety Shuklagandaki", phone: "9856111224", description: "4.5 km away" },
+      { name: "Emergency Ambulance Tanahu", phone: "9856222335", description: "8.0 km away" },
+    ],
+  },
+  {
+    localGovName: "Shuklagandaki",
+    department: "landslide",
+    contacts: [
+      { name: "Landslide Rescue Shuklagandaki", phone: "9856333446", description: "3.5 km away" },
+      { name: "Hill Response Tanahu", phone: "9856444557", description: "6.0 km away" },
+      { name: "Shuklagandaki Disaster Control", phone: "9856555668", description: "10.0 km away" },
+    ],
+  },
+  {
+    localGovName: "Shuklagandaki",
+    department: "other",
+    contacts: [
+      { name: "Animal Control Shuklagandaki", phone: "9856666779", description: "2.0 km away" },
+      { name: "Gas Leak Response Shuklagandaki", phone: "9856777880", description: "5.0 km away" },
+      { name: "Misc Emergency Shuklagandaki", phone: "9856888991", description: "9.0 km away" },
+    ],
+  },
+
   // =====================================================================
   // KATHMANDU VALLEY — Kathmandu District
   // =====================================================================
