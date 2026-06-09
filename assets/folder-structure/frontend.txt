@@ -118,7 +118,7 @@ ROOT LEVEL
       useLocalGovernment.js    — GPS → local government name hook
       usePushNotifications.js  — Web push subscription hook
       useSWUpdate.js       — Service Worker update detection hook
-    i18n.js                — i18next configuration & initialization
+    i18n.js                — i18next config (EN statically loaded, 11 other languages lazy via import.meta.glob)
     index.css              — Global Tailwind CSS styles
     layouts/               — Layout wrapper components
       AdminLayout.jsx      — Admin dashboard layout (sidebar + content)
@@ -163,9 +163,7 @@ ROOT LEVEL
     routes/
       AppRoutes.jsx        — Route definitions with lazy loading & guards
     services/
-      api.js               — Legacy/deprecated API service
-      firebase.js          — Firebase config (future push fallback)
-    Socket.jsx             — Socket.IO client connection (real-time)
+      (removed — unused)
     stores/                — Zustand state stores
       UsePreference.jsx    — Theme/font/language preferences (localStorage)
       localGovStore.js     — GPS → GaPa/NaPa cache (30 min expiry)
@@ -177,4 +175,4 @@ ROOT LEVEL
       exportCsv.js         — CSV export utility
       offlineQueue.js      — IndexedDB offline queue + Background Sync
   vercel.json              — Vercel deployment config (SPA rewrites)
-  vite.config.js           — Vite config (plugins, manual chunks, allowed hosts)
+  vite.config.js           — Vite config (React, Tailwind v4, PWA injectManifest, manual chunks, allowed hosts)

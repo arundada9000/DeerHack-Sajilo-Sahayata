@@ -26,7 +26,7 @@
 | **i18n** | i18next 25 + react-i18next 15 |
 | **Icons** | Lucide React |
 | **Notifications** | React Hot Toast |
-| **PWA** | Service Worker (custom `sw.js`) |
+| **PWA** | vite-plugin-pwa + custom `sw.js` |
 | **Geospatial** | Turf.js |
 | **Date** | Day.js |
 
@@ -39,9 +39,9 @@
 - **Emergency Contacts** — Department-specific contacts cached offline
 - **Interactive Map** — Clustered Leaflet map with type-colored markers
 - **Push Notifications** — Web push for admin alerts
-- **12 Languages** — English, Nepali, Hindi, Bhojpuri, Magar, Maithili, Newar, Tamang, Tharu, Chinese, Japanese, Korean
+- **12 Languages** — English (bundled), 11 others lazy-loaded on demand via `import.meta.glob`
 - **Admin Panel** — Dashboard, user/report/alert/contact/safezone management
-- **Code Splitting** — Route-based lazy loading + Vite manual chunks
+- **Code Splitting** — Route-based lazy loading + Vite manual chunks + i18n lazy loading
 
 ---
 
@@ -130,9 +130,7 @@ frontend/
 │   │   └── Unauthorized.jsx
 │   ├── routes/
 │   │   └── AppRoutes.jsx            # All routes with lazy loading + guards
-│   ├── services/
-│   │   ├── api.js                   # Legacy/deprecated API service
-│   │   └── firebase.js              # Firebase config
+│   ├── services/                     # (removed — unused)
 │   ├── stores/                      # Zustand state stores
 │   │   ├── localGovStore.js         # GPS → GaPa cache (30 min expiry)
 │   │   ├── useAuth.js               # Auth state login/logout/autoLogin
@@ -143,7 +141,7 @@ frontend/
 │   ├── utils/
 │   │   ├── exportCsv.js             # CSV export utility
 │   │   └── offlineQueue.js          # IndexedDB queue + Background Sync
-│   ├── App.jsx / i18n.js / index.css / main.jsx / Socket.jsx
+│   ├── App.jsx / i18n.js / index.css / main.jsx
 ├── index.html / vercel.json / vite.config.js
 ├── eslint.config.js / package.json
 └── information/Additional-information.txt  # Quick-start notes
@@ -168,7 +166,8 @@ frontend/
 - Background Sync registration via `navigator.serviceWorker.ready.sync.register("sync-reports")`
 
 ### `public/sw.js`
-- **Install**: Pre-caches core shell (index.html, icons)
+- **Build-time Injection**: `self.__WB_MANIFEST` replaced by `vite-plugin-pwa` with all hashed build assets
+- **Install**: Pre-caches core shell + all build-manifest assets via `Promise.allSettled` (no single-failure cascading)
 - **Activate**: Cleans old caches
 - **Fetch Strategy**:
   - CARTO map tiles → Cache-first
@@ -189,6 +188,11 @@ frontend/
 - `setLocalGov(name, coords)` — stores with timestamp
 - `getLocalGov()` / `getCoordinates()` — returns `null` if expired
 
+### `src/i18n.js`
+- English (`en`) is statically imported at init for instant first paint
+- 11 other languages are lazy-loaded via `import.meta.glob` — each language's JSON is a separate async chunk
+- `loadLanguage(lang)` is called from `main.jsx` whenever the user switches language, loading the translation chunk on demand
+
 ### `src/stores/UsePreference.jsx`
 - Persists theme (light/dark), font size, font family, language to `localStorage`
 - Applied in `main.jsx` via `ApplyPreferences` wrapper component
@@ -201,7 +205,8 @@ frontend/
 - Catch-all route renders `NotFound`
 
 ### `vite.config.js`
-- Manual chunk splitting for optimal caching:
+- **PWA**: `vite-plugin-pwa` in `injectManifest` mode — reads `public/sw.js`, injects hashed asset manifest at `self.__WB_MANIFEST`, writes `dist/sw.js`
+- **Manual chunk splitting** for optimal caching:
   - `vendor-react` (react, react-dom, react-router-dom)
   - `vendor-ui` (framer-motion, lucide-react)
   - `vendor-map` (leaflet, react-leaflet, react-leaflet-cluster)
@@ -216,7 +221,6 @@ frontend/
 | Variable | Required | Description |
 |---|---|---|
 | `VITE_API_URL` | Yes | Backend API base URL (e.g. `http://localhost:3000/api`) |
-| `VITE_FIREBASE_CONFIG` | No | Firebase config JSON for future push notification fallback |
 
 ---
 
@@ -236,7 +240,8 @@ frontend/
 The app is a full Progressive Web Application:
 
 1. **Installable** — Service Worker registers on first visit; browser prompts install
-2. **Offline Reports** — When offline, report submissions are saved to IndexedDB. On reconnect, `OfflineSyncBanner` shows a "Sync Now" button and auto-syncs
-3. **Background Sync** — Even if the user closes the tab, the service worker fires a `sync` event when connectivity returns, triggering re-sync
-4. **Contact Cache** — Emergency contacts fetched from the API are cached in IndexedDB. When offline, `DynamicContact.jsx` falls back to the cache with an amber "showing cached data" indicator
-5. **Map Tiles** — CARTO basemap tiles are cached via a cache-first strategy, so the map works offline for previously viewed areas
+2. **Build-time Pre-caching** — `vite-plugin-pwa` injects the hashed asset manifest into `sw.js` at build time, so all build artifacts are pre-cached on install
+3. **Offline Reports** — When offline, report submissions are saved to IndexedDB. On reconnect, `OfflineSyncBanner` shows a "Sync Now" button and auto-syncs
+4. **Background Sync** — Even if the user closes the tab, the service worker fires a `sync` event when connectivity returns, triggering re-sync
+5. **Contact Cache** — Emergency contacts fetched from the API are cached in IndexedDB. When offline, `DynamicContact.jsx` falls back to the cache with an amber "showing cached data" indicator
+6. **Map Tiles** — CARTO basemap tiles are cached via a cache-first strategy, so the map works offline for previously viewed areas
