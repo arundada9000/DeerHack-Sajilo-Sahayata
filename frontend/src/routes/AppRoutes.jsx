@@ -31,6 +31,7 @@ const ManageReports = React.lazy(() => import("../Admin/Manage-Reports"));
 const ManageContacts = React.lazy(() => import("../Admin/ManageContacts"));
 const SendAlerts = React.lazy(() => import("../Admin/SendAlerts"));
 const ManageSafeZones = React.lazy(() => import("../Admin/ManageSafeZones"));
+const ManageVolunteers = React.lazy(() => import("../Admin/ManageVolunteers"));
 const Profile = React.lazy(() => import("../pages/Dashboard/Profile"));
 const Unauthorized = React.lazy(() => import("../pages/Unauthorized"));
 const NotFound = React.lazy(() => import("../pages/NotFound"));
@@ -93,6 +94,7 @@ const AnimatedRoutes = () => {
             <Route path="manage-users" element={<ManageUsers />} />
             <Route path="send-alerts" element={<SendAlerts />} />
             <Route path="manage-reports" element={<ManageReports />} />
+            <Route path="manage-volunteers" element={<ManageVolunteers />} />
             <Route path="manage-contacts" element={<ManageContacts />} />
             <Route path="manage-safe-zones" element={<ManageSafeZones />} />
           </Route>

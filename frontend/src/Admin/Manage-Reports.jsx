@@ -12,6 +12,7 @@ import Pagination from "../components/admin/Pagination";
 import { exportToCSV } from "../utils/exportCsv";
 import DetailModal from "../components/DetailModal";
 import { useTranslation } from "react-i18next";
+import toast from "react-hot-toast";
 
 const REPORT_TYPES = ["fire", "police", "flood", "accident", "landslide", "other"];
 const STATUS_TYPES = ["pending", "verified", "solved", "working"];
@@ -29,6 +30,15 @@ export default function Reports() {
   const [showModal, setShowModal] = useState(false);
   const [viewItem, setViewItem] = useState(null);
   const [viewOpen, setViewOpen] = useState(false);
+  const [showSpam, setShowSpam] = useState(false);
+  
+  const [replyOpen, setReplyOpen] = useState(false);
+  const [replyMessage, setReplyMessage] = useState("");
+  const [sendingReply, setSendingReply] = useState(false);
+  
+  const [nearbyVolunteers, setNearbyVolunteers] = useState([]);
+  const [fetchingNearby, setFetchingNearby] = useState(false);
+  const [showNearby, setShowNearby] = useState(false);
 
   const { adminLocation } = useAdminLocationStore();
   const debouncedSearch = useDebounce(search, 300);
@@ -44,6 +54,11 @@ export default function Reports() {
 
   const filtered = useMemo(() => {
     let data = [...reports];
+    if (showSpam) {
+      data = data.filter((r) => r.aiAnalysis?.isFake === true);
+    } else {
+      data = data.filter((r) => r.aiAnalysis?.isFake !== true);
+    }
     if (debouncedSearch) {
       const q = debouncedSearch.toLowerCase();
       data = data.filter((r) => r.description?.toLowerCase().includes(q) || r._id?.toLowerCase().includes(q));
@@ -52,9 +67,9 @@ export default function Reports() {
     if (typeFilter) data = data.filter((r) => r.type === typeFilter);
     if (locationFilter) data = data.filter((r) => r.localGovName?.toLowerCase() === locationFilter.toLowerCase());
     return data;
-  }, [reports, debouncedSearch, statusFilter, typeFilter, locationFilter]);
+  }, [reports, debouncedSearch, statusFilter, typeFilter, locationFilter, showSpam]);
 
-  useEffect(() => { setCurrentPage(1); }, [debouncedSearch, statusFilter, typeFilter, locationFilter]);
+  useEffect(() => { setCurrentPage(1); }, [debouncedSearch, statusFilter, typeFilter, locationFilter, showSpam]);
 
   const totalPages = Math.ceil(filtered.length / PAGE_SIZE);
   const paginated = filtered.slice((currentPage - 1) * PAGE_SIZE, currentPage * PAGE_SIZE);
@@ -66,14 +81,68 @@ export default function Reports() {
   };
   const clearAll = () => { setSearch(""); setStatusFilter(""); setTypeFilter(""); setLocationFilter(""); };
 
+  const [pinging, setPinging] = useState(false);
+  const handlePingVolunteers = async () => {
+    if (!viewItem) return;
+    setPinging(true);
+    try {
+      const { data } = await API.post(`/reports/${viewItem._id}/ping-volunteers`);
+      toast.success(data.message || t("admin.manageReports.pingSuccess", "Successfully pinged volunteers."));
+    } catch (err) {
+      toast.error(err.response?.data?.message || t("admin.manageReports.pingError", "Failed to ping volunteers."));
+    } finally {
+      setPinging(false);
+    }
+  };
+
+  const handleSendReply = async () => {
+    if (!replyMessage.trim() || !viewItem?.reportedByPhone) return;
+    setSendingReply(true);
+    try {
+      const { data } = await API.post("/webhook/sms/reply", { phone: viewItem.reportedByPhone, message: replyMessage });
+      toast.success(data.message || t("admin.manageReports.replySuccess", "Reply sent successfully!"));
+      setReplyMessage("");
+      setReplyOpen(false);
+    } catch (err) {
+      toast.error(err.response?.data?.message || t("admin.manageReports.replyError", "Failed to send reply."));
+    } finally {
+      setSendingReply(false);
+    }
+  };
+
+  const handleFindNearby = async () => {
+    const coords = Array.isArray(viewItem?.location) ? viewItem.location : viewItem?.location?.coordinates;
+    if (!coords) return;
+    setFetchingNearby(true);
+    setShowNearby(true);
+    try {
+      const isNewFormat = coords[0] > 70;
+      const lng = isNewFormat ? coords[0] : coords[1];
+      const lat = isNewFormat ? coords[1] : coords[0];
+      const { data } = await API.get(`/auth/volunteers/nearby?longitude=${lng}&latitude=${lat}&radius=10000`);
+      setNearbyVolunteers(data);
+    } catch (err) {
+      toast.error(t("admin.manageReports.errorNearby", "Failed to fetch nearby volunteers"));
+    } finally {
+      setFetchingNearby(false);
+    }
+  };
+
   const counts = useMemo(() => {
-    const c = { pending: 0, verified: 0, working: 0, solved: 0 };
-    reports.forEach((r) => { if (c[r.status] !== undefined) c[r.status]++; });
+    const c = { pending: 0, verified: 0, working: 0, solved: 0, spam: 0, totalReal: 0 };
+    reports.forEach((r) => { 
+      if (r.aiAnalysis?.isFake) {
+        c.spam++;
+      } else {
+        c.totalReal++;
+        if (c[r.status] !== undefined) c[r.status]++; 
+      }
+    });
     return c;
   }, [reports]);
 
   const cards = [
-    { label: t("admin.manageReports.total"), color: "bg-gray-100 text-gray-800", count: reports.length, icon: <ListChecks size={22} /> },
+    { label: t("admin.manageReports.total"), color: "bg-gray-100 text-gray-800", count: counts.totalReal, icon: <ListChecks size={22} /> },
     { label: t("admin.manageReports.pending"), color: "bg-yellow-100 text-yellow-800", count: counts.pending, icon: <Clock size={22} /> },
     { label: t("admin.manageReports.verified"), color: "bg-blue-100 text-blue-800", count: counts.verified, icon: <ShieldCheck size={22} /> },
     { label: t("admin.manageReports.working"), color: "bg-purple-100 text-purple-800", count: counts.working, icon: <Hammer size={22} /> },
@@ -115,6 +184,16 @@ export default function Reports() {
         ))}
       </div>
 
+      <div className="flex gap-2 mb-4">
+        <button onClick={() => setShowSpam(false)} className={`px-4 py-2 rounded-lg text-sm font-semibold transition ${!showSpam ? "bg-indigo-600 text-white shadow-md" : "bg-white text-gray-600 border border-gray-200 hover:bg-gray-50"}`}>
+          {t("admin.manageReports.verifiedReports", "Verified Reports")}
+        </button>
+        <button onClick={() => setShowSpam(true)} className={`px-4 py-2 rounded-lg text-sm font-semibold transition flex items-center gap-2 ${showSpam ? "bg-red-600 text-white shadow-md" : "bg-white text-gray-600 border border-gray-200 hover:bg-gray-50"}`}>
+          {t("admin.manageReports.spamQueue", "Spam Queue")} 
+          {counts.spam > 0 && <span className={`px-1.5 py-0.5 rounded-full text-xs font-bold ${showSpam ? "bg-white text-red-600" : "bg-red-100 text-red-800"}`}>{counts.spam}</span>}
+        </button>
+      </div>
+
       <AdminFilterBar search={search} onSearchChange={setSearch} searchPlaceholder={t("admin.manageReports.searchPlaceholder")} locationFilter={locationFilter} onLocationChange={setLocationFilter}
         filters={[
           { label: t("admin.manageReports.status"), value: statusFilter, onChange: setStatusFilter, options: STATUS_TYPES.map((s) => ({ value: s, label: s.charAt(0).toUpperCase() + s.slice(1) })) },
@@ -152,19 +231,129 @@ export default function Reports() {
 
       <DetailModal
         open={viewOpen}
-        onClose={() => { setViewOpen(false); setViewItem(null); }}
+        onClose={() => { setViewOpen(false); setViewItem(null); setShowNearby(false); setReplyOpen(false); }}
         title={t("admin.manageReports.reportDetails")}
         icon={<FileText size={20} />}
         imageUrl={viewItem?.imageUrl ? (viewItem.imageUrl.startsWith("http") ? viewItem.imageUrl : `${import.meta.env.VITE_API_URL.replace("/api", "")}${viewItem.imageUrl}`) : null}
         fields={[
-          { label: t("admin.manageReports.typeLabel"), value: viewItem?.type, render: (v) => <span className="capitalize">{v}</span> },
-          { label: t("admin.manageReports.statusLabel"), value: viewItem?.status, render: (v) => <span className={`inline-block px-2.5 py-1 rounded-full text-xs font-semibold capitalize ${v === "pending" ? "bg-yellow-100 text-yellow-700" : v === "verified" ? "bg-blue-100 text-blue-700" : v === "working" ? "bg-purple-100 text-purple-700" : "bg-green-100 text-green-700"}`}>{v}</span> },
-          { label: t("admin.manageReports.description"), value: viewItem?.description },
-          { label: t("admin.manageReports.location"), value: viewItem?.localGovName || "—" },
-          { label: t("admin.manageReports.coordinates"), value: viewItem?.location?.coordinates ? `[${viewItem.location.coordinates[0]?.toFixed(5)}, ${viewItem.location.coordinates[1]?.toFixed(5)}]` : "—" },
-          { label: t("admin.manageReports.reportedAt"), value: viewItem?.createdAt ? new Date(viewItem.createdAt).toLocaleString() : "—" },
-          { label: t("admin.manageReports.updatedAt"), value: viewItem?.updatedAt ? new Date(viewItem.updatedAt).toLocaleString() : "—" },
+          { label: t("admin.manageReports.typeLabel", "Type"), value: viewItem?.type, render: (v) => <span className="capitalize">{v}</span> },
+          { label: t("admin.manageReports.statusLabel", "Status"), value: viewItem?.status, render: (v) => <span className={`inline-block px-2.5 py-1 rounded-full text-xs font-semibold capitalize ${v === "pending" ? "bg-yellow-100 text-yellow-700" : v === "verified" ? "bg-blue-100 text-blue-700" : v === "working" ? "bg-purple-100 text-purple-700" : "bg-green-100 text-green-700"}`}>{v}</span> },
+          { label: t("admin.manageReports.description", "Description"), value: viewItem?.description },
+          ...(viewItem?.rawDescription && viewItem.rawDescription !== viewItem.description ? [{ label: t("admin.manageReports.rawDescription", "Original SMS Text"), value: viewItem.rawDescription, render: (v) => <div className="p-2 mt-1 bg-gray-50 border border-gray-200 rounded text-sm italic text-gray-700">{v}</div> }] : []),
+          ...(viewItem?.reportedByPhone ? [
+            { 
+              label: t("admin.manageReports.reportedByPhone", "Reported via SMS"), 
+              value: viewItem.reportedByPhone, 
+              render: (v) => (
+                <div className="flex flex-col gap-2 mt-1">
+                  <div className="flex items-center gap-3">
+                    <a href={`tel:${v}`} className="text-blue-600 font-semibold hover:underline">{v}</a>
+                    <button onClick={() => setReplyOpen(!replyOpen)} className="text-xs bg-indigo-50 text-indigo-700 px-2 py-1 rounded border border-indigo-200 hover:bg-indigo-100 transition font-bold">
+                      {t("admin.manageReports.replyViaSms", "Reply via SMS")}
+                    </button>
+                  </div>
+                  {replyOpen && (
+                    <div className="flex flex-col gap-2 mt-2 bg-gray-50 p-3 rounded-lg border border-gray-200 shadow-inner">
+                      <textarea 
+                        value={replyMessage} 
+                        onChange={(e) => setReplyMessage(e.target.value)} 
+                        placeholder={t("admin.manageReports.typeSms", "Type SMS message to victim...")} 
+                        className="w-full text-sm p-2 rounded border border-gray-300 focus:outline-none focus:ring-2 focus:ring-indigo-500" 
+                        rows={2} 
+                      />
+                      <button 
+                        onClick={handleSendReply} 
+                        disabled={sendingReply || !replyMessage.trim()} 
+                        className="self-end px-4 py-1.5 bg-indigo-600 text-white text-xs font-bold rounded shadow-sm hover:bg-indigo-700 disabled:opacity-50 transition"
+                      >
+                        {sendingReply ? t("admin.manageReports.sending", "Sending...") : t("admin.manageReports.sendSms", "Send SMS")}
+                      </button>
+                    </div>
+                  )}
+                </div>
+              ) 
+            },
+          ] : []),
+          ...(viewItem?.smsThread && viewItem.smsThread.length > 0 ? [
+            {
+              label: t("admin.manageReports.smsThread", "Follow-up SMS Thread"),
+              value: viewItem.smsThread,
+              render: (thread) => (
+                <div className="flex flex-col gap-2 mt-2">
+                  {thread.map((msg, idx) => (
+                    <div key={idx} className="p-3 bg-indigo-50 border border-indigo-100 rounded-lg text-sm text-indigo-900 shadow-sm">
+                      <div className="font-semibold text-xs text-indigo-700 mb-1">{new Date(msg.receivedAt).toLocaleString()}</div>
+                      <div>{msg.message}</div>
+                    </div>
+                  ))}
+                </div>
+              )
+            }
+          ] : []),
+          { label: t("admin.manageReports.location", "Location"), value: viewItem?.localGovName || "—" },
+          ...(viewItem?.aiAnalysis ? [
+            { 
+              label: t("admin.manageReports.aiSeverity", "AI Severity Score"), 
+              value: viewItem.aiAnalysis.severityScore, 
+              render: (v) => <span className={`font-bold ${v > 7 ? 'text-red-600' : v > 4 ? 'text-yellow-600' : 'text-green-600'}`}>{v}/10</span>
+            },
+            { label: t("admin.manageReports.aiFakeDetection", "AI Fake Detection"), value: viewItem.aiAnalysis.isFake, render: (v) => v ? <span className="text-red-600 font-bold">{t("admin.manageReports.likelyFake", "Likely Fake")}</span> : <span className="text-green-600">{t("admin.manageReports.seemsReal", "Seems Real")}</span> },
+            { label: t("admin.manageReports.aiTags", "AI Tags"), value: viewItem.aiAnalysis.tags, render: (v) => <div className="flex flex-wrap gap-1">{v?.map((t, idx) => <span key={idx} className="px-2 py-0.5 bg-indigo-50 text-indigo-600 text-xs rounded-md">{t}</span>)}</div> },
+            { label: t("admin.manageReports.aiSummary", "AI Summary"), value: viewItem.aiAnalysis.summary }
+          ] : []),
+          { label: t("admin.manageReports.coordinates", "Coordinates"), value: (Array.isArray(viewItem?.location) ? viewItem.location : viewItem?.location?.coordinates) ? `[${(Array.isArray(viewItem?.location) ? viewItem.location : viewItem?.location?.coordinates)[0]?.toFixed(5)}, ${(Array.isArray(viewItem?.location) ? viewItem.location : viewItem?.location?.coordinates)[1]?.toFixed(5)}]` : "—" },
+          ...(showNearby ? [
+            {
+              label: t("admin.manageReports.nearbyVolunteers", "Nearby Volunteers (10km)"),
+              value: null,
+              render: () => (
+                <div className="mt-2 flex flex-col gap-2">
+                  {fetchingNearby ? (
+                    <span className="text-sm text-gray-500">{t("admin.manageReports.loadingNearby", "Loading...")}</span>
+                  ) : nearbyVolunteers.length === 0 ? (
+                    <span className="text-sm text-gray-500">{t("admin.manageReports.noNearbyFound", "No volunteers found within 10km.")}</span>
+                  ) : (
+                    <div className="flex flex-col gap-2 max-h-48 overflow-y-auto pr-2 bg-gray-50 p-2 rounded-lg border border-gray-200">
+                      {nearbyVolunteers.map(v => (
+                        <div key={v._id} className="flex justify-between items-center text-sm p-2 border border-gray-100 bg-white rounded shadow-sm">
+                          <div className="flex flex-col">
+                            <span className="font-bold text-gray-800">{v.username}</span>
+                            <span className="text-xs text-gray-500 flex items-center gap-1">
+                              {v.phoneNumber && <a href={`tel:${v.phoneNumber}`} className="text-blue-600 hover:underline">{v.phoneNumber}</a>}
+                            </span>
+                          </div>
+                          <div className="text-xs text-indigo-600 font-bold bg-indigo-50 px-2 py-1 rounded">
+                            {v.skills?.length > 0 ? v.skills.join(", ") : "General"}
+                          </div>
+                        </div>
+                      ))}
+                    </div>
+                  )}
+                </div>
+              )
+            }
+          ] : []),
+          { label: t("admin.manageReports.reportedAt", "Reported At"), value: viewItem?.createdAt ? new Date(viewItem.createdAt).toLocaleString() : "—" },
+          { label: t("admin.manageReports.updatedAt", "Updated At"), value: viewItem?.updatedAt ? new Date(viewItem.updatedAt).toLocaleString() : "—" },
         ]}
+        actions={
+          <>
+            <button
+              onClick={handleFindNearby}
+              disabled={fetchingNearby || !(Array.isArray(viewItem?.location) ? viewItem.location : viewItem?.location?.coordinates)}
+              className="flex items-center gap-2 px-4 py-2.5 bg-indigo-100 hover:bg-indigo-200 text-indigo-700 rounded-xl font-bold text-sm transition shadow-sm disabled:opacity-50"
+            >
+              {fetchingNearby ? t("admin.manageReports.locating", "Locating...") : t("admin.manageReports.findNearbyBtn", "Find Nearby")}
+            </button>
+            <button
+              onClick={handlePingVolunteers}
+              disabled={pinging}
+              className="flex items-center gap-2 px-6 py-2.5 bg-red-600 hover:bg-red-700 text-white rounded-xl font-bold text-sm transition shadow-md disabled:opacity-50"
+            >
+              {pinging ? t("admin.manageReports.pinging", "Pinging...") : t("admin.manageReports.pingVolunteers", "Ping Nearby Volunteers")}
+            </button>
+          </>
+        }
       />
       <AnimatePresence>
         {showModal && selectedReport && (

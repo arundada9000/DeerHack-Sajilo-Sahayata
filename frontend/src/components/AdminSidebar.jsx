@@ -13,6 +13,7 @@ import {
   LogOut,
   ChevronLeft,
   Shield,
+  HeartHandshake,
 } from "lucide-react";
 
 export default function AdminSidebar() {
@@ -27,6 +28,7 @@ export default function AdminSidebar() {
     { label: t("sidebar.dashboard"), to: "/admin", icon: LayoutDashboard, exact: true },
     { label: t("sidebar.manageUsers"), to: "/admin/manage-users", icon: Users },
     { label: t("sidebar.manageReports"), to: "/admin/manage-reports", icon: FileText },
+    { label: t("sidebar.manageVolunteers", "Volunteers"), to: "/admin/manage-volunteers", icon: HeartHandshake },
     { label: t("sidebar.manageContacts"), to: "/admin/manage-contacts", icon: Phone },
     { label: t("sidebar.manageAlerts"), to: "/admin/send-alerts", icon: Bell },
     { label: t("sidebar.safeZones"), to: "/admin/manage-safe-zones", icon: Shield },

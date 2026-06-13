@@ -35,6 +35,8 @@ const profileFields = [
   { key: "gender", labelKey: "profile.gender", icon: UserIcon, type: "select", options: ["Male", "Female", "Other"] },
   { key: "address", labelKey: "profile.address", icon: MapPin, type: "text", placeholder: "profile.addressPlaceholder" },
   { key: "citizenshipId", labelKey: "profile.citizenship", icon: IdCard, type: "text", placeholder: "profile.citizenshipPlaceholder" },
+  { key: "isVolunteer", labelKey: "profile.isVolunteer", icon: ShieldCheck, type: "checkbox" },
+  { key: "skills", labelKey: "profile.skills", icon: UserIcon, type: "text", placeholder: "profile.skillsPlaceholder" },
 ];
 
 /* ─── Push Notifications Toggle Row ─── */
@@ -127,6 +129,8 @@ const ProfileDrawer = ({ open, onClose }) => {
         gender: user.gender || "",
         citizenshipId: user.citizenshipId || "",
         address: user.address || "",
+        isVolunteer: user.isVolunteer || false,
+        skills: user.skills?.join(", ") || "",
       });
     }
   }, [isEditing, user]);
@@ -170,7 +174,11 @@ const ProfileDrawer = ({ open, onClose }) => {
   const handleSave = async () => {
     setSaving(true);
     try {
-      const { data } = await API.put("/auth/profile", editForm);
+      const payload = { ...editForm };
+      if (typeof payload.skills === 'string') {
+        payload.skills = payload.skills.split(',').map(s => s.trim()).filter(Boolean);
+      }
+      const { data } = await API.put("/auth/profile", payload);
       updateUser(data.user);
       toast.success(t("profile.saveSuccess"));
       setIsEditing(false);
@@ -352,8 +360,8 @@ const ProfileDrawer = ({ open, onClose }) => {
                               <div key={field.key}>
                                 <InfoRow
                                   icon={field.icon}
-                                  label={t(field.labelKey)}
-                                  value={user[field.key]}
+                                  label={t(field.labelKey) || field.key}
+                                  value={field.type === "checkbox" ? (user[field.key] ? t("common.yes", "Yes") : t("common.no", "No")) : (Array.isArray(user[field.key]) ? user[field.key].join(", ") : user[field.key])}
                                 />
                                 {idx < filledFields.length - 1 && (
                                   <div className="h-[1px] bg-gray-50 ml-14" />
@@ -537,9 +545,16 @@ const EditField = ({ icon: Icon, label, type, value, placeholder, options, onCha
       </div>
       <div className="flex flex-col flex-1 min-w-0">
         <label className="text-[11px] font-bold text-gray-400 uppercase tracking-wider mb-1">
-          {label}
+          {label || "Field"}
         </label>
-        {type === "select" ? (
+        {type === "checkbox" ? (
+          <input
+            type="checkbox"
+            checked={!!value}
+            onChange={(e) => onChange(e.target.checked)}
+            className="w-5 h-5 accent-blue-600 rounded cursor-pointer mt-1"
+          />
+        ) : type === "select" ? (
           <select
             value={value}
             onChange={(e) => onChange(e.target.value)}

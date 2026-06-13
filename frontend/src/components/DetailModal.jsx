@@ -3,7 +3,7 @@ import { useTranslation } from "react-i18next";
 import { X, Maximize2 } from "lucide-react";
 import useImagePreview from "../hooks/useImagePreview.jsx";
 
-export default function DetailModal({ open, onClose, title, icon, fields, imageUrl }) {
+export default function DetailModal({ open, onClose, title, icon, fields, imageUrl, actions }) {
   const { t } = useTranslation();
   const { openPreview, ImagePreview } = useImagePreview();
 
@@ -75,7 +75,8 @@ export default function DetailModal({ open, onClose, title, icon, fields, imageU
           </div>
 
           {/* Footer */}
-          <div className="p-6 border-t border-gray-100 bg-gray-50 rounded-b-2xl flex-shrink-0 flex justify-end">
+          <div className="p-6 border-t border-gray-100 bg-gray-50 rounded-b-2xl flex-shrink-0 flex justify-end gap-3">
+            {actions}
             <button
               onClick={onClose}
               className="px-6 py-2.5 bg-indigo-600 hover:bg-indigo-700 text-white rounded-xl font-semibold text-sm transition shadow-md"
