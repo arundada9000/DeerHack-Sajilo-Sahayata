@@ -71,6 +71,10 @@ vite.config.ts.timestamp*
 /frontend/package-lock.json
 /frontend/src/services/firebase.js
 
+# Session / temp files
+session-*.md
+working.txt
+
 # Project notes
 notes/
 hackathon_old/
