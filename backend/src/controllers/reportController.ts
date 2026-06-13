@@ -368,7 +368,7 @@ export const pingNearbyVolunteers = async (req: Request, res: Response) => {
   } catch (error: any) {
     console.error("Error pinging volunteers:", error);
     res.status(500).json({ 
-      message: "Error pinging volunteers", 
+      message: `Error pinging volunteers: ${error.message || String(error)}`, 
       error: error.message || String(error),
       stack: process.env.NODE_ENV === "development" ? error.stack : undefined
     });
