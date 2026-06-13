@@ -310,8 +310,20 @@ export const pingNearbyVolunteers = async (req: Request, res: Response) => {
     }
     // ensure longitude and latitude are correctly used based on standard format
     const isNewFormat = c[0] > 70;
-    const lng = isNewFormat ? c[0] : c[1];
-    const lat = isNewFormat ? c[1] : c[0];
+    const lng = Number(isNewFormat ? c[0] : c[1]);
+    const lat = Number(isNewFormat ? c[1] : c[0]);
+
+    if (isNaN(lng) || isNaN(lat)) {
+      res.status(400).json({ message: "Invalid numeric coordinates." });
+      return;
+    }
+
+    // Attempt to ensure indexes just in case (this shouldn't block, but handles missing index)
+    try {
+      await User.syncIndexes();
+    } catch (e) {
+      console.error("Index sync error:", e);
+    }
 
     const volunteers = await User.find({
       isVolunteer: true,
@@ -336,14 +348,29 @@ export const pingNearbyVolunteers = async (req: Request, res: Response) => {
     const body = `A ${report.type} has been reported near your location. We need your help!`;
     const url = `/reports/${report.id}`;
 
-    await sendPushToUsers(volunteerIds, title, body, url);
+    try {
+      await sendPushToUsers(volunteerIds, title, body, url);
+    } catch (pushError: any) {
+      console.error("Push notification error:", pushError);
+      // We can still return success for finding volunteers even if push fails
+      res.status(200).json({
+        message: `Found ${volunteers.length} volunteers, but push notifications failed.`,
+        pingedCount: volunteers.length,
+        pushError: pushError.message || String(pushError),
+      });
+      return;
+    }
 
     res.status(200).json({
       message: `Successfully pinged ${volunteers.length} volunteers.`,
       pingedCount: volunteers.length,
     });
-  } catch (error) {
+  } catch (error: any) {
     console.error("Error pinging volunteers:", error);
-    res.status(500).json({ message: "Error pinging volunteers", error });
+    res.status(500).json({ 
+      message: "Error pinging volunteers", 
+      error: error.message || String(error),
+      stack: process.env.NODE_ENV === "development" ? error.stack : undefined
+    });
   }
 };
