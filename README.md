@@ -1,4 +1,4 @@
-﻿# Sajilo Sahayata - Disaster Reporting & Coordination System
+# Sajilo Sahayata - Disaster Reporting & Coordination System
 
 **From Alert to Action Instantly**
 
@@ -33,17 +33,20 @@ When a citizen reports an incident (fire, flood, landslide, accident, etc.) with
 ### Citizen Features
 
 - **Incident Reporting** - Submit reports with live GPS location and photo capture (camera/gallery)
+- **SMS & Twilio Integration** - Submit emergency reports via SMS. Supports conversation threading for follow-up details.
+- **AI Translation & Image Analysis** - Uses Google Gemini AI to translate multilingual reports (Nepali, Hindi, Maithili, etc.) to English and analyzes attached photos for disaster severity and verification.
 - **Offline Queue** - Reports submitted offline are queued in IndexedDB and auto-synced when connectivity returns
 - **Interactive Map** - View all incidents clustered on a Leaflet map with color-coded markers by type
 - **Emergency Contacts** - Department-specific contacts (Fire, Police, Flood, etc.) cached for offline access
-- **Real-Time Alerts** - Push notifications for urgent incidents broadcast by admins
+- **Real-Time Alerts** - Push notifications with deep links to the map for urgent incidents broadcast by admins
 - **Multi-Language** - Interface available in English, Nepali, Hindi, Bhojpuri, and 5 other local languages
 - **Profile Management** - Edit personal details (username, phone, email, address, citizenship ID)
 
 ### Admin Features
 
 - **Dashboard** - Data visualizations (charts) for incident analytics
-- **Report Management** - View, filter (by type/status/location), verify, edit, and resolve reports
+- **Report Management** - View, filter, verify, edit, and resolve reports
+- **Two-way SMS** - Reply to SMS reporters directly from the dashboard using Twilio
 - **User Management** - View users filtered by location, change roles, delete users
 - **Alert Broadcasting** - Create and send alerts with automatic push notifications to all subscribers
 - **Contact Management** - CRUD for emergency contact numbers by department and location
@@ -301,7 +304,8 @@ Full API reference: [docs/API.md](docs/API.md)
 
 ## Changelog
 
-- **v1.2.0 (Latest)** - Offline queue with Background Sync, contacts cache, map tile caching, profile editing with backend persistence, fixed signup GaPa detection, Manage Users location filter fix
+- **v1.3.0 (Latest)** - Added Twilio SMS Reporting, two-way SMS replies from dashboard, Gemini AI image analysis & multilingual text translation (Web + SMS), and Map deep linking for Push Notifications.
+- **v1.2.0** - Offline queue with Background Sync, contacts cache, map tile caching, profile editing with backend persistence, fixed signup GaPa detection, Manage Users location filter fix
 - **v1.1.0** - UI/UX Overhaul, Admin Polish, Custom SVG Map/Notification Themes, Vercel Serverless Ready
 - **v1.0.0** - Initial release (August 2, 2025)
 

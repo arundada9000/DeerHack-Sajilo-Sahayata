@@ -35,12 +35,13 @@
 ## Features
 
 - **Incident Reporting** — Live photo from camera/gallery + auto GPS location
+- **SMS & AI Integration** — Twilio SMS support & Gemini AI for automated multilingual translation and image severity analysis
 - **Offline Queue** — Reports queued in IndexedDB, auto-synced via Background Sync
 - **Emergency Contacts** — Department-specific contacts cached offline
 - **Interactive Map** — Clustered Leaflet map with type-colored markers
-- **Push Notifications** — Web push for admin alerts
+- **Push Notifications** — Web push for admin alerts with map deep linking
 - **12 Languages** — English (bundled), 11 others lazy-loaded on demand via `import.meta.glob`
-- **Admin Panel** — Dashboard, user/report/alert/contact/safezone management
+- **Admin Panel** — Dashboard, user/report/alert/contact/safezone management, and two-way SMS replies
 - **Code Splitting** — Route-based lazy loading + Vite manual chunks + i18n lazy loading
 
 ---
