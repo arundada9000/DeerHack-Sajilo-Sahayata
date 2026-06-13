@@ -1,14 +1,19 @@
 import { GoogleGenAI } from "@google/genai";
 
 let ai: any;
-if (process.env.GEMINI_API_KEY) {
-  ai = new GoogleGenAI({ apiKey: process.env.GEMINI_API_KEY });
-} else {
+const getAI = () => {
+  if (ai) return ai;
+  if (process.env.GEMINI_API_KEY) {
+    ai = new GoogleGenAI({ apiKey: process.env.GEMINI_API_KEY });
+    return ai;
+  }
   console.warn("GEMINI_API_KEY is not set. AI features will be disabled.");
-}
+  return null;
+};
 
 export const analyzeDisasterImage = async (imageUrl: string, disasterType: string, imageBuffer?: Buffer, providedMimeType?: string) => {
-  if (!ai || (!imageUrl && !imageBuffer)) return null;
+  const currentAi = getAI();
+  if (!currentAi || (!imageUrl && !imageBuffer)) return null;
 
   try {
     let base64Image: string;
@@ -35,7 +40,7 @@ Your task is to provide a structured JSON response with the following fields:
 Output ONLY valid JSON.
 `;
 
-    const result = await ai.models.generateContent({
+    const result = await currentAi.models.generateContent({
       model: "gemini-2.5-flash",
       contents: [
         {
@@ -77,17 +82,20 @@ Output ONLY valid JSON.
         return JSON.parse(text);
     } catch (e) {
         console.error("Failed to parse Gemini response:", text);
+        require("fs").writeFileSync("ai_error.log", "Parse error: " + e + "\nText: " + text);
         return null;
     }
 
   } catch (error) {
     console.error("AI Analysis failed:", error);
+    require("fs").writeFileSync("ai_error.log", "AI error: " + (error as any).stack || error);
     return null;
   }
 };
 
 export const parseSmsReport = async (text: string) => {
-  if (!ai) return null;
+  const currentAi = getAI();
+  if (!currentAi) return null;
 
   try {
     const prompt = `
@@ -97,7 +105,7 @@ Translate the emergency description to English, but also retain the exact origin
 Extract the incident type and any mentioned location.
 `;
 
-    const result = await ai.models.generateContent({
+    const result = await currentAi.models.generateContent({
       model: "gemini-2.5-flash",
       contents: [{ role: "user", parts: [{ text: prompt }] }],
       config: { 
