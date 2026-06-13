@@ -5,7 +5,7 @@ import relativeTime from "dayjs/plugin/relativeTime";
 import { resolveGaPa } from "../utils/resolveGaPa";
 import { sendPushToUsers } from "./pushController";
 import User from "../models/userModel";
-import { analyzeDisasterImage } from "../services/aiService";
+import { analyzeDisasterImage, translateWebReport } from "../services/aiService";
 
 import { v2 as cloudinary } from "cloudinary";
 
@@ -89,9 +89,23 @@ export const createReport = async (req: Request, res: Response) => {
       aiAnalysis = await analyzeDisasterImage(imageUrl || "", type, req.file?.buffer, req.file?.mimetype);
     }
 
+    let finalDescription = description;
+    let rawDescription = description;
+    
+    try {
+      const translation = await translateWebReport(description);
+      if (translation && translation.description) {
+        finalDescription = translation.description;
+        rawDescription = translation.rawDescription || description;
+      }
+    } catch (e) {
+      console.error("Translation failed during web report creation:", e);
+    }
+
     const report = new Report({
       type,
-      description,
+      description: finalDescription,
+      rawDescription,
       location: { coordinates: parsedLocation },
       localGovName,
       imageUrl,
