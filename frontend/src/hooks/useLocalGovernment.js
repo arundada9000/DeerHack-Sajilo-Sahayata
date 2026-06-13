@@ -33,8 +33,10 @@ export const useLocalGovernment = () => {
               setLocalGovState(name);
             } catch (err) {
               console.error("Backend detection failed", err);
-              setLocalGov("Detection Failed", null);
-              setLocalGovState("Detection Failed");
+              // Save coordinates even if backend fails (we are offline)
+              const coords = [pos.coords.latitude, pos.coords.longitude];
+              setLocalGov("Unknown", coords);
+              setLocalGovState("Unknown");
             } finally {
               setLoading(false);
             }
@@ -44,7 +46,8 @@ export const useLocalGovernment = () => {
             setLocalGov("Location Access Denied");
             setLocalGovState("Location Access Denied");
             setLoading(false);
-          }
+          },
+          { enableHighAccuracy: true, timeout: 15000, maximumAge: 60000 }
         );
       } catch (err) {
         console.error("Geolocation request failed", err);
