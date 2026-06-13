@@ -5,7 +5,7 @@
  */
 
 const DB_NAME = "sajilo-offline-db";
-const DB_VERSION = 2;
+const DB_VERSION = 3; // Bumped version for contacts store
 const STORE_NAME = "offlineReports";
 const CONTACTS_STORE = "offlineContacts";
 
