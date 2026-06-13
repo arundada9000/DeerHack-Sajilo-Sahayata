@@ -242,6 +242,7 @@
   "profile": {
     "title": "My Profile",
     "back": "Back",
+    "name": "Full Name",
     "phone": "Phone",
     "email": "Email",
     "gender": "Gender",
@@ -297,6 +298,9 @@
     "emailPlaceholder": "you@example.com",
     "addressPlaceholder": "Butwal-11, Rupandehi",
     "citizenshipPlaceholder": "XX-XX-XX-XXXXX",
+    "isVolunteer": "Register as Volunteer",
+    "skills": "Skills",
+    "skillsPlaceholder": "e.g. Medical, Rescue (comma separated)",
     "blockedByBrowser": "Blocked by browser",
     "toggleNotifications": "Toggle push notifications",
     "changePhoto": "Change profile picture",
@@ -328,6 +332,7 @@
     "dashboard": "Dashboard",
     "manageUsers": "Manage Users",
     "manageReports": "Manage Reports",
+    "manageVolunteers": "Volunteers",
     "manageContacts": "Manage Contacts",
     "manageAlerts": "Manage Alerts",
     "safeZones": "Safe Zones",
@@ -445,6 +450,10 @@
     "updated": "Contact updated",
     "created": "Contact created"
   },
+  "common": {
+    "yes": "Yes",
+    "no": "No"
+  },
   "pageLoader": {
     "loading": "Loading..."
   },
@@ -548,7 +557,33 @@
       "pending": "Pending",
       "verified": "Verified",
       "working": "Working",
-      "solved": "Solved"
+      "solved": "Solved",
+      "reportedByPhone": "Reported via SMS",
+      "aiSeverity": "AI Severity Score",
+      "aiFakeDetection": "AI Fake Detection",
+      "aiTags": "AI Tags",
+      "aiSummary": "AI Summary",
+      "pingSuccess": "Successfully pinged volunteers.",
+      "pingError": "Failed to ping volunteers.",
+      "pinging": "Pinging...",
+      "pingVolunteers": "Ping Nearby Volunteers",
+      "likelyFake": "Likely Fake",
+      "seemsReal": "Seems Real"
+    },
+    "manageVolunteers": {
+      "title": "Manage Volunteers",
+      "searchPlaceholder": "Search by name, email, skill...",
+      "totalVolunteers": "Total Volunteers",
+      "uniqueSkills": "Unique Skills",
+      "withPhone": "With Phone",
+      "name": "Name",
+      "contact": "Contact",
+      "skills": "Skills",
+      "location": "Location",
+      "errorLoading": "Failed to load volunteers.",
+      "tryAgain": "Please try refreshing the page.",
+      "noVolunteers": "No volunteers found.",
+      "noSkills": "No skills listed"
     },
     "manageContacts": {
       "title": "Manage Contacts",

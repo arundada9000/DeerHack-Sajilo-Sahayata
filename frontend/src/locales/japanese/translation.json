@@ -1,4 +1,4 @@
- {
+{
   "login": {
     "back": "戻る",
     "title": "おかえりなさい",
@@ -300,7 +300,11 @@
     "blockedByBrowser": "ブラウザによりブロックされました",
     "toggleNotifications": "プッシュ通知を切り替え",
     "changePhoto": "プロフィール写真を変更",
-    "toggleTheme": "テーマを切り替え"
+    "toggleTheme": "テーマを切り替え",
+    "name": "Full Name",
+    "isVolunteer": "Register as Volunteer",
+    "skills": "Skills",
+    "skillsPlaceholder": "e.g. Medical, Rescue (comma separated)"
   },
   "auth": {
     "back": "戻る",
@@ -336,7 +340,8 @@
     "toggleSidebar": "サイドバーを切り替え",
     "expandSidebar": "サイドバーを拡大",
     "collapseSidebar": "サイドバーを縮小",
-    "admin": "管理者"
+    "admin": "管理者",
+    "manageVolunteers": "Volunteers"
   },
   "errorBoundary": {
     "connectionLost": "接続が切断されました",
@@ -543,7 +548,18 @@
       "pending": "保留中",
       "verified": "確認済み",
       "working": "対応中",
-      "solved": "解決済み"
+      "solved": "解決済み",
+      "reportedByPhone": "Reported via SMS",
+      "aiSeverity": "AI Severity Score",
+      "aiFakeDetection": "AI Fake Detection",
+      "aiTags": "AI Tags",
+      "aiSummary": "AI Summary",
+      "pingSuccess": "Successfully pinged volunteers.",
+      "pingError": "Failed to ping volunteers.",
+      "pinging": "Pinging...",
+      "pingVolunteers": "Ping Nearby Volunteers",
+      "likelyFake": "Likely Fake",
+      "seemsReal": "Seems Real"
     },
     "manageContacts": {
       "title": "連絡先管理",
@@ -629,7 +645,7 @@
       "tableActions": "操作"
     },
     "sendAlerts": {
-      "title": "アラート管理",
+      "title": "タイトル",
       "alertCount": "アラート",
       "exportCsv": "CSVエクスポート",
       "createAlert": "アラートを作成",
@@ -640,7 +656,6 @@
       "edit": "編集",
       "delete": "削除",
       "alertDetails": "アラート詳細",
-      "title": "タイトル",
       "typeLabel": "タイプ",
       "location": "場所",
       "description": "説明",
@@ -656,6 +671,25 @@
       "tableLocation": "場所",
       "tableTime": "時刻",
       "tableActions": "操作"
+    },
+    "manageVolunteers": {
+      "title": "Manage Volunteers",
+      "searchPlaceholder": "Search by name, email, skill...",
+      "totalVolunteers": "Total Volunteers",
+      "uniqueSkills": "Unique Skills",
+      "withPhone": "With Phone",
+      "name": "Name",
+      "contact": "Contact",
+      "skills": "Skills",
+      "location": "Location",
+      "errorLoading": "Failed to load volunteers.",
+      "tryAgain": "Please try refreshing the page.",
+      "noVolunteers": "No volunteers found.",
+      "noSkills": "No skills listed"
     }
+  },
+  "common": {
+    "yes": "Yes",
+    "no": "No"
   }
 }

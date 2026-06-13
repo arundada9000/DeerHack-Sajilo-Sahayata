@@ -300,7 +300,11 @@
     "blockedByBrowser": "ब्राउजरले रोक्यो",
     "toggleNotifications": "पुश सूचनाहरू टगल गर्नुहोस्",
     "changePhoto": "प्रोफाइल तस्वीर परिवर्तन गर्नुहोस्",
-    "toggleTheme": "थिम टगल गर्नुहोस्"
+    "toggleTheme": "थिम टगल गर्नुहोस्",
+    "name": "Full Name",
+    "isVolunteer": "Register as Volunteer",
+    "skills": "Skills",
+    "skillsPlaceholder": "e.g. Medical, Rescue (comma separated)"
   },
   "auth": {
     "back": "फिर्ता जानुहोस्",
@@ -336,7 +340,8 @@
     "toggleSidebar": "साइडबार टगल गर्नुहोस्",
     "expandSidebar": "साइडबार विस्तार गर्नुहोस्",
     "collapseSidebar": "साइडबार संकुचन गर्नुहोस्",
-    "admin": "प्रशासक"
+    "admin": "प्रशासक",
+    "manageVolunteers": "Volunteers"
   },
   "errorBoundary": {
     "connectionLost": "जडान टुट्यो",
@@ -543,7 +548,18 @@
       "pending": "विचाराधीन",
       "verified": "प्रमाणित",
       "working": "कार्यरत",
-      "solved": "समाधान भयो"
+      "solved": "समाधान भयो",
+      "reportedByPhone": "Reported via SMS",
+      "aiSeverity": "AI Severity Score",
+      "aiFakeDetection": "AI Fake Detection",
+      "aiTags": "AI Tags",
+      "aiSummary": "AI Summary",
+      "pingSuccess": "Successfully pinged volunteers.",
+      "pingError": "Failed to ping volunteers.",
+      "pinging": "Pinging...",
+      "pingVolunteers": "Ping Nearby Volunteers",
+      "likelyFake": "Likely Fake",
+      "seemsReal": "Seems Real"
     },
     "manageContacts": {
       "title": "सम्पर्क व्यवस्थापन",
@@ -629,7 +645,7 @@
       "tableActions": "कार्यहरू"
     },
     "sendAlerts": {
-      "title": "सूचना व्यवस्थापन",
+      "title": "शीर्षक",
       "alertCount": "सूचना(हरू)",
       "exportCsv": "सीएसभी निर्यात गर्नुहोस्",
       "createAlert": "सूचना सिर्जना गर्नुहोस्",
@@ -640,7 +656,6 @@
       "edit": "सम्पादन गर्नुहोस्",
       "delete": "मेटाउनुहोस्",
       "alertDetails": "सूचना विवरण",
-      "title": "शीर्षक",
       "typeLabel": "प्रकार",
       "location": "स्थान",
       "description": "विवरण",
@@ -656,6 +671,25 @@
       "tableLocation": "स्थान",
       "tableTime": "समय",
       "tableActions": "कार्यहरू"
+    },
+    "manageVolunteers": {
+      "title": "Manage Volunteers",
+      "searchPlaceholder": "Search by name, email, skill...",
+      "totalVolunteers": "Total Volunteers",
+      "uniqueSkills": "Unique Skills",
+      "withPhone": "With Phone",
+      "name": "Name",
+      "contact": "Contact",
+      "skills": "Skills",
+      "location": "Location",
+      "errorLoading": "Failed to load volunteers.",
+      "tryAgain": "Please try refreshing the page.",
+      "noVolunteers": "No volunteers found.",
+      "noSkills": "No skills listed"
     }
+  },
+  "common": {
+    "yes": "Yes",
+    "no": "No"
   }
 }
