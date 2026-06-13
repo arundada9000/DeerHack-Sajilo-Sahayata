@@ -97,6 +97,7 @@ export const createReport = async (req: Request, res: Response) => {
       imageUrl,
       imageId,
       aiAnalysis,
+      status: aiAnalysis?.isFake ? "rejected" : "pending",
     });
 
     await report.save();
@@ -106,27 +107,29 @@ export const createReport = async (req: Request, res: Response) => {
       report,
     });
 
-    // Automatically ping nearby volunteers
-    try {
-      const volunteers = await User.find({
-        isVolunteer: true,
-        location: {
-          $near: {
-            $geometry: { type: "Point", coordinates: [lng, lat] },
-            $maxDistance: 5000,
+    // Automatically ping nearby volunteers if not rejected
+    if (report.status !== "rejected") {
+      try {
+        const volunteers = await User.find({
+          isVolunteer: true,
+          location: {
+            $near: {
+              $geometry: { type: "Point", coordinates: [lng, lat] },
+              $maxDistance: 5000,
+            },
           },
-        },
-      });
+        });
 
-      if (volunteers.length > 0) {
-        const volunteerIds = volunteers.map((v) => v.id.toString());
-        const title = `Volunteer Request: ${type.toUpperCase()}`;
-        const body = `A ${type} has been reported near your location. We need your help!`;
-        const url = `/reports/${report.id}`;
-        await sendPushToUsers(volunteerIds, title, body, url);
+        if (volunteers.length > 0) {
+          const volunteerIds = volunteers.map((v) => v.id.toString());
+          const title = `Volunteer Request: ${type.toUpperCase()}`;
+          const body = `A ${type} has been reported near your location. We need your help!`;
+          const url = `/reports/${report.id}`;
+          await sendPushToUsers(volunteerIds, title, body, url);
+        }
+      } catch (pushErr) {
+        console.error("Failed to auto-ping volunteers:", pushErr);
       }
-    } catch (pushErr) {
-      console.error("Failed to auto-ping volunteers:", pushErr);
     }
   } catch (error) {
     console.error("Error creating report:", error);

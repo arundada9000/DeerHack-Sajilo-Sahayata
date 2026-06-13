@@ -11,7 +11,7 @@ export interface IReport extends Document {
     coordinates: [number, number];
   };
   localGovName?: string;
-  status: "pending" | "verified" | "solved" | "working";
+  status: "pending" | "verified" | "solved" | "working" | "rejected";
   aiAnalysis?: {
     severityScore: number;
     isFake: boolean;
@@ -38,7 +38,7 @@ const ReportSchema: Schema = new Schema({
   localGovName: { type: String, default: "Unknown" },
   status: {
     type: String,
-    enum: ["pending", "verified", "solved", "working"],
+    enum: ["pending", "verified", "solved", "working", "rejected"],
     default: "pending",
   },
   aiAnalysis: {
