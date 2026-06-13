@@ -242,3 +242,23 @@ export async function getCachedContacts(localGov, department) {
     request.onerror = () => reject(request.error);
   });
 }
+
+/**
+ * Proactively fetches ALL contacts from the API and caches them offline.
+ * Should be called when the app initializes (e.g. in App.jsx).
+ */
+export async function prefetchAllContacts(apiInstance) {
+  try {
+    const res = await apiInstance.get("/contacts");
+    if (res.data && Array.isArray(res.data)) {
+      for (const record of res.data) {
+        if (record.localGovName && record.department && record.contacts) {
+          await cacheContacts(record.localGovName, record.department, record.contacts);
+        }
+      }
+      console.log("[Offline] Proactively cached all emergency contacts for offline use.");
+    }
+  } catch (err) {
+    console.warn("[Offline] Failed to prefetch contacts:", err.message);
+  }
+}
