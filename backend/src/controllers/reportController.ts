@@ -85,8 +85,8 @@ export const createReport = async (req: Request, res: Response) => {
     const localGovName = resolveGaPa(lat, lng);
 
     let aiAnalysis;
-    if (imageUrl) {
-      aiAnalysis = await analyzeDisasterImage(imageUrl, type);
+    if (imageUrl || req.file) {
+      aiAnalysis = await analyzeDisasterImage(imageUrl || "", type, req.file?.buffer, req.file?.mimetype);
     }
 
     const report = new Report({
@@ -163,7 +163,7 @@ export const getAllReports = async (req: Request, res: Response) => {
     const reports = await Report.find().sort({ createdAt: -1 });
     res.json(reports);
   } catch (error) {
-    res.status(400).json({ message: "Error fetching reports", error });
+    res.status(500).json({ message: "Error fetching reports", error });
   }
 };
 

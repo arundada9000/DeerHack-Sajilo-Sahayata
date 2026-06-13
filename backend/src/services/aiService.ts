@@ -7,15 +7,22 @@ if (process.env.GEMINI_API_KEY) {
   console.warn("GEMINI_API_KEY is not set. AI features will be disabled.");
 }
 
-export const analyzeDisasterImage = async (imageUrl: string, disasterType: string) => {
-  if (!ai || !imageUrl) return null;
+export const analyzeDisasterImage = async (imageUrl: string, disasterType: string, imageBuffer?: Buffer, providedMimeType?: string) => {
+  if (!ai || (!imageUrl && !imageBuffer)) return null;
 
   try {
-    const response = await fetch(imageUrl);
-    const contentType = response.headers.get("content-type") || "image/jpeg";
-    const arrayBuffer = await response.arrayBuffer();
-    const buffer = Buffer.from(arrayBuffer);
-    const base64Image = buffer.toString("base64");
+    let base64Image: string;
+    let contentType = providedMimeType || "image/jpeg";
+
+    if (imageBuffer) {
+      base64Image = imageBuffer.toString("base64");
+    } else {
+      const response = await fetch(imageUrl);
+      contentType = response.headers.get("content-type") || "image/jpeg";
+      const arrayBuffer = await response.arrayBuffer();
+      const buffer = Buffer.from(arrayBuffer);
+      base64Image = buffer.toString("base64");
+    }
 
 const prompt = `
 You are a highly advanced incident and civic reporting AI. Analyze the provided image, which was reported as a "${disasterType}".

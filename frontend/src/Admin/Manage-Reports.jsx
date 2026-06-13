@@ -55,9 +55,9 @@ export default function Reports() {
   const filtered = useMemo(() => {
     let data = [...reports];
     if (showSpam) {
-      data = data.filter((r) => r.aiAnalysis?.isFake === true);
+      data = data.filter((r) => r.status === "rejected");
     } else {
-      data = data.filter((r) => r.aiAnalysis?.isFake !== true);
+      data = data.filter((r) => r.status !== "rejected");
     }
     if (debouncedSearch) {
       const q = debouncedSearch.toLowerCase();
@@ -131,7 +131,7 @@ export default function Reports() {
   const counts = useMemo(() => {
     const c = { pending: 0, verified: 0, working: 0, solved: 0, spam: 0, totalReal: 0 };
     reports.forEach((r) => { 
-      if (r.aiAnalysis?.isFake) {
+      if (r.status === "rejected") {
         c.spam++;
       } else {
         c.totalReal++;
