@@ -8,9 +8,11 @@ import {
   changeReportStatus,
   deleteReport,
   updateReport,
+  pingNearbyVolunteers,
 } from "../controllers/reportController";
 import { uploadImage } from "../controllers/authController";
 import authenticateToken from "../middlewares/authenticateToken";
+import requireAdmin from "../middlewares/requireAdmin";
 
 const router = Router();
 
@@ -22,5 +24,6 @@ router.get("/reportsLocation", getAllReportLocations);
 router.put("/reports/:id/status", changeReportStatus);
 router.delete("/reports/:id", authenticateToken, deleteReport);
 router.put("/reports/:id", authenticateToken, updateReport);
+router.post("/reports/:id/ping-volunteers", authenticateToken, requireAdmin, pingNearbyVolunteers);
 
 export default router;

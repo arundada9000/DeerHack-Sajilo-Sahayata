@@ -115,12 +115,14 @@ export const loginUser = async (req: Request, res: Response) => {
     // Basic check
     if (!phone || !password) {
       res.status(400).json({ message: "Phone and password are required" });
+      return;
     }
 
     // Find user by phone number
     const user = await User.findOne({ phoneNumber: phone });
     if (!user) {
       res.status(401).json({ message: "User not found" });
+      return;
     }
 
     // Compare entered password with hashed password
@@ -181,7 +183,7 @@ export const verifyUser = async (req: Request, res: Response) => {
 
 export const getUserById = async (req: Request, res: Response) => {
   try {
-    const user = await User.findById(req.params.id);
+    const user = await User.findById(req.params.id).select("-password");
     if (!user) res.status(404).json({ message: "User not found" });
     res.json(user);
   } catch (error) {
@@ -205,10 +207,34 @@ export const getAllUsersAroundLocation = async (
           $maxDistance: Number(radius) || 5000, // 5 km default
         },
       },
-    });
+    }).select("-password");
     res.json(users);
   } catch (error) {
     res.status(400).json({ message: "Error fetching users", error });
+  }
+};
+
+export const getNearbyVolunteers = async (
+  req: Request,
+  res: Response
+) => {
+  try {
+    const { longitude, latitude, radius } = req.query;
+    const volunteers = await User.find({
+      isVolunteer: true,
+      location: {
+        $near: {
+          $geometry: {
+            type: "Point",
+            coordinates: [Number(longitude), Number(latitude)],
+          },
+          $maxDistance: Number(radius) || 5000,
+        },
+      },
+    }).select("-password");
+    res.json(volunteers);
+  } catch (error) {
+    res.status(400).json({ message: "Error fetching volunteers", error });
   }
 };
 
@@ -222,7 +248,7 @@ export const updateProfile = async (req: Request, res: Response) => {
 
     const allowedFields = [
       "username", "phoneNumber", "email", "gender",
-      "citizenshipId", "address",
+      "citizenshipId", "address", "isVolunteer", "skills",
     ];
 
     const updates: Record<string, any> = {};

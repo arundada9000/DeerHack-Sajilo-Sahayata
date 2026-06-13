@@ -9,6 +9,7 @@ import {
   updateProfile,
   updateUserRole,
   deleteUser,
+  getNearbyVolunteers,
 } from "../controllers/authController";
 
 import authenticateToken from "../middlewares/authenticateToken";
@@ -22,6 +23,7 @@ router.post("/login", loginUser);
 router.get("/verify", authenticateToken, verifyUser);
 router.get("/users/:id", getUserById);
 router.get("/users/around", getAllUsersAroundLocation);
+router.get("/volunteers/nearby", authenticateToken, requireAdmin, getNearbyVolunteers);
 
 router.put("/profile", authenticateToken, updateProfile);
 

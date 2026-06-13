@@ -1,3 +1,4 @@
+import "dotenv/config";
 import express from "express";
 import connectDB from "./config/db";
 import authRoutes from "./routes/authRoutes";
@@ -7,14 +8,13 @@ import contactRoutes from "./routes/contactRoutes";
 import locationRoutes from "./routes/locationRoutes";
 import pushRoutes from "./routes/pushRoutes";
 import safeZoneRoutes from "./routes/safeZoneRoutes";
+import smsRoutes from "./routes/smsRoutes";
 import cookieParser from "cookie-parser";
-import dotenv from "dotenv";
 import cors from "cors";
 import dns from "dns";
 dns.setServers(["1.1.1.1", "8.8.8.8"]);
 const app = express();
 
-dotenv.config();
 // Middleware
 app.use(
   cors({
@@ -35,6 +35,7 @@ app.use(
   }),
 ); // Apply CORS middleware with the configuration
 app.use(express.json());
+app.use(express.urlencoded({ extended: true }));
 app.use(cookieParser());
 
 // Connect to MongoDB
@@ -48,6 +49,7 @@ app.use("/api/contacts", contactRoutes);
 app.use("/api/location", locationRoutes);
 app.use("/api/push", pushRoutes);
 app.use("/api/safe-zones", safeZoneRoutes);
+app.use("/api/webhook", smsRoutes);
 
 // Global Error Handler
 app.use((err: any, req: express.Request, res: express.Response, next: express.NextFunction) => {

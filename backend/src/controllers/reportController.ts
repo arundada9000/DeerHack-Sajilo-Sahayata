@@ -3,6 +3,9 @@ import Report from "../models/reportModel";
 import dayjs from "dayjs";
 import relativeTime from "dayjs/plugin/relativeTime";
 import { resolveGaPa } from "../utils/resolveGaPa";
+import { sendPushToUsers } from "./pushController";
+import User from "../models/userModel";
+import { analyzeDisasterImage } from "../services/aiService";
 
 import { v2 as cloudinary } from "cloudinary";
 
@@ -81,6 +84,11 @@ export const createReport = async (req: Request, res: Response) => {
     const [lng, lat] = parsedLocation;
     const localGovName = resolveGaPa(lat, lng);
 
+    let aiAnalysis;
+    if (imageUrl) {
+      aiAnalysis = await analyzeDisasterImage(imageUrl, type);
+    }
+
     const report = new Report({
       type,
       description,
@@ -88,6 +96,7 @@ export const createReport = async (req: Request, res: Response) => {
       localGovName,
       imageUrl,
       imageId,
+      aiAnalysis,
     });
 
     await report.save();
@@ -96,6 +105,29 @@ export const createReport = async (req: Request, res: Response) => {
       message: "Report created successfully",
       report,
     });
+
+    // Automatically ping nearby volunteers
+    try {
+      const volunteers = await User.find({
+        isVolunteer: true,
+        location: {
+          $near: {
+            $geometry: { type: "Point", coordinates: [lng, lat] },
+            $maxDistance: 5000,
+          },
+        },
+      });
+
+      if (volunteers.length > 0) {
+        const volunteerIds = volunteers.map((v) => v.id.toString());
+        const title = `Volunteer Request: ${type.toUpperCase()}`;
+        const body = `A ${type} has been reported near your location. We need your help!`;
+        const url = `/reports/${report.id}`;
+        await sendPushToUsers(volunteerIds, title, body, url);
+      }
+    } catch (pushErr) {
+      console.error("Failed to auto-ping volunteers:", pushErr);
+    }
   } catch (error) {
     console.error("Error creating report:", error);
     res.status(400).json({ message: "Error creating report", error });
@@ -254,5 +286,61 @@ export const updateReport = async (req: Request, res: Response) => {
   } catch (error) {
     console.error("Error updating report:", error);
     res.status(500).json({ message: "Error updating report", error });
+  }
+};
+
+export const pingNearbyVolunteers = async (req: Request, res: Response) => {
+  const { id } = req.params;
+  const { radius } = req.body; // optional radius in meters, default 5000
+
+  try {
+    const report = await Report.findById(id);
+    if (!report) {
+      res.status(404).json({ message: "Report not found" });
+      return;
+    }
+
+    const c = Array.isArray(report.location) ? (report.location as any) : report.location?.coordinates;
+    if (!c || c.length < 2) {
+      res.status(400).json({ message: "Invalid location coordinates on report." });
+      return;
+    }
+    // ensure longitude and latitude are correctly used based on standard format
+    const isNewFormat = c[0] > 70;
+    const lng = isNewFormat ? c[0] : c[1];
+    const lat = isNewFormat ? c[1] : c[0];
+
+    const volunteers = await User.find({
+      isVolunteer: true,
+      location: {
+        $near: {
+          $geometry: {
+            type: "Point",
+            coordinates: [lng, lat],
+          },
+          $maxDistance: Number(radius) || 5000,
+        },
+      },
+    });
+
+    if (volunteers.length === 0) {
+      res.status(200).json({ message: "No volunteers found nearby." });
+      return;
+    }
+
+    const volunteerIds = volunteers.map((v) => v.id.toString());
+    const title = `Volunteer Request: ${report.type.toUpperCase()}`;
+    const body = `A ${report.type} has been reported near your location. We need your help!`;
+    const url = `/reports/${report.id}`;
+
+    await sendPushToUsers(volunteerIds, title, body, url);
+
+    res.status(200).json({
+      message: `Successfully pinged ${volunteers.length} volunteers.`,
+      pingedCount: volunteers.length,
+    });
+  } catch (error) {
+    console.error("Error pinging volunteers:", error);
+    res.status(500).json({ message: "Error pinging volunteers", error });
   }
 };
