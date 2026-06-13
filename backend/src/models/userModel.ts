@@ -10,6 +10,8 @@ export interface IUser extends Document {
   gender?: string;
   citizenshipId?: string;
   address?: string;
+  isVolunteer?: boolean;
+  skills?: string[];
   location?: {
     type: string;
     coordinates: [number, number];
@@ -27,6 +29,8 @@ const UserSchema: Schema = new Schema({
   gender: { type: String, default: "" },
   citizenshipId: { type: String, default: "" },
   address: { type: String, default: "" },
+  isVolunteer: { type: Boolean, default: false },
+  skills: { type: [String], default: [] },
   location: {
     type: { type: String, default: "Point" },
     coordinates: { type: [Number], default: [0, 0] },
