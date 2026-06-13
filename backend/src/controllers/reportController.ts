@@ -294,7 +294,7 @@ export const updateReport = async (req: Request, res: Response) => {
 
 export const pingNearbyVolunteers = async (req: Request, res: Response) => {
   const { id } = req.params;
-  const { radius } = req.body; // optional radius in meters, default 5000
+  const { radius } = req.body || {}; // optional radius in meters, default 5000
 
   try {
     const report = await Report.findById(id);
