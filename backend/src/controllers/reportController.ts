@@ -346,7 +346,7 @@ export const pingNearbyVolunteers = async (req: Request, res: Response) => {
     const volunteerIds = volunteers.map((v) => v.id.toString());
     const title = `Volunteer Request: ${report.type.toUpperCase()}`;
     const body = `A ${report.type} has been reported near your location. We need your help!`;
-    const url = `/reports/${report.id}`;
+    const url = `/dashboard/map?focusId=${report.id}&lat=${lat}&lng=${lng}&title=${encodeURIComponent(report.title || "Emergency")}&type=${report.type}`;
 
     try {
       await sendPushToUsers(volunteerIds, title, body, url);
