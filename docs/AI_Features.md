@@ -6,14 +6,19 @@ The AI Damage Assessment feature uses Google's **Gemini 2.5 Flash** vision-langu
 ## Implementation Details
 
 ### 1. The AI Service (`backend/src/services/aiService.ts`)
-The `analyzeDisasterImage` function handles the core logic:
-- It downloads the image buffer from the provided Cloudinary URL.
-- It encodes the image as base64 and passes it to the Gemini API along with a highly specific system prompt.
-- The prompt instructs Gemini to output a structured JSON response containing:
+The `aiService` acts as the core intelligence layer using `gemini-2.5-flash` for two main purposes:
+
+**Image Analysis (`analyzeDisasterImage`)**:
+- It downloads the image buffer from Cloudinary and passes it to Gemini.
+- Outputs a structured JSON response containing:
   - `severityScore` (1-10): The estimated intensity of the disaster.
-  - `isFake` (boolean): Flag indicating if the image is a prank, selfie, meme, or unrelated to disasters.
+  - `isFake` (boolean): Flag indicating if the image is a prank, selfie, or unrelated.
   - `tags` (string array): Identified entities (e.g., "smoke", "residential building").
   - `summary` (string): A brief human-readable observation.
+
+**Multilingual Translation (`translateWebReport` & `parseSmsReport`)**:
+- Translates incoming emergency descriptions (from the web form or Twilio SMS) from any native local language (e.g., Nepali, Bhojpuri, Hindi, Maithili) directly into English.
+- Saves the clean English translation to `description` for universal admin readability, while preserving the exact `rawDescription` text as originally typed by the user.
 
 ### 2. Integration into the Reporting Flow (`backend/src/controllers/reportController.ts`)
 When a user submits a new disaster report via the `POST /api/reports` endpoint:

@@ -23,12 +23,13 @@ After the AI extracts a `locationName`, we convert it to real GPS coordinates so
 - If geocoding fails (network error, unrecognized place name), the system falls back to default Kathmandu coordinates (`27.7172, 85.3240`).
 - A custom `User-Agent: SajiloSahayata/1.0` header is sent per Nominatim's usage policy.
 
-### 4. Database & Push Dispatch (`backend/src/controllers/smsController.ts`)
+### 4. Database, Threading & Push Dispatch (`backend/src/controllers/smsController.ts`)
 Once parsed and geocoded:
-1. A new `Report` document is created in MongoDB with the geocoded coordinates.
-2. The `reportedByPhone` field stores the sender's phone number extracted from the Twilio `From` payload, allowing admins to follow up with the victim.
-3. A system-wide Push Notification is instantly dispatched to all registered admins and nearby volunteers via `sendPushToAll`, alerting them to the offline request.
-4. A TwiML (Twilio Markup Language) response is generated and sent back to the user, confirming receipt: *"Emergency reported successfully. Help is on the way."*
+1. The system checks if there is already an active, unresolved report (`pending`, `verified`, or `working`) from that exact phone number.
+2. **Conversation Threading**: If an active report exists, the new SMS text is intelligently appended to the existing report's `smsThread` array instead of creating a duplicate report marker. This prevents dashboard spam if a victim sends multiple follow-up texts.
+3. **New Reports**: If no active report exists, a new `Report` document is created in MongoDB with the geocoded coordinates. The `reportedByPhone` field stores the sender's phone number extracted from the Twilio `From` payload.
+4. A system-wide Push Notification is instantly dispatched to all registered admins and nearby volunteers via `sendPushToAll`, alerting them to the offline request. The push notification includes deep-link query parameters so clicking it focuses the exact incident on the map.
+5. A TwiML (Twilio Markup Language) response is generated and sent back to the user, confirming receipt: *"Emergency reported successfully. Help is on the way."* or *"Update added to your existing report."*
 
 ### 5. Admin SMS Reply (`POST /api/webhook/sms/reply`)
 Admins can send custom text messages directly back to victims from the dashboard:
