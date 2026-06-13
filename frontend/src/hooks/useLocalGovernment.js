@@ -1,6 +1,8 @@
 // Local government boundary detection using backend API
 import { useEffect, useState } from "react";
 import { useLocalGovStore } from "../stores/localGovStore";
+import { prefetchLocalContacts } from "../utils/offlineQueue";
+import API from "../api/axios";
 
 export const useLocalGovernment = () => {
   const [loading, setLoading] = useState(true);
@@ -14,6 +16,7 @@ export const useLocalGovernment = () => {
       if (cached) {
         setLocalGovState(cached);
         setLoading(false);
+        prefetchLocalContacts(API, cached);
         return;
       }
 
@@ -31,6 +34,11 @@ export const useLocalGovernment = () => {
               // Cache result in Zustand
               setLocalGov(name, coords);
               setLocalGovState(name);
+              
+              // Prefetch offline contacts for this specific local gov
+              if (name !== "Unknown") {
+                prefetchLocalContacts(API, name);
+              }
             } catch (err) {
               console.error("Backend detection failed", err);
               // Save coordinates even if backend fails (we are offline)
