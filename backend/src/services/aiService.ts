@@ -17,15 +17,15 @@ export const analyzeDisasterImage = async (imageUrl: string, disasterType: strin
     const buffer = Buffer.from(arrayBuffer);
     const base64Image = buffer.toString("base64");
 
-    const prompt = `
+const prompt = `
 You are a highly advanced incident and civic reporting AI. Analyze the provided image, which was reported as a "${disasterType}".
 Your task is to provide a structured JSON response with the following fields:
 1. "severityScore": A number from 1 to 10 indicating the severity of the incident (1 = minor civic issue like garbage or traffic, 10 = catastrophic disaster).
-2. "isFake": A boolean indicating if the image appears to be a fake, a prank, or completely unrelated to the reported incident type (e.g., a selfie, a meme, a completely unrelated stock photo).
-3. "tags": An array of strings representing key elements found in the image (e.g., ["garbage", "traffic", "fire", "flood"]).
+2. "isFake": A boolean. Set to true if the image is a prank, a meme, or completely unrelated to the reported incident (e.g., a photo of a TV screen, a plain wall, a selfie, or random objects showing no signs of an emergency). Set to false if it depicts a real incident or scene related to the report.
+3. "tags": An array of strings representing key elements found in the image.
 4. "summary": A brief 1-2 sentence description of what you observe in the image.
 
-Output ONLY valid JSON. Do not include markdown formatting or extra text.
+Output ONLY valid JSON.
 `;
 
     const result = await ai.models.generateContent({
@@ -46,6 +46,16 @@ Output ONLY valid JSON. Do not include markdown formatting or extra text.
       ],
       config: {
         responseMimeType: "application/json",
+        responseSchema: {
+          type: "OBJECT",
+          properties: {
+            severityScore: { type: "INTEGER", description: "Severity from 1 to 10" },
+            isFake: { type: "BOOLEAN", description: "True if image is completely unrelated, a prank, a TV, or a wall" },
+            tags: { type: "ARRAY", items: { type: "STRING" } },
+            summary: { type: "STRING" }
+          },
+          required: ["severityScore", "isFake", "tags", "summary"]
+        }
       }
     });
 
