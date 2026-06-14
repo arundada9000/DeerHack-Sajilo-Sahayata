@@ -21,15 +21,17 @@ const OfflineSyncBanner = () => {
     try {
       const pending = await getPendingReports();
       setPendingCount(pending.length);
+      return pending.length;
     } catch {
       // IndexedDB might not be available
+      return 0;
     }
   };
 
   useEffect(() => {
-    checkPending().then(() => {
+    checkPending().then((count) => {
       // Auto-sync immediately if online with pending items
-      if (navigator.onLine && pendingCount > 0) {
+      if (navigator.onLine && count > 0) {
         handleSync();
       }
     });
