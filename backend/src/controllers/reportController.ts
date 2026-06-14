@@ -36,6 +36,7 @@ export const createReport = async (req: Request, res: Response) => {
     "flood",
     "accident",
     "landslide",
+    "garbage",
     "other",
   ];
 

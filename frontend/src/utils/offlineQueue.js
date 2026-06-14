@@ -168,7 +168,13 @@ export async function syncPendingReports(apiInstance) {
       synced++;
     } catch (err) {
       console.warn(`[OfflineQueue] Failed to sync report ${report.id}:`, err.message);
-      failed++;
+      
+      if (err.response && err.response.status >= 400 && err.response.status < 500) {
+        // Validation error or client error: report will never succeed, discard it.
+        await removePendingReport(report.id);
+      } else {
+        failed++;
+      }
     }
   }
 

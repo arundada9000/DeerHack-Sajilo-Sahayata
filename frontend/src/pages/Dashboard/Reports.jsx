@@ -142,18 +142,26 @@ export default function ReportForm() {
       setStatus("success");
     } catch (err) {
       console.error(err);
-      try {
-        const offlineData = await prepareOfflineReport({
-          type,
-          description,
-          location: JSON.stringify([location.lng, location.lat]),
-          photoFile,
-        });
-        await saveReportOffline(offlineData);
-        setStatus("queued");
-      } catch (queueErr) {
-        console.error("Failed to queue offline:", queueErr);
-        setErrorMessage(t("report.offlineSaveFailed", "Failed to save report offline."));
+      
+      const isNetworkError = !err.response || err.code === "ERR_NETWORK" || !navigator.onLine;
+
+      if (isNetworkError) {
+        try {
+          const offlineData = await prepareOfflineReport({
+            type,
+            description,
+            location: JSON.stringify([location.lng, location.lat]),
+            photoFile,
+          });
+          await saveReportOffline(offlineData);
+          setStatus("queued");
+        } catch (queueErr) {
+          console.error("Failed to queue offline:", queueErr);
+          setErrorMessage(t("report.offlineSaveFailed", "Failed to save report offline."));
+          setStatus("failed");
+        }
+      } else {
+        setErrorMessage(err.response?.data?.message || err.response?.data?.error || t("report.errorTitle", "Submission Failed"));
         setStatus("failed");
       }
     }
