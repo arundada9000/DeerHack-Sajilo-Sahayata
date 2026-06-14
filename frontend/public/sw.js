@@ -1,4 +1,4 @@
-const CACHE_NAME = "sajilo-sahayata-v4";
+const CACHE_NAME = "sajilo-sahayata-v5";
 
 // Injected at build time by vite-plugin-pwa (auto-generated hashed filenames)
 const BUILD_MANIFEST = self.__WB_MANIFEST;
@@ -10,6 +10,12 @@ function getPrecacheAssets() {
     "/favicon.ico",
     "/logos/icon-192x192.png",
     "/logos/icon-512x512.png",
+    "/icons/fire-red.svg",
+    "/icons/police-red.svg",
+    "/icons/flood-red.svg",
+    "/icons/accident-red.svg",
+    "/icons/landslide-red.svg",
+    "/icons/others-red.svg",
   ];
   if (BUILD_MANIFEST && Array.isArray(BUILD_MANIFEST)) {
     return [...staticAssets, ...BUILD_MANIFEST.map((e) => e.url)];

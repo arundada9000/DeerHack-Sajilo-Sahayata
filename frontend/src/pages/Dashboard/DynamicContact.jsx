@@ -30,6 +30,17 @@ const DynamicContact = () => {
 
   useEffect(() => {
     const fetchContacts = async () => {
+      // Don't try to fetch contacts for error states
+      if (
+        localGov === "Unknown" ||
+        localGov === "Location Access Denied" ||
+        localGov === "Detection Failed"
+      ) {
+        setLoading(false);
+        setError("Location not detected. Cannot fetch localized contacts.");
+        return;
+      }
+
       try {
         setLoading(true);
         setError(null);
