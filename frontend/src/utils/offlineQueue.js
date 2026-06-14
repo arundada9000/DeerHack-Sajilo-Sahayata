@@ -244,6 +244,31 @@ export async function getCachedContacts(localGov, department) {
 }
 
 /**
+ * Retrieves all cached contacts for a specific department across all localGovs.
+ * Useful as a fallback when location is completely unknown offline.
+ * @returns {Promise<Array>} - Array of objects: { localGov, contacts }
+ */
+export async function getAllCachedContactsForDepartment(department) {
+  const db = await openDB();
+  return new Promise((resolve, reject) => {
+    const tx = db.transaction(CONTACTS_STORE, "readonly");
+    const store = tx.objectStore(CONTACTS_STORE);
+    const index = store.index("department");
+    const request = index.getAll(department.toLowerCase());
+    request.onsuccess = () => {
+      if (!request.result) resolve([]);
+      // Return array of { localGov, contacts }
+      const results = request.result.map(record => ({
+        localGov: record.localGov,
+        contacts: record.contacts || []
+      }));
+      resolve(results);
+    };
+    request.onerror = () => reject(request.error);
+  });
+}
+
+/**
  * Proactively fetches contacts from the API and caches only the ones
  * for the user's specific local government.
  */

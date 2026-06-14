@@ -41,26 +41,42 @@ export const useLocalGovernment = () => {
               }
             } catch (err) {
               console.error("Backend detection failed", err);
-              // Save coordinates even if backend fails (we are offline)
-              const coords = [pos.coords.latitude, pos.coords.longitude];
-              setLocalGov("Unknown", coords);
-              setLocalGovState("Unknown");
+              // Fallback to persisted location if offline
+              const lastKnown = useLocalGovStore.getState().getLastKnownLocalGov();
+              if (lastKnown && lastKnown !== "Unknown" && lastKnown !== "Location Access Denied" && lastKnown !== "Detection Failed") {
+                setLocalGovState(lastKnown);
+              } else {
+                // Save coordinates even if backend fails (we are offline)
+                const coords = [pos.coords.latitude, pos.coords.longitude];
+                setLocalGov("Unknown", coords);
+                setLocalGovState("Unknown");
+              }
             } finally {
               setLoading(false);
             }
           },
           (err) => {
             console.error("Geolocation Error", err.message);
-            setLocalGov("Location Access Denied");
-            setLocalGovState("Location Access Denied");
+            const lastKnown = useLocalGovStore.getState().getLastKnownLocalGov();
+            if (lastKnown && lastKnown !== "Unknown" && lastKnown !== "Location Access Denied" && lastKnown !== "Detection Failed") {
+              setLocalGovState(lastKnown);
+            } else {
+              setLocalGov("Location Access Denied");
+              setLocalGovState("Location Access Denied");
+            }
             setLoading(false);
           },
           { enableHighAccuracy: true, timeout: 15000, maximumAge: 60000 }
         );
       } catch (err) {
         console.error("Geolocation request failed", err);
-        setLocalGov("Detection Failed");
-        setLocalGovState("Detection Failed");
+        const lastKnown = useLocalGovStore.getState().getLastKnownLocalGov();
+        if (lastKnown && lastKnown !== "Unknown" && lastKnown !== "Location Access Denied" && lastKnown !== "Detection Failed") {
+          setLocalGovState(lastKnown);
+        } else {
+          setLocalGov("Detection Failed");
+          setLocalGovState("Detection Failed");
+        }
         setLoading(false);
       }
     };

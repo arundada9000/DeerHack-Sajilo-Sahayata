@@ -5,7 +5,7 @@ import { motion } from "framer-motion";
 import { Helmet } from "react-helmet-async";
 import { ChevronLeft, Phone, WifiOff } from "lucide-react";
 import API from "../../api/axios";
-import { cacheContacts, getCachedContacts } from "../../utils/offlineQueue";
+import { cacheContacts, getCachedContacts, getAllCachedContactsForDepartment } from "../../utils/offlineQueue";
 
 const departmentIcons = {
   fire: "/icons/fire-red.svg",
@@ -30,14 +30,38 @@ const DynamicContact = () => {
 
   useEffect(() => {
     const fetchContacts = async () => {
-      // Don't try to fetch contacts for error states
-      if (
+      const isInvalidLocation = 
+        !localGov ||
+        localGov === "null" ||
         localGov === "Unknown" ||
         localGov === "Location Access Denied" ||
-        localGov === "Detection Failed"
-      ) {
+        localGov === "Detection Failed";
+
+      if (isInvalidLocation) {
+        // Location unknown: fallback to showing all cached contacts for this department
+        try {
+          const cachedAll = await getAllCachedContactsForDepartment(department);
+          if (cachedAll && cachedAll.length > 0) {
+            const flattened = [];
+            cachedAll.forEach(record => {
+              record.contacts.forEach(c => {
+                flattened.push({
+                  ...c,
+                  name: `${c.name} (${record.localGov.charAt(0).toUpperCase() + record.localGov.slice(1)})`
+                });
+              });
+            });
+            setContacts(flattened);
+            setFromCache(true);
+            setLoading(false);
+            return;
+          }
+        } catch (e) {
+          console.error("Error fetching general cache:", e);
+        }
+
         setLoading(false);
-        setError("Location not detected. Cannot fetch localized contacts.");
+        setError("Location not detected and no offline contacts saved.");
         return;
       }
 
@@ -51,13 +75,13 @@ const DynamicContact = () => {
         cacheContacts(localGov, department, res.data.contacts || []);
       } catch (err) {
         console.error("Failed to fetch contacts:", err);
-        // Try offline cache
+        // Try offline cache for this specific localGov
         const cached = await getCachedContacts(localGov, department);
         if (cached && cached.length > 0) {
           setContacts(cached);
           setFromCache(true);
         } else {
-          setError("Could not load contact information.");
+          setError("Could not load contact information for " + localGov + ".");
         }
       } finally {
         setLoading(false);
