@@ -108,14 +108,28 @@ const getRelativeTime = (timestamp, t) => {
   return t("dashboard.daysAgo", { days });
 };
 
-// Nominatim Reverse Geocoding fetcher (with rate limit awareness)
-const fetchReverseGeocode = async (lat, lon) => {
-  const res = await fetch(
-    `https://nominatim.openstreetmap.org/reverse?format=jsonv2&lat=${lat}&lon=${lon}`,
-  );
-  if (!res.ok) throw new Error("Geocoding failed");
-  const json = await res.json();
-  return json.display_name;
+// Simple queue to prevent hitting Nominatim rate limits (absolute max 1 req/sec)
+let geocodeQueue = Promise.resolve();
+
+const fetchReverseGeocode = (lat, lon) => {
+  return new Promise((resolve, reject) => {
+    geocodeQueue = geocodeQueue.then(async () => {
+      try {
+        const res = await fetch(
+          `https://nominatim.openstreetmap.org/reverse?format=jsonv2&lat=${lat}&lon=${lon}`,
+          { headers: { "Accept-Language": "en" } }
+        );
+        if (!res.ok) throw new Error("Geocoding failed");
+        const json = await res.json();
+        resolve(json.display_name);
+      } catch (err) {
+        reject(err);
+      } finally {
+        // Enforce strict 1.1 second delay between requests
+        await new Promise((r) => setTimeout(r, 1100));
+      }
+    });
+  });
 };
 
 const INITIAL_VISIBLE = 10;
