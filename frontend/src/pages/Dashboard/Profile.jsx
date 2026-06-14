@@ -9,7 +9,7 @@ import { useLocalGovStore } from "../../stores/localGovStore";
 import {
   X, Camera, Phone, Mail, User as UserIcon, IdCard,
   MapPin, Globe, Type, Settings,
-  Moon, Sun, LogOut, ShieldCheck, Pencil, Save, XCircle, Bell, Loader2,
+  Moon, Sun, LogOut, ShieldCheck, Pencil, Save, XCircle, Bell, Loader2, RefreshCcw,
 } from "lucide-react";
 import usePushNotifications from "../../hooks/usePushNotifications";
 import toast from "react-hot-toast";
@@ -489,6 +489,30 @@ const ProfileDrawer = ({ open, onClose }) => {
                       {t("profile.adminDashboard")}
                     </button>
                   )}
+
+                  <button
+                    onClick={() => {
+                      if (window.confirm(t("profile.confirmClearCache", "Are you sure you want to clear app cache? You will need to log in again."))) {
+                        localStorage.clear();
+                        sessionStorage.clear();
+                        if ('caches' in window) {
+                          caches.keys().then((names) => {
+                            names.forEach(name => caches.delete(name));
+                          });
+                        }
+                        if ('serviceWorker' in navigator) {
+                          navigator.serviceWorker.getRegistrations().then((registrations) => {
+                            registrations.forEach(registration => registration.unregister());
+                          });
+                        }
+                        window.location.reload(true);
+                      }
+                    }}
+                    className="w-full flex items-center justify-center gap-2 py-3.5 bg-orange-50 text-orange-600 font-bold rounded-2xl hover:bg-orange-100 transition-colors active:scale-[0.98]"
+                  >
+                    <RefreshCcw size={20} />
+                    {t("profile.clearCache", "Clear Cache & Refresh")}
+                  </button>
 
                   {user ? (
                     <button

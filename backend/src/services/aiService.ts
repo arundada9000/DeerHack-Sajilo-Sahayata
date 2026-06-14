@@ -81,14 +81,12 @@ Output ONLY valid JSON.
         }
         return JSON.parse(text);
     } catch (e) {
-        console.error("Failed to parse Gemini response:", text);
-        require("fs").writeFileSync("ai_error.log", "Parse error: " + e + "\nText: " + text);
+        console.error("Failed to parse Gemini response:", text, e);
         return null;
     }
 
   } catch (error) {
     console.error("AI Analysis failed:", error);
-    require("fs").writeFileSync("ai_error.log", "AI error: " + (error as any).stack || error);
     return null;
   }
 };
