@@ -108,28 +108,10 @@ const getRelativeTime = (timestamp, t) => {
   return t("dashboard.daysAgo", { days });
 };
 
-// Simple queue to prevent hitting Nominatim rate limits (absolute max 1 req/sec)
-let geocodeQueue = Promise.resolve();
-
-const fetchReverseGeocode = (lat, lon) => {
-  return new Promise((resolve, reject) => {
-    geocodeQueue = geocodeQueue.then(async () => {
-      try {
-        const res = await fetch(
-          `https://nominatim.openstreetmap.org/reverse?format=jsonv2&lat=${lat}&lon=${lon}`,
-          { headers: { "Accept-Language": "en" } }
-        );
-        if (!res.ok) throw new Error("Geocoding failed");
-        const json = await res.json();
-        resolve(json.display_name);
-      } catch (err) {
-        reject(err);
-      } finally {
-        // Enforce strict 1.1 second delay between requests
-        await new Promise((r) => setTimeout(r, 1100));
-      }
-    });
-  });
+// Reverse geocode via backend proxy (avoids CORS and handles rate limiting server-side)
+const fetchReverseGeocode = async (lat, lon) => {
+  const { data } = await API.get(`/geocode/reverse?lat=${lat}&lon=${lon}`);
+  return data.display_name;
 };
 
 const INITIAL_VISIBLE = 10;
@@ -399,7 +381,7 @@ const Dashboard = () => {
                               src={
                                 incident.imageUrl?.startsWith("http")
                                   ? incident.imageUrl
-                                  : `${import.meta.env.VITE_API_URL.replace("/api", "")}${incident.imageUrl}`
+                                  : `${(import.meta.env.VITE_API_URL || "").replace(/\/api\/?$/, "")}${incident.imageUrl}`
                               }
                               alt={incident.type}
                               loading="lazy"

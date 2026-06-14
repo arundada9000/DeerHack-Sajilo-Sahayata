@@ -9,6 +9,7 @@ import locationRoutes from "./routes/locationRoutes";
 import pushRoutes from "./routes/pushRoutes";
 import safeZoneRoutes from "./routes/safeZoneRoutes";
 import smsRoutes from "./routes/smsRoutes";
+import geocodeRoutes from "./routes/geocodeRoutes";
 import cookieParser from "cookie-parser";
 import cors from "cors";
 import dns from "dns";
@@ -50,6 +51,7 @@ app.use("/api/location", locationRoutes);
 app.use("/api/push", pushRoutes);
 app.use("/api/safe-zones", safeZoneRoutes);
 app.use("/api/webhook", smsRoutes);
+app.use("/api/geocode", geocodeRoutes);
 
 // Global Error Handler
 app.use((err: any, req: express.Request, res: express.Response, next: express.NextFunction) => {
