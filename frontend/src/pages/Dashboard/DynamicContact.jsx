@@ -147,64 +147,69 @@ const DynamicContact = () => {
                   : t("emergency.errorLoading")}
               </p>
             </div>
-          ) : fromCache ? (
-            <div className="mb-4 flex items-center gap-2 bg-amber-50 border border-amber-200 rounded-2xl px-4 py-3 text-sm text-amber-800 font-medium">
-              <WifiOff size={16} />
-              {t("emergency.offlineBanner")}
-            </div>
-          ) : contacts.length === 0 ? (
-            <div className="text-center py-12 text-gray-500 bg-white rounded-2xl p-6 shadow-sm border border-gray-100">
-              <p>{t("emergency.noContacts")}</p>
-            </div>
           ) : (
-            <div className="flex flex-col gap-4">
-              {contacts.map((contact, index) => (
-                <motion.div
-                  key={index}
-                  initial={{ opacity: 0, y: 15 }}
-                  animate={{ opacity: 1, y: 0 }}
-                  transition={{
-                    delay: index * 0.08,
-                    type: "spring",
-                    stiffness: 300,
-                    damping: 25,
-                  }}
-                  className="group relative flex flex-col sm:flex-row sm:items-center justify-between bg-white rounded-3xl p-5 shadow-sm border border-gray-100 hover:shadow-md hover:border-gray-200 transition-all duration-300 gap-4"
-                >
-                  <div className="flex flex-col">
-                    <h3 className="font-bold text-base text-gray-900 tracking-tight">
-                      {contact.name}
-                    </h3>
-                    <p className="text-sm font-medium text-gray-600 mt-1 flex items-center gap-1.5">
-                      <span className="tabular-nums">{contact.phone}</span>
-                      {contact.description && (
-                        <>
-                          <span className="text-gray-300" aria-hidden="true">
-                            •
-                          </span>
-                          <span className="text-gray-500">
-                            {contact.description}
-                          </span>
-                        </>
-                      )}
-                    </p>
-                  </div>
+            <>
+              {fromCache && (
+                <div className="mb-4 flex items-center gap-2 bg-amber-50 border border-amber-200 rounded-2xl px-4 py-3 text-sm text-amber-800 font-medium">
+                  <WifiOff size={16} />
+                  {t("emergency.offlineBanner")}
+                </div>
+              )}
+              {contacts.length === 0 ? (
+                <div className="text-center py-12 text-gray-500 bg-white rounded-2xl p-6 shadow-sm border border-gray-100">
+                  <p>{t("emergency.noContacts")}</p>
+                </div>
+              ) : (
+                <div className="flex flex-col gap-4">
+                  {contacts.map((contact, index) => (
+                    <motion.div
+                      key={index}
+                      initial={{ opacity: 0, y: 15 }}
+                      animate={{ opacity: 1, y: 0 }}
+                      transition={{
+                        delay: index * 0.08,
+                        type: "spring",
+                        stiffness: 300,
+                        damping: 25,
+                      }}
+                      className="group relative flex flex-col sm:flex-row sm:items-center justify-between bg-white rounded-3xl p-5 shadow-sm border border-gray-100 hover:shadow-md hover:border-gray-200 transition-all duration-300 gap-4"
+                    >
+                      <div className="flex flex-col">
+                        <h3 className="font-bold text-base text-gray-900 tracking-tight">
+                          {contact.name}
+                        </h3>
+                        <p className="text-sm font-medium text-gray-600 mt-1 flex items-center gap-1.5">
+                          <span className="tabular-nums">{contact.phone}</span>
+                          {contact.description && (
+                            <>
+                              <span className="text-gray-300" aria-hidden="true">
+                                •
+                              </span>
+                              <span className="text-gray-500">
+                                {contact.description}
+                              </span>
+                            </>
+                          )}
+                        </p>
+                      </div>
 
-                  <a
-                    href={`tel:${contact.phone}`}
-                    aria-label={`Call ${contact.name} at ${contact.phone}`}
-                    className="flex-shrink-0 flex items-center justify-center gap-2 bg-primary-red text-white font-semibold text-sm px-6 py-3 sm:py-2.5 rounded-full shadow-md hover:bg-primary-red-hover hover:shadow-lg focus-visible:ring-4 focus-visible:ring-red-200 outline-none transition-all duration-200 active:scale-95"
-                  >
-                    <Phone
-                      size={18}
-                      strokeWidth={2.5}
-                      className="animate-pulse"
-                    />
-                    <span>{t("fireAuthorities.call")}</span>
-                  </a>
-                </motion.div>
-              ))}
-            </div>
+                      <a
+                        href={`tel:${contact.phone}`}
+                        aria-label={`Call ${contact.name} at ${contact.phone}`}
+                        className="flex-shrink-0 flex items-center justify-center gap-2 bg-primary-red text-white font-semibold text-sm px-6 py-3 sm:py-2.5 rounded-full shadow-md hover:bg-primary-red-hover hover:shadow-lg focus-visible:ring-4 focus-visible:ring-red-200 outline-none transition-all duration-200 active:scale-95"
+                      >
+                        <Phone
+                          size={18}
+                          strokeWidth={2.5}
+                          className="animate-pulse"
+                        />
+                        <span>{t("fireAuthorities.call")}</span>
+                      </a>
+                    </motion.div>
+                  ))}
+                </div>
+              )}
+            </>
           )}
         </section>
       </motion.main>

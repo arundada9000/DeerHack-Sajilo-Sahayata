@@ -241,7 +241,7 @@ export default function Reports() {
         onClose={() => { setViewOpen(false); setViewItem(null); setShowNearby(false); setReplyOpen(false); }}
         title={t("admin.manageReports.reportDetails")}
         icon={<FileText size={20} />}
-        imageUrl={viewItem?.imageUrl ? (viewItem.imageUrl.startsWith("http") ? viewItem.imageUrl : `${import.meta.env.VITE_API_URL.replace("/api", "")}${viewItem.imageUrl}`) : null}
+        imageUrl={viewItem?.imageUrl ? (viewItem.imageUrl.startsWith("http") ? viewItem.imageUrl : `${(import.meta.env.VITE_API_URL || "").replace(/\/api\/?$/, "")}${viewItem.imageUrl}`) : null}
         fields={[
           { label: t("admin.manageReports.typeLabel", "Type"), value: viewItem?.type, render: (v) => <span className="capitalize">{v}</span> },
           { label: t("admin.manageReports.statusLabel", "Status"), value: viewItem?.status, render: (v) => <span className={`inline-block px-2.5 py-1 rounded-full text-xs font-semibold capitalize ${v === "pending" ? "bg-yellow-100 text-yellow-700" : v === "verified" ? "bg-blue-100 text-blue-700" : v === "working" ? "bg-purple-100 text-purple-700" : v === "rejected" ? "bg-red-100 text-red-700" : "bg-green-100 text-green-700"}`}>{v}</span> },

@@ -379,9 +379,11 @@ const Dashboard = () => {
                           <div className="relative overflow-hidden rounded-2xl group">
                             <img
                               src={
-                                incident.imageUrl?.startsWith("http")
-                                  ? incident.imageUrl
-                                  : `${(import.meta.env.VITE_API_URL || "").replace(/\/api\/?$/, "")}${incident.imageUrl}`
+                                incident.imageUrl
+                                  ? incident.imageUrl.startsWith("http")
+                                    ? incident.imageUrl
+                                    : `${(import.meta.env.VITE_API_URL || "").replace(/\/api\/?$/, "")}${incident.imageUrl}`
+                                  : "/images/placeholder.jpg" // Or any fallback
                               }
                               alt={incident.type}
                               loading="lazy"

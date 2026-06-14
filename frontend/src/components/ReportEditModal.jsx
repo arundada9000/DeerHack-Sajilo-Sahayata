@@ -186,10 +186,10 @@ export default function ReportEditModal({ report, onClose, onUpdate }) {
                 <label className="block text-sm font-semibold text-gray-700 mb-1.5">{t("reportEdit.evidencePhoto")}</label>
                 <div
                   className="relative w-full h-48 bg-gray-50 rounded-xl border border-gray-200 overflow-hidden group cursor-pointer"
-                  onClick={() => openPreview(report.imageUrl.startsWith("http") ? report.imageUrl : `${import.meta.env.VITE_API_URL.replace("/api", "")}${report.imageUrl}`)}
+                  onClick={() => openPreview(report.imageUrl.startsWith("http") ? report.imageUrl : `${(import.meta.env.VITE_API_URL || "").replace(/\/api\/?$/, "")}${report.imageUrl}`)}
                 >
                   <img
-                    src={report.imageUrl.startsWith("http") ? report.imageUrl : `${import.meta.env.VITE_API_URL.replace("/api", "")}${report.imageUrl}`}
+                    src={report.imageUrl.startsWith("http") ? report.imageUrl : `${(import.meta.env.VITE_API_URL || "").replace(/\/api\/?$/, "")}${report.imageUrl}`}
                     alt={t("reportEdit.altEvidence")}
                     className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-300"
                   />
