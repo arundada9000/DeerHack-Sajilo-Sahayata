@@ -1,4 +1,4 @@
-const CACHE_NAME = "sajilo-sahayata-v3";
+const CACHE_NAME = "sajilo-sahayata-v4";
 
 // Injected at build time by vite-plugin-pwa (auto-generated hashed filenames)
 const BUILD_MANIFEST = self.__WB_MANIFEST;
@@ -53,23 +53,36 @@ self.addEventListener("fetch", (event) => {
   // Skip chrome-extension and other non-http(s)
   if (!url.protocol.startsWith("http")) return;
 
-  // ── Map tiles (CARTO): Cache-first, fallback to network ──
-  if (url.hostname.includes("basemaps.cartocdn.com")) {
-    event.respondWith(
-      caches.match(request).then((cached) => {
-        if (cached) return cached;
-        return fetch(request).then((response) => {
-          if (!response || response.status !== 200) return response;
-          const clone = response.clone();
-          caches.open(CACHE_NAME).then((cache) => cache.put(request, clone));
-          return response;
-        });
-      })
-    );
+  // ── Only intercept same-origin requests ──
+  // Cross-origin API calls (e.g. to the Vercel backend) should NOT be
+  // intercepted — let the browser handle them directly to avoid
+  // "Failed to convert value to 'Response'" errors when both the
+  // network fetch and cache miss return undefined.
+  if (url.origin !== self.location.origin) {
+    // Exception: cache map tiles from CARTO CDN
+    if (url.hostname.includes("basemaps.cartocdn.com")) {
+      event.respondWith(
+        caches.match(request).then((cached) => {
+          if (cached) return cached;
+          return fetch(request).then((response) => {
+            if (!response || response.status !== 200) return response;
+            const clone = response.clone();
+            caches.open(CACHE_NAME).then((cache) => cache.put(request, clone));
+            return response;
+          }).catch(() => {
+            return new Response(JSON.stringify({ error: "Offline" }), {
+              status: 503,
+              headers: { "Content-Type": "application/json" },
+            });
+          });
+        })
+      );
+    }
+    // For all other cross-origin requests, don't intercept
     return;
   }
 
-  // API calls: Network first, fallback to cache
+  // ── Same-origin API calls: Network first, fallback to cache ──
   if (url.pathname.startsWith("/api/")) {
     event.respondWith(
       fetch(request)
@@ -78,7 +91,15 @@ self.addEventListener("fetch", (event) => {
           caches.open(CACHE_NAME).then((cache) => cache.put(request, clone));
           return response;
         })
-        .catch(() => caches.match(request))
+        .catch(() =>
+          caches.match(request).then((cached) => {
+            // Always return a valid Response — never undefined
+            return cached || new Response(JSON.stringify({ error: "Offline" }), {
+              status: 503,
+              headers: { "Content-Type": "application/json" },
+            });
+          })
+        )
     );
     return;
   }
@@ -102,8 +123,18 @@ self.addEventListener("fetch", (event) => {
         .catch(() => {
           // For navigation requests, serve the cached index.html (SPA fallback)
           if (request.mode === "navigate") {
-            return caches.match("/index.html");
+            return caches.match("/index.html").then((fallback) => {
+              return fallback || new Response("Offline", {
+                status: 503,
+                headers: { "Content-Type": "text/plain" },
+              });
+            });
           }
+          // For other assets, return a proper error response
+          return new Response("Offline", {
+            status: 503,
+            headers: { "Content-Type": "text/plain" },
+          });
         });
     })
   );
