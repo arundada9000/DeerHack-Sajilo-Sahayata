@@ -161,7 +161,15 @@ export default function ReportForm() {
           setStatus("failed");
         }
       } else {
-        setErrorMessage(err.response?.data?.message || err.response?.data?.error || t("report.errorTitle", "Submission Failed"));
+        const msg = err.response?.data?.message;
+        const errObj = err.response?.data?.error;
+        let finalError = msg || t("report.errorTitle", "Submission Failed");
+        if (errObj) {
+           if (typeof errObj === 'string') finalError += " - " + errObj;
+           else if (errObj.message) finalError += " - " + errObj.message;
+           else finalError += " - " + JSON.stringify(errObj);
+        }
+        setErrorMessage(finalError);
         setStatus("failed");
       }
     }

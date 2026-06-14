@@ -1,7 +1,7 @@
 import React, { useEffect, useState } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 import { WifiOff, RefreshCw, CheckCircle2 } from "lucide-react";
-import { getPendingReports, syncPendingReports } from "../utils/offlineQueue";
+import { getPendingReports, syncPendingReports, removePendingReport } from "../utils/offlineQueue";
 import API from "../api/axios";
 import toast from "react-hot-toast";
 import { useTranslation } from "react-i18next";
@@ -87,6 +87,21 @@ const OfflineSyncBanner = () => {
     }
   };
 
+  const handleDiscard = async () => {
+    if (window.confirm(t("offlineSync.confirmClear", "Are you sure you want to discard these stuck offline reports?"))) {
+      try {
+        const pending = await getPendingReports();
+        for (const p of pending) {
+          await removePendingReport(p.id);
+        }
+        toast.success(t("offlineSync.cleared", "Pending reports discarded."));
+        await checkPending();
+      } catch (err) {
+        toast.error("Failed to discard reports.");
+      }
+    }
+  };
+
   if (pendingCount === 0 && !justSynced) return null;
 
   return (
@@ -125,14 +140,22 @@ const OfflineSyncBanner = () => {
             </div>
 
             {navigator.onLine && (
-              <button
-                onClick={handleSync}
-                disabled={syncing}
-                className="flex items-center gap-1.5 bg-amber-600 hover:bg-amber-700 disabled:opacity-60 text-white text-xs font-bold px-4 py-2 rounded-xl transition-colors shrink-0"
-              >
-                <RefreshCw size={14} className={syncing ? "animate-spin" : ""} />
-                {syncing ? t("offlineSync.syncing") : t("offlineSync.syncNow")}
-              </button>
+              <div className="flex gap-2 shrink-0">
+                <button
+                  onClick={handleDiscard}
+                  className="flex items-center gap-1.5 bg-red-100 hover:bg-red-200 text-red-700 text-xs font-bold px-3 py-2 rounded-xl transition-colors shrink-0"
+                >
+                  {t("offlineSync.discard", "Discard")}
+                </button>
+                <button
+                  onClick={handleSync}
+                  disabled={syncing}
+                  className="flex items-center gap-1.5 bg-amber-600 hover:bg-amber-700 disabled:opacity-60 text-white text-xs font-bold px-4 py-2 rounded-xl transition-colors shrink-0"
+                >
+                  <RefreshCw size={14} className={syncing ? "animate-spin" : ""} />
+                  {syncing ? t("offlineSync.syncing") : t("offlineSync.syncNow")}
+                </button>
+              </div>
             )}
           </div>
         )}
