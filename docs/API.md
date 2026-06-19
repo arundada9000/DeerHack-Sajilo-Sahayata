@@ -308,7 +308,7 @@ Content-Type: application/json
 { "status": "verified" }
 ```
 
-**Valid statuses:** `pending`, `verified`, `working`, `solved`
+**Valid statuses:** `pending`, `verified`, `working`, `solved`, `rejected`
 
 **Response (200):**
 ```json
@@ -355,6 +355,20 @@ Authorization: Bearer <token>
 ```json
 { "message": "Report deleted successfully" }
 ```
+
+---
+### Ping Nearby Volunteers (Admin)
+```
+POST /api/reports/:id/ping-volunteers
+Authorization: Bearer <token> (admin)
+```
+
+**Response (200):**
+```json
+{ "message": "Ping sent to N volunteers" }
+```
+
+**Notes:** Finds volunteers within 10km of the report's location and sends them a push notification.
 
 ---
 
@@ -633,6 +647,30 @@ Content-Type: application/json
 
 ---
 
+### Broadcast Push to Selected Users (Admin)
+```
+POST /api/push/broadcast
+Authorization: Bearer <token> (admin)
+Content-Type: application/json
+```
+
+**Request:**
+```json
+{
+  "userIds": ["userId1", "userId2"],
+  "message": "Flood rescue needed at Pokhara."
+}
+```
+
+**Response (200):**
+```json
+{ "message": "Broadcast sent to 2 volunteers successfully." }
+```
+
+**Notes:** Sends web push notifications to all push subscriptions linked to the given user IDs. Expired subscriptions (410/404) are automatically cleaned up.
+
+---
+
 ## SMS Webhook
 
 ### Receive Inbound SMS (Twilio Webhook)
@@ -680,27 +718,23 @@ Content-Type: application/json
 
 ---
 
-### Broadcast Push to Selected Users (Admin)
-```
-POST /api/push/broadcast
-Authorization: Bearer <token> (admin)
-Content-Type: application/json
-```
+## Geocoding
 
-**Request:**
-```json
-{
-  "userIds": ["userId1", "userId2"],
-  "message": "Flood rescue needed at Pokhara."
-}
+### Reverse Geocode
+```
+GET /api/geocode/reverse?lat=27.7172&lng=85.3240
 ```
 
 **Response (200):**
 ```json
-{ "message": "Broadcast sent to 2 volunteers successfully." }
+{
+  "displayName": "Kathmandu, Nepal",
+  "lat": "27.7172",
+  "lon": "85.3240"
+}
 ```
 
-**Notes:** Sends web push notifications to all push subscriptions linked to the given user IDs. Expired subscriptions (410/404) are automatically cleaned up.
+**Notes:** Uses OpenStreetMap Nominatim API with rate limiting and in-memory caching. Returns `"Unknown"` if no match found.
 
 ---
 

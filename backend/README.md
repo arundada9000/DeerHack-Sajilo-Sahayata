@@ -53,16 +53,18 @@ backend/
 │   │   ├── authController.ts      # Register, Login, Verify, Profile CRUD, Role mgmt
 │   │   ├── alertController.ts     # Alert CRUD + push notification broadcast
 │   │   ├── contactController.ts   # Emergency contact CRUD by department/location
+│   │   ├── geocodeController.ts   # Reverse geocoding via Nominatim
 │   │   ├── locationController.ts  # GPS → GaPa detection, available locations list
-│   │   ├── pushController.ts      # Subscribe, unsubscribe, send push to all
-│   │   ├── reportController.ts    # Report CRUD, verify, status change, Cloudinary upload
-│   │   └── safeZoneController.ts  # Safe zone CRUD (hospitals, shelters, etc.)
+│   │   ├── pushController.ts      # Subscribe, unsubscribe, send push to all/users
+│   │   ├── reportController.ts    # Report CRUD, verify, status change, Cloudinary upload, AI analysis
+│   │   ├── safeZoneController.ts  # Safe zone CRUD (hospitals, shelters, etc.)
+│   │   └── smsController.ts       # Twilio SMS webhook, reply, AI parsing
 │   ├── middlewares/
 │   │   ├── authenticateToken.ts   # JWT verification → req.user
 │   │   └── requireAdmin.ts        # Role check (admin-only)
 │   ├── models/
-│   │   ├── userModel.ts           # User (username, password, phone, role, location, etc.)
-│   │   ├── reportModel.ts         # Report (type, description, image, location, status)
+│   │   ├── userModel.ts           # User (username, password, phone, role, location, isVolunteer, etc.)
+│   │   ├── reportModel.ts         # Report (type, description, image, location, status, aiAnalysis, smsThread)
 │   │   ├── alertModel.ts          # Alert (title, description, type, location, timestamp)
 │   │   ├── contactModel.ts        # ContactInfo (localGovName, department, contacts[])
 │   │   ├── safeZoneModel.ts       # SafeZone (name, type, location, address, phone, isActive)
@@ -74,7 +76,9 @@ backend/
 │   │   ├── contactRoutes.ts       # Contact endpoints
 │   │   ├── locationRoutes.ts      # Location endpoints
 │   │   ├── pushRoutes.ts          # Push notification endpoints
-│   │   └── safeZoneRoutes.ts      # Safe zone endpoints
+│   │   ├── safeZoneRoutes.ts      # Safe zone endpoints
+│   │   ├── smsRoutes.ts           # SMS webhook endpoints
+│   │   └── geocodeRoutes.ts       # Geocoding endpoints
 │   ├── utils/
 │   │   └── resolveGaPa.ts         # GPS → GaPa/NaPa name resolver using Turf.js
 │   ├── env.ts                     # Typed environment config
@@ -122,6 +126,7 @@ All routes are prefixed with `/api`.
 | PUT | `/reports/verify/:id` | Admin | Verify a report |
 | PUT | `/reports/:id` | JWT | Update report (type, description, status, image) |
 | DELETE | `/reports/:id` | JWT | Delete a report |
+| POST | `/reports/:id/ping-volunteers` | Admin | Ping nearby volunteers with push notification |
 
 ### Alerts (`/api/alerts`)
 
@@ -165,6 +170,7 @@ All routes are prefixed with `/api`.
 | GET | `/vapid-public-key` | — | Get VAPID public key for client subscription |
 | POST | `/subscribe` | — | Save a push subscription |
 | POST | `/unsubscribe` | — | Remove a push subscription |
+| POST | `/broadcast` | Admin | Broadcast push notification to selected users |
 
 ### SMS (`/api/webhook/sms`)
 
@@ -172,6 +178,12 @@ All routes are prefixed with `/api`.
 |---|---|---|---|
 | POST | `/` | Twilio | Handle inbound SMS reports via Twilio Webhook |
 | POST | `/reply` | Admin | Send outbound SMS reply to a user |
+
+### Geocoding (`/api/geocode`)
+
+| Method | Path | Auth | Description |
+|---|---|---|---|
+| GET | `/reverse?lat=&lng=` | — | Reverse geocode coordinates to address via Nominatim |
 
 ---
 
@@ -184,6 +196,8 @@ All routes are prefixed with `/api`.
 | `password` | String | bcrypt hashed |
 | `phoneNumber` | String | Unique, required |
 | `role` | `"user" \| "admin"` | Default: `"user"` |
+| `isVolunteer` | Boolean | Default: `false` |
+| `skills` | [String] | Volunteer skill tags |
 | `localGovName` | String | Auto-detected from GPS |
 | `location` | GeoJSON Point | `[lng, lat]` |
 | `email` | String | Optional, editable |
@@ -200,12 +214,16 @@ Index: `2dsphere` on `location`
 |---|---|---|
 | `type` | String | `fire, police, flood, accident, landslide, other` |
 | `description` | String | Min 10 characters |
+| `rawDescription` | String | Original untranslated text (SMS/Web) |
 | `imageUrl` | String | Cloudinary URL |
 | `imageId` | String | Cloudinary public ID |
 | `location` | GeoJSON Point | `[lng, lat]` |
 | `localGovName` | String | Auto-detected from GPS |
-| `status` | String | `pending, verified, working, solved` |
+| `status` | String | `pending, verified, working, solved, rejected` |
+| `aiAnalysis` | Object | `{ severityScore, isFake, tags[], summary }` |
 | `userId` | String | Reporter |
+| `reportedByPhone` | String | Phone number for SMS-originated reports |
+| `smsThread` | Array | `[{ message, receivedAt }]` for SMS conversation threading |
 | `verifiedBy` | String | Admin who verified |
 | `createdAt` / `updatedAt` | Date | Auto (timestamps: true) |
 
@@ -312,4 +330,3 @@ The `resolveGaPa.ts` utility loads GeoJSON boundary files from `data/geojson/` o
 | `npm run build` | Compile TypeScript to `dist/` |
 | `npm run start` | Run compiled `dist/main.js` |
 | `npm run seed` | Seed emergency contact data to MongoDB (reads from `.env`) |
-| `npm run db:generate` | Initialize Prisma (legacy, not used) |

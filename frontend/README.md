@@ -81,6 +81,7 @@ frontend/
 │   │   ├── Manage-Reports.jsx
 │   │   ├── ManageContacts.jsx
 │   │   ├── ManageSafeZones.jsx
+│   │   ├── ManageVolunteers.jsx
 │   │   └── SendAlerts.jsx
 │   ├── Auth/                        # Auth components (RequireAdmin, Login, etc.)
 │   ├── api/
@@ -131,7 +132,6 @@ frontend/
 │   │   └── Unauthorized.jsx
 │   ├── routes/
 │   │   └── AppRoutes.jsx            # All routes with lazy loading + guards
-│   ├── services/                     # (removed — unused)
 │   ├── stores/                      # Zustand state stores
 │   │   ├── localGovStore.js         # GPS → GaPa cache (30 min expiry)
 │   │   ├── useAuth.js               # Auth state login/logout/autoLogin

@@ -39,7 +39,7 @@ When a citizen reports an incident (fire, flood, landslide, accident, etc.) with
 - **Interactive Map** - View all incidents clustered on a Leaflet map with color-coded markers by type
 - **Emergency Contacts** - Department-specific contacts (Fire, Police, Flood, etc.) cached for offline access
 - **Real-Time Alerts** - Push notifications with deep links to the map for urgent incidents broadcast by admins
-- **Multi-Language** - Interface available in English, Nepali, Hindi, Bhojpuri, and 5 other local languages
+- **Multi-Language** - Interface available in English, Nepali, Hindi, Bhojpuri, Maithili, Tharu, Magar, Tamang, Newar, Chinese, Japanese, and Korean (12 languages total)
 - **Profile Management** - Edit personal details (username, phone, email, address, citizenship ID)
 
 ### Admin Features
@@ -76,7 +76,7 @@ When a citizen reports an incident (fire, flood, landslide, accident, etc.) with
 | **Zustand**                    | State management                   |
 | **TanStack React Query**       | Server state & caching             |
 | **React Router v7**            | Client-side routing                |
-| **i18next**                    | Internationalization (9 languages) |
+| **i18next**                    | Internationalization (12 languages) |
 | **Leaflet / React-Leaflet**    | Interactive maps                   |
 | **Chart.js / react-chartjs-2** | Data visualization                 |
 | **Axios**                      | HTTP client                        |
@@ -127,10 +127,9 @@ sajilo-sahayata/
 │   │   ├── data/              # Dummy/fixture data
 │   │   ├── hooks/             # Custom React hooks
 │   │   ├── layouts/           # Navigation/Admin layouts
-│   │   ├── locales/           # i18n translation JSON files (9 langs)
+│   │   ├── locales/           # i18n translation JSON files (12 langs)
 │   │   ├── pages/             # Route-level page components
 │   │   ├── routes/            # React Router configuration
-│   │   ├── services/          # Firebase, API service
 │   │   ├── stores/            # Zustand stores
 │   │   ├── utils/             # Offline queue, CSV export
 │   │   └── ...config files
@@ -139,10 +138,10 @@ sajilo-sahayata/
 ├── backend/                   # Express API
 │   ├── src/
 │   │   ├── config/            # DB, Cloudinary config
-│   │   ├── controllers/       # Route handlers (7 controllers)
+│   │   ├── controllers/       # Route handlers (9 controllers)
 │   │   ├── middlewares/       # Auth + admin guards
 │   │   ├── models/            # Mongoose schemas (6 models)
-│   │   ├── routes/            # Express routers (7 route files)
+│   │   ├── routes/            # Express routers (9 route files)
 │   │   ├── utils/             # resolveGaPa helper
 │   │   └── main.ts            # Entry point
 │   ├── data/geojson/          # GeoJSON boundary files
@@ -244,7 +243,6 @@ Frontend `.env`:
 
 ```env
 VITE_API_URL=http://localhost:3000/api
-VITE_FIREBASE_CONFIG=...
 ```
 
 ---
@@ -304,10 +302,7 @@ Full API reference: [docs/API.md](docs/API.md)
 
 ## Changelog
 
-- **v1.3.0 (Latest)** - Added Twilio SMS Reporting, two-way SMS replies from dashboard, Gemini AI image analysis & multilingual text translation (Web + SMS), and Map deep linking for Push Notifications.
-- **v1.2.0** - Offline queue with Background Sync, contacts cache, map tile caching, profile editing with backend persistence, fixed signup GaPa detection, Manage Users location filter fix
-- **v1.1.0** - UI/UX Overhaul, Admin Polish, Custom SVG Map/Notification Themes, Vercel Serverless Ready
-- **v1.0.0** - Initial release (August 2, 2025)
+See [CHANGELOG.md](CHANGELOG.md) for full release history.
 
 ---
 
